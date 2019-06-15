@@ -1,7 +1,6 @@
 import org.lwjgl.glfw.Callbacks
 import org.lwjgl.glfw.GLFW
 import org.lwjgl.glfw.GLFWErrorCallback
-import org.lwjgl.opengl.GL
 import org.lwjgl.opengl.GL46.*
 import org.lwjgl.system.MemoryUtil
 
@@ -36,11 +35,27 @@ class Application(val windowID: Long, internal var windowWidth: Int, internal va
     internal val onDrawCallbacks = mutableListOf<DrawCallback>()
     internal val onUpdateCallbacks = mutableListOf<UpdateCallback>()
 
+    internal val mainThreadFunctions = mutableListOf<() -> Unit>()
+
     internal val heldMouseButtons = mutableListOf<GLFWMouseButton>()
     internal var lastMouseX = 0
     internal var lastMouseY = 0
     internal var firstMouseX = 0
     internal var firstMouseY = 0
+}
+
+fun Application.thread(fn: () -> Unit) {
+    Thread(fn).start()
+}
+
+fun Application.mainThread(fn: () -> Unit) {
+    mainThreadFunctions.add(fn)
+}
+
+fun <T> Application.computeOnMainThread(fn: () -> T): T {
+    val evaluator = DeferredEvaluator(fn)
+    mainThread(evaluator::evaluate)
+    while (true) { if (evaluator.hasValue()) return evaluator.getValue() }
 }
 
 fun Application.draw(draw: (Application).() -> Unit) = onDrawCallbacks.add { draw(this) }
@@ -50,8 +65,7 @@ fun application(name: String, load: (Application).() -> Unit) {
     val width = 1080
     val height = 720
     val app = setup(name, width, height)
-
-    load(app)
+    app.thread { load(app) }
     run(app)
     destroy(app)
 }
@@ -157,6 +171,8 @@ private fun run(app: Application) {
         // call the update render callbacks
         app.onUpdateCallbacks.map { it(dt / 1000f) }
         app.onDrawCallbacks.map { it() }
+        app.mainThreadFunctions.map { it() }
+        app.mainThreadFunctions.clear()
 
         checkGLError { glFinish() }
 
