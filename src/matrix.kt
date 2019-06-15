@@ -1,4 +1,3 @@
-package lwaf_core
 
 class mat4(vararg val elements: Float)
 class mat3(vararg val elements: Float)

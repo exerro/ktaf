@@ -4,8 +4,8 @@ fun main() = application("Hello world") {
     println("Hello world")
 
     val vao = computeOnMainThread { createVAO {
-        genVertexPositionBuffer(floatArrayOf(0f, 0f, 0f, 0f, 1f, 0f, 1f, 0f, 0f))
-        genVertexColourBuffer(floatArrayOf(0f, 1f, 0f, 1f, 0f, 0f, 0f, 0f, 1f))
+        genVertexPositionBuffer(listOf(vec3(0f, 0f, 0f), vec3(0f, 1f, 0f), vec3(1f, 0f, 0f)))
+        genVertexColourBuffer(listOf(RGB(0f, 1f, 0f), RGB(1f, 0f, 0f), RGB(0f, 0f, 1f)))
     } }
 
     val program = computeOnMainThread { createGLShaderProgram {
