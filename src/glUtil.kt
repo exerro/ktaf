@@ -18,3 +18,26 @@ fun createStandardGLVAO(vertices: List<vec3>, normals: List<vec3>, colours: Bool
     genVertexNormalBuffer(normals)
     if (colours) genVertexColourBuffer(vertices.size)
 }
+
+fun createElementGLVAO(elements: List<Int>, vertices: List<vec3>, normals: List<vec3>, uvs: List<vec2>, colours: List<RGB>) = createVAO {
+    genVertexPositionBuffer(vertices)
+    genVertexNormalBuffer(normals)
+    genVertexUVBuffer(uvs)
+    genVertexColourBuffer(colours)
+    genElementBuffer(elements)
+}
+
+fun createElementGLVAO(elements: List<Int>, vertices: List<vec3>, normals: List<vec3>, uvs: List<vec2>, colours: Boolean = true) = createVAO {
+    genVertexPositionBuffer(vertices)
+    genVertexNormalBuffer(normals)
+    genVertexUVBuffer(uvs)
+    if (colours) genVertexColourBuffer(vertices.size)
+    genElementBuffer(elements)
+}
+
+fun createElementGLVAO(elements: List<Int>, vertices: List<vec3>, normals: List<vec3>, colours: Boolean = true) = createVAO {
+    genVertexPositionBuffer(vertices)
+    genVertexNormalBuffer(normals)
+    if (colours) genVertexColourBuffer(vertices.size)
+    genElementBuffer(elements)
+}

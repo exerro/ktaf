@@ -10,6 +10,9 @@ class Application(val windowID: Long, internal var windowWidth: Int, internal va
     var running = true
     var fps = 0
 
+    val viewport
+        get() = GLViewport({0}, {0}, {windowWidth}, {windowHeight})
+
     var displayWidth
         get() = windowWidth
         set(w) {
@@ -68,6 +71,7 @@ fun application(name: String, load: (Application).() -> Unit) {
     app.thread { load(app) }
     run(app)
     destroy(app)
+    System.exit(0)
 }
 
 private fun setup(title: String, width: Int, height: Int): Application {
@@ -168,13 +172,16 @@ private fun run(app: Application) {
         fpsReadings = (listOf(1000/dt) + fpsReadings).take(DISPLAY_FPS_READINGS)
         app.fps = (fpsReadings.fold(dt) { acc, it -> acc + it } / (fpsReadings.size + 1)).toInt()
 
-        // call the update render callbacks
+        // call the update callbacks
         app.onUpdateCallbacks.map { it(dt / 1000f) }
-        app.onDrawCallbacks.map { it() }
-        app.mainThreadFunctions.map { it() }
-        app.mainThreadFunctions.clear()
 
+        // call the draw callbacks
         checkGLError { glFinish() }
+        app.onDrawCallbacks.map { it() }
+
+        // run the main thread functions
+        app.mainThreadFunctions.forEach { it() }
+        app.mainThreadFunctions.clear()
 
         // swap the color buffers to present the content to the screen
         GLFW.glfwSwapBuffers(app.windowID)
@@ -182,8 +189,6 @@ private fun run(app: Application) {
         // poll for window events
         // the key callback above will only be invoked during this call
         GLFW.glfwPollEvents()
-
-        checkGLError {}
 
         freeUnreferencedGLObjects()
     }
