@@ -47,21 +47,17 @@ fun DrawContext2D.image(image: GLTexture2, position: vec2 = vec2(0f), scale: vec
     }
 }
 
-class DrawContext2D(val viewport: GLViewport) {
-    private val state = DrawState()
-    private val states: MutableList<DrawState> = mutableListOf()
-    private val activeState: DrawState
-        get() = if (states.isNotEmpty()) states.last() else state
-    private val transform: mat4
-        get() = (scissor?.let { it.max - it.min } ?: viewport.size) .let { viewSize ->
-            mat4_identity *
-                    mat3_scale(vec3(1f, -1f, 1f)).mat4() *
-                    mat4_translate(vec3(-1f, -1f, 0f)) *
-                    mat3_scale(vec3(2 / viewSize.x, 2 / viewSize.y, 1f)).mat4() *
-                    mat4_translate(-vec3(scissor?.min?.x ?: 0f, scissor?.min?.y ?: 0f, 0f)) *
-                    states.fold(state.transform) { a, b -> a * b.transform }
-        }
+fun <T> DrawContext2D.draw(fn: DrawContext2D.() -> T)
+        = fn(this)
 
+fun <T> DrawContext2D.push(fn: DrawContext2D.() -> T): T {
+    push()
+    val result = fn()
+    pop()
+    return result
+}
+
+class DrawContext2D(val viewport: GLViewport) {
     var fill: Boolean
         get() = activeState.fill
         set(fill) { activeState.fill = fill }
@@ -77,25 +73,6 @@ class DrawContext2D(val viewport: GLViewport) {
     var scissor: AABB?
         get() = states.fold(state.scissor) { a, b -> b.scissor?.let { a?.intersection(it) } }
         set(scissor) { activeState.scissor = scissor?.intersection(AABB(vec2(0f), viewport.size)) }
-
-    fun vao(vao: GLVAO, vertexCount: Int, customTransform: mat4 = mat4_identity, textured: Boolean = false, mode: GLDrawMode = GLDrawMode.GL_TRIANGLES) {
-        val sOffset = viewport.offset + vec2(scissor?.min?.x ?: 0f, viewport.size.y - (scissor?.max?.y ?: viewport.size.y))
-        val sSize = scissor?.max?.minus(scissor?.min ?: vec2(0f)) ?: viewport.size
-        GLViewport(sOffset.x.toInt(), sOffset.y.toInt(), sSize.x.toInt(), sSize.y.toInt()).setGLViewport()
-        shaderProgram2D.uniform("transform", transform * customTransform)
-        shaderProgram2D.uniform("colour", activeState.colour)
-//        shaderProgram2D.uniform("useTexture", texture != null)
-        shaderProgram2D.uniform("useTexture", textured)
-        // TODO: replace with lwjgl-kt state calls
-        //  maybe wrap drawing in some state-restoring function call that also sets the shader
-        // GL11.glEnable(GL11.GL_BLEND)
-        // GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA)
-        shaderProgram2D.useIn {
-            vao.bindIn {
-                GLDraw.drawElements(mode, vertexCount, 0)
-            }
-        }
-    }
 
     fun push() {
         states.add(DrawState(activeState))
@@ -126,6 +103,41 @@ class DrawContext2D(val viewport: GLViewport) {
     fun scale(scale: Float) {
         activeState.transform *= mat3_scale(vec3(scale, scale, 1f)).mat4()
     }
+
+    fun vao(vao: GLVAO, vertexCount: Int, customTransform: mat4 = mat4_identity, textured: Boolean = false, mode: GLDrawMode = GLDrawMode.GL_TRIANGLES) {
+        val sOffset = viewport.offset + vec2(scissor?.min?.x ?: 0f, viewport.size.y - (scissor?.max?.y ?: viewport.size.y))
+        val sSize = scissor?.max?.minus(scissor?.min ?: vec2(0f)) ?: viewport.size
+        GLViewport(sOffset.x.toInt(), sOffset.y.toInt(), sSize.x.toInt(), sSize.y.toInt()).setGLViewport()
+        shaderProgram2D.uniform("transform", transform * customTransform)
+        shaderProgram2D.uniform("colour", activeState.colour)
+        shaderProgram2D.uniform("useTexture", textured)
+        // TODO: replace with lwjgl-kt state calls
+        //  maybe wrap drawing in some state-restoring function call that also sets the shader
+        // GL11.glEnable(GL11.GL_BLEND)
+        // GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA)
+        shaderProgram2D.useIn {
+            vao.bindIn {
+                GLDraw.drawElements(mode, vertexCount, 0)
+            }
+        }
+    }
+
+    private val state = DrawState()
+
+    private val states: MutableList<DrawState> = mutableListOf()
+
+    private val activeState: DrawState
+        get() = if (states.isNotEmpty()) states.last() else state
+
+    private val transform: mat4
+        get() = (scissor?.let { it.max - it.min } ?: viewport.size) .let { viewSize ->
+            mat4_identity *
+                    mat3_scale(vec3(1f, -1f, 1f)).mat4() *
+                    mat4_translate(vec3(-1f, -1f, 0f)) *
+                    mat3_scale(vec3(2 / viewSize.x, 2 / viewSize.y, 1f)).mat4() *
+                    mat4_translate(-vec3(scissor?.min?.x ?: 0f, scissor?.min?.y ?: 0f, 0f)) *
+                    states.fold(state.transform) { a, b -> a * b.transform }
+        }
 
     private var shaderProgram2D: GLShaderProgram = createGLShaderProgram {
         val fragment = shader(GLShaderType.GL_VERTEX_SHADER, "#version 400 core\n" +
@@ -166,7 +178,7 @@ class DrawContext2D(val viewport: GLViewport) {
         detach(vertex)
     }
 
-    private class DrawState(val parent: DrawState? = null) {
+    private class DrawState(parent: DrawState? = null) {
         var fill: Boolean = parent?.fill ?: true
         var transform: mat4 = mat4_identity
         var colour: vec3 = parent?.colour ?: vec3(1f)

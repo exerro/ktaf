@@ -1,33 +1,17 @@
 import org.lwjgl.glfw.Callbacks
 import org.lwjgl.glfw.GLFW
-import org.lwjgl.glfw.GLFWErrorCallback
 import org.lwjgl.opengl.GL46.*
-import org.lwjgl.system.MemoryUtil
 
 const val DISPLAY_FPS_READINGS = 10
 
-class Application(val windowID: Long, internal var windowWidth: Int, internal var windowHeight: Int) {
+class Application(val display: GLFWDisplay) {
     var running = true
     var fps = 0
 
     val viewport
-        get() = GLViewport({0}, {0}, {windowWidth}, {windowHeight})
+        get() = GLViewport({0}, {0}, {display.width}, {display.height})
 
-    var displayWidth
-        get() = windowWidth
-        set(w) {
-            windowWidth = w
-            GLFW.glfwSetWindowSize(windowID, windowWidth, windowHeight)
-        }
-
-    var displayHeight
-        get() = windowHeight
-        set(h) {
-            windowHeight = h
-            GLFW.glfwSetWindowSize(windowID, windowWidth, windowHeight)
-        }
-
-    internal val onResizedCallbacks = mutableListOf<(Int, Int) -> Unit>()
+    internal val onResizedCallbacks = mutableListOf<ResizeCallback>()
     internal val onKeyPressedCallbacks = mutableListOf<KeyPressedCallback>()
     internal val onKeyReleasedCallbacks = mutableListOf<KeyReleasedCallback>()
     internal val onTextInputCallbacks = mutableListOf<TextInputCallback>()
@@ -68,69 +52,44 @@ fun application(name: String, load: (Application).() -> Unit) {
     val width = 1080
     val height = 720
     val app = setup(name, width, height)
-    app.thread { load(app) }
+    load(app)
     run(app)
     destroy(app)
     System.exit(0)
 }
 
 private fun setup(title: String, width: Int, height: Int): Application {
-    // set the GLFW error callback
-    GLFWErrorCallback.createPrint(System.err).set()
+    val display = GLFWDisplay(title, width, height)
+    val app = Application(display)
 
-    // initialise GLFW
-    if (!GLFW.glfwInit()) throw IllegalStateException("Unable to initialize GLFW")
-
-    GLFW.glfwWindowHint(GLFW.GLFW_VISIBLE, GLFW.GLFW_FALSE) // the window will stay hidden after creation
-    GLFW.glfwWindowHint(GLFW.GLFW_FOCUS_ON_SHOW, GLFW.GLFW_TRUE) // the window will focus when shown
-    GLFW.glfwWindowHint(GLFW.GLFW_RESIZABLE, GLFW.GLFW_TRUE) // the window will be resizable
-    GLFW.glfwWindowHint(GLFW.GLFW_CENTER_CURSOR, GLFW.GLFW_TRUE) // the window will have the cursor centred
-
-    val windowID = GLFW.glfwCreateWindow(width, height, title, MemoryUtil.NULL, MemoryUtil.NULL) // create the window
-    if (windowID == MemoryUtil.NULL) throw RuntimeException("Failed to create the GLFW window")
-
-    val videoMode = GLFW.glfwGetVideoMode(GLFW.glfwGetPrimaryMonitor())
-    if (videoMode != null)
-        GLFW.glfwSetWindowPos(
-                windowID,
-                (videoMode.width() - width) / 2,
-                (videoMode.height() - height) / 2
-        )
-
-    GLFW.glfwMakeContextCurrent(windowID) // make the OpenGL context current
-    GLFW.glfwSwapInterval(1) // enable/disable v-sync
-    GLFW.glfwShowWindow(windowID) // make the window visible
-
-    setupGL()
-
-    val app = Application(windowID, width, height)
+    display.setup()
 
     // on window resize, update the GL viewport and call a resized callback, if set
-    GLFW.glfwSetWindowSizeCallback(windowID) { _, w, h ->
-        app.windowWidth = w
-        app.windowHeight = h
+    GLFW.glfwSetWindowSizeCallback(display.windowID) { _, w, h ->
+        app.display.width = w
+        app.display.height = h
         app.onResizedCallbacks.map { it(w, h) }
     }
 
-    GLFW.glfwSetKeyCallback(windowID) { _, key, _, action, mods ->
+    GLFW.glfwSetKeyCallback(display.windowID) { _, key, _, action, mods ->
         if (action == GLFW.GLFW_PRESS) app.onKeyPressedCallbacks.map { it(key, keyModifiers(mods)) }
         if (action == GLFW.GLFW_RELEASE) app.onKeyReleasedCallbacks.map { it(key, keyModifiers(mods)) }
     }
 
-    GLFW.glfwSetCharCallback(windowID) { _, codepoint ->
+    GLFW.glfwSetCharCallback(display.windowID) { _, codepoint ->
         app.onTextInputCallbacks.map { it(Character.toChars(codepoint).toString()) }
     }
 
-    GLFW.glfwSetCursorPosCallback(windowID) { _, xr, yr ->
-        val x = (xr * app.windowWidth).toInt()
-        val y = (yr * app.windowHeight).toInt()
+    GLFW.glfwSetCursorPosCallback(display.windowID) { _, xr, yr ->
+        val x = (xr * app.display.width).toInt()
+        val y = (yr * app.display.height).toInt()
         if (app.heldMouseButtons.isEmpty()) app.onMouseMovedCallbacks.map { it(x, y, app.lastMouseX, app.lastMouseY) }
         else app.onMouseDraggedCallbacks.map { it(x, y, app.lastMouseX, app.lastMouseY, app.firstMouseX, app.firstMouseY, app.heldMouseButtons.toSet()) }
         app.lastMouseX = x
         app.lastMouseY = y
     }
 
-    GLFW.glfwSetMouseButtonCallback(windowID) { _, button, action, mods ->
+    GLFW.glfwSetMouseButtonCallback(display.windowID) { _, button, action, mods ->
         val x = 0 // TODO
         val y = 0 // TODO
 
@@ -157,7 +116,7 @@ private fun run(app: Application) {
     app.running = true
 
     // run the rendering loop until the user has attempted to close the window or has pressed the ESCAPE key
-    while (app.running && !GLFW.glfwWindowShouldClose(app.windowID)) {
+    while (app.running && !GLFW.glfwWindowShouldClose(app.display.windowID)) {
         // set the clear colour to black and clear the framebuffer
         checkGLError {
             glClearColor(0.0f, 0.0f, 0.0f, 0.0f)
@@ -184,7 +143,7 @@ private fun run(app: Application) {
         app.mainThreadFunctions.clear()
 
         // swap the color buffers to present the content to the screen
-        GLFW.glfwSwapBuffers(app.windowID)
+        GLFW.glfwSwapBuffers(app.display.windowID)
 
         // poll for window events
         // the key callback above will only be invoked during this call
@@ -195,8 +154,8 @@ private fun run(app: Application) {
 }
 
 private fun destroy(app: Application) {
-    Callbacks.glfwFreeCallbacks(app.windowID)
-    GLFW.glfwDestroyWindow(app.windowID)
+    Callbacks.glfwFreeCallbacks(app.display.windowID)
+    GLFW.glfwDestroyWindow(app.display.windowID)
     GLFW.glfwTerminate()
     GLFW.glfwSetErrorCallback(null)?.free()
 }

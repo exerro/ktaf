@@ -36,6 +36,7 @@ typealias MouseMovedCallback = (Int, Int, Int, Int) -> Unit
 typealias MouseDraggedCallback = (Int, Int, Int, Int, Int, Int, Set<GLFWMouseButton>) -> Unit
 typealias DrawCallback = () -> Unit
 typealias UpdateCallback = (Float) -> Unit
+typealias ResizeCallback = (Int, Int) -> Unit
 
 typealias RGB = vec3
 typealias RGBA = vec4
