@@ -38,5 +38,5 @@ typealias DrawCallback = () -> Unit
 typealias UpdateCallback = (Float) -> Unit
 typealias ResizeCallback = (Int, Int) -> Unit
 
-typealias RGB = vec3
+typealias RGB = vec4
 typealias RGBA = vec4

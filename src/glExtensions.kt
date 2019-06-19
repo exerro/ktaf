@@ -58,7 +58,7 @@ fun GLVAO.genVertexNormalBuffer(data: List<vec3>, usage: GLBufferUsage = GLBuffe
         usage
 )
 
-fun GLVAO.genVertexColourBuffer(data: List<RGB>, usage: GLBufferUsage = GLBufferUsage.GL_STATIC_DRAW): GLVBO = genAttributeFloatBuffer(
+fun GLVAO.genVertexColourBuffer(data: List<vec3>, usage: GLBufferUsage = GLBufferUsage.GL_STATIC_DRAW): GLVBO = genAttributeFloatBuffer(
         data,
         VERTEX_COLOUR_ATTRIBUTE,
         GLNumComponents.THREE,
@@ -89,6 +89,6 @@ fun GLShaderProgram.uniform(uniform: String, value: Int    ) { uniform1i(uniform
 fun GLShaderProgram.uniform(uniform: String, value: Float  ) { uniform1f(uniformLocation(uniform), value) }
 fun GLShaderProgram.uniform(uniform: String, value: vec2   ) { uniform2f(uniformLocation(uniform), value.x, value.y) }
 fun GLShaderProgram.uniform(uniform: String, value: vec3   ) { uniform3f(uniformLocation(uniform), value.x, value.y, value.z) }
-fun GLShaderProgram.uniform(uniform: String, value: vec4   ) { uniform4f(uniformLocation(uniform), value.x, value.y, value.x, value.z) }
+fun GLShaderProgram.uniform(uniform: String, value: vec4   ) { uniform4f(uniformLocation(uniform), value.x, value.y, value.z, value.w) }
 fun GLShaderProgram.uniform(uniform: String, value: mat3   ) { uniformMatrix3ft(uniformLocation(uniform), value.elements) }
 fun GLShaderProgram.uniform(uniform: String, value: mat4   ) { uniformMatrix4ft(uniformLocation(uniform), value.elements) }

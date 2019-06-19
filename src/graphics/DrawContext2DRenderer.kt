@@ -27,7 +27,7 @@ import vec2
 import vec3
 import kotlin.math.max
 
-class DrawContext2DRenderer(val context: DrawContext2D, val transform: mat4) { init {
+class DrawContext2DRenderer(val context: DrawContext2D) { init {
     rasterState {
         defaults()
     }
@@ -40,8 +40,8 @@ class DrawContext2DRenderer(val context: DrawContext2D, val transform: mat4) { i
     GL.enable(GLOption.GL_BLEND)
 } }
 
-fun DrawContext2DRenderer.vao(vao: GLVAO, vertexCount: Int, customTransform: mat4 = mat4_identity, textured: Boolean = false, mode: GLDrawMode = GLDrawMode.GL_TRIANGLES) {
-    context.shader.uniform("transform", transform * customTransform)
+fun DrawContext2DRenderer.vao(vao: GLVAO, vertexCount: Int, transform: mat4 = mat4_identity, textured: Boolean = false, mode: GLDrawMode = GLDrawMode.GL_TRIANGLES) {
+    context.shader.uniform("transform", context.transform * transform)
     context.shader.uniform("colour", context.colour)
     context.shader.uniform("useTexture", textured)
     vao.bindIn {

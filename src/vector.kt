@@ -1,6 +1,6 @@
 import kotlin.math.sqrt
 
-data class vec4(val x: Float, val y: Float, val z: Float, val w: Float = 1f)
+data class vec4(val x: Float, val y: Float = x, val z: Float = y, val w: Float = 1f)
 data class vec3(val x: Float, val y: Float = x, val z: Float = y)
 data class vec2(val x: Float, val y: Float = x)
 

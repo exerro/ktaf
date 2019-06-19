@@ -1,13 +1,10 @@
 package graphics
 
 import AABB
-import GLDraw
-import GLDrawMode
 import GLShaderProgram
 import GLShaderType
-import GLVAO
 import GLViewport
-import bindIn
+import RGBA
 import createGLShaderProgram
 import detach
 import intersection
@@ -20,17 +17,15 @@ import mat4_translate
 import minus
 import offset
 import plus
-import postFragmentShaderState
-import rasterState
 import shader
 import size
 import times
 import unaryMinus
-import uniform
 import useIn
 import validate
 import vec2
 import vec3
+import vec4
 
 fun <T> DrawContext2D.draw(fn: DrawContext2D.() -> T)
         = fn(this)
@@ -47,7 +42,7 @@ class DrawContext2D(val viewport: GLViewport) {
         get() = activeState.fill
         set(fill) { activeState.fill = fill }
 
-    var colour: vec3
+    var colour: RGBA
         get() = activeState.colour
         set(colour) { activeState.colour = colour }
 
@@ -106,7 +101,7 @@ class DrawContext2D(val viewport: GLViewport) {
             ?: viewport.size.y))
         val sSize = scissor?.max?.minus(scissor?.min ?: vec2(0f)) ?: viewport.size
         GLViewport(sOffset.x.toInt(), sOffset.y.toInt(), sSize.x.toInt(), sSize.y.toInt()).setGLViewport()
-        val renderer = DrawContext2DRenderer(this, transform)
+        val renderer = DrawContext2DRenderer(this)
         shaderProgram2D.useIn { fn(renderer) }
     }
 
@@ -143,11 +138,11 @@ class DrawContext2D(val viewport: GLViewport) {
                     "in vec2 fragment_uv;\n" +
                     "\n" +
                     "uniform sampler2D textureSampler;\n" +
-                    "uniform vec3 colour = vec3(1, 1, 1);\n" +
+                    "uniform vec4 colour = vec4(1, 1, 1, 1);\n" +
                     "uniform bool useTexture = false;\n" +
                     "\n" +
                     "void main(void) {\n" +
-                    "    gl_FragColor = vec4(colour * fragment_colour, 1.0);\n" +
+                    "    gl_FragColor = colour * vec4(fragment_colour, 1.0);\n" +
                     "    if (useTexture) gl_FragColor *= texture(textureSampler, fragment_uv);\n" +
                     "}")
 
@@ -162,7 +157,7 @@ class DrawContext2D(val viewport: GLViewport) {
 private class DrawState(parent: DrawState? = null) {
     var fill: Boolean = parent?.fill ?: true
     var transform: mat4 = mat4_identity
-    var colour: vec3 = parent?.colour ?: vec3(1f)
+    var colour: vec4 = parent?.colour ?: vec4(1f)
     var lineWidth: Float = parent?.lineWidth ?: 1f
     var scissor: AABB? = null
 }

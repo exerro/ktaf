@@ -10,9 +10,9 @@ fun main() = application("Hello world") {
         val height = FNTFont.DEFAULT_FONT.scaleTo(300f).height
 
         context.draw {
-            context.colour = RGB(1f)
-            rectangle(vec2(10f), vec2(width + 1, height))
-            context.colour = RGB(1f, 0f, 1f)
+            context.colour = RGBA(1f, 1f, 1f)
+            rectangle(vec2(10f), vec2(width / 2, height))
+            context.colour = RGBA(1f, 0f, 1f, 0.5f)
             write("Hello g", FNTFont.DEFAULT_FONT.scaleTo(300f), vec2(10f))
         }
     }
