@@ -1,5 +1,11 @@
 package ui
 
+import core.vec2
+import core.vec3
+import core.vec4
+import util.Animation
+import util.Easing
+import util.EasingFunction
 import kotlin.reflect.KProperty
 import kotlin.reflect.KProperty0
 import kotlin.reflect.full.isSubclassOf
@@ -7,31 +13,36 @@ import kotlin.reflect.jvm.isAccessible
 
 internal interface UI_t
 
-class UIProperty<out N, T>(private val self: N, private var value: T) {
-    private val onChangeCallbacks = mutableListOf<N.(T, T) -> Unit>()
+class UIProperty<out N, T>(private val self: N, private var valueInternal: T) {
+    private val onChangeCallbacks = mutableListOf<N.(T, T) -> Any?>()
+    var value
+        get() = valueInternal
+        set(value) {
+            if (valueInternal != value) {
+                val oldValue = valueInternal
+                valueInternal = value
+                onChangeCallbacks.forEach { it(this.self, oldValue, value) }
+            }
+        }
 
     operator fun setValue(self: Any, property: KProperty<*>, value: T) {
-        if (this.value != value) {
-            val oldValue = this.value
-            this.value = value
-            onChangeCallbacks.forEach { it(this.self, oldValue, value) }
-        }
+        this.value = value
     }
 
     operator fun getValue(self: Any, property: KProperty<*>): T {
-        return value
+        return valueInternal
     }
 
-    fun attachChangeCallback(fn: N.(T, T) -> Unit) {
+    fun <R> attachChangeCallback(fn: N.(T, T) -> R) {
         onChangeCallbacks.add(fn)
     }
 
-    fun detachChangeCallback(fn: N.(T, T) -> Unit) {
+    fun <R> detachChangeCallback(fn: N.(T, T) -> R) {
         onChangeCallbacks.remove(fn)
     }
 }
 
-fun <N, T> UIProperty<N, T>.attachChangeToCallback(fn: N.(T) -> Unit): N.(T, T) -> Unit {
+fun <N, T, R> UIProperty<N, T>.attachChangeToCallback(fn: N.(T) -> R): N.(T, T) -> Unit {
     val cb: N.(T, T) -> Unit = { _, new -> fn(new) }
     attachChangeCallback(cb)
     return cb
@@ -40,7 +51,7 @@ fun <N, T> UIProperty<N, T>.attachChangeToCallback(fn: N.(T) -> Unit): N.(T, T) 
 internal inline fun <reified N: UI_t, reified T> N.property(value: T)
         = UIProperty(this, value)
 
-inline fun <reified N: UI_t, reified T> N.withProperty(property: KProperty0<T>, fn: UIProperty<N, T>.() -> Unit) {
+inline fun <reified N: UI_t, reified T, R> N.p(property: KProperty0<T>, fn: UIProperty<N, T>.() -> R) {
     val p = this.property(property)
 
     if (p == null) {
@@ -60,5 +71,101 @@ inline fun <reified N: UI_t, reified T> N.property(property: KProperty0<T>): UIP
             @Suppress("UNCHECKED_CAST") // safe unless the property was incorrectly initialised
             delegate as UIProperty<N, T>
         else -> null
+    }
+}
+
+inline fun <reified N: UINode> N.animateNullable(
+        property: KProperty0<Float?>,
+        to: Float,
+        duration: Float = Animation.NORMAL,
+        noinline easing: EasingFunction = Easing.LINEAR
+) {
+    p(property) {
+        value ?.let { notNullValue -> scene?.animateNullable(this@animateNullable, this, Animation(
+                notNullValue,
+                to,
+                duration,
+                easing,
+                Animation.Float,
+                { value = it }
+        )) } ?: ({ value = to })()
+    }
+}
+
+inline fun <reified N: UINode> N.animate(
+        property: KProperty0<Float>,
+        to: Float,
+        duration: Float = Animation.NORMAL,
+        noinline easing: EasingFunction = Easing.LINEAR
+) {
+    p(property) {
+        scene?.animate(this@animate, this, Animation(
+                value,
+                to,
+                duration,
+                easing,
+                Animation.Float,
+                { value = it }
+        ))
+    }
+}
+
+inline fun <reified N: UINode> N.animate(
+        property: KProperty0<vec2>,
+        to: vec2,
+        duration: Float = Animation.NORMAL,
+        noinline easing: EasingFunction = Easing.LINEAR
+) {
+    p(property) {
+        scene?.animate(this@animate, this, Animation(
+                value,
+                to,
+                duration,
+                easing,
+                Animation.vec2,
+                { value = it }
+        ))
+    }
+}
+
+inline fun <reified N: UINode> N.animate(
+        property: KProperty0<vec3>,
+        to: vec3,
+        duration: Float = Animation.NORMAL,
+        noinline easing: EasingFunction = Easing.LINEAR
+) {
+    p(property) {
+        scene?.animate(this@animate, this, Animation(
+                value,
+                to,
+                duration,
+                easing,
+                Animation.vec3,
+                { value = it }
+        ))
+    }
+}
+
+inline fun <reified N: UINode> N.animate(
+        property: KProperty0<vec4>,
+        to: vec4,
+        duration: Float = Animation.NORMAL,
+        noinline easing: EasingFunction = Easing.LINEAR
+) {
+    p(property) {
+        scene?.animate(this@animate, this, Animation(
+                value,
+                to,
+                duration,
+                easing,
+                Animation.vec4,
+                { value = it }
+        ))
+    }
+}
+
+inline fun <reified N: UINode, reified T> N.cancelAnimation(property: KProperty0<T>) {
+    p(property) {
+        scene?.cancelAnimation(this@cancelAnimation, this)
     }
 }

@@ -44,7 +44,7 @@ abstract class UINode: UI_t {
     val backgrounds get() = backgroundsInternal.toList()
 
     init {
-        withProperty(::parent) {
+        p(::parent) {
             attachChangeCallback { old, new ->
                 old?.childrenInternal?.remove(this@UINode)
                 new?.childrenInternal?.add(this@UINode)
@@ -52,7 +52,7 @@ abstract class UINode: UI_t {
             }
         }
 
-        withProperty(::scene) {
+        p(::scene) {
             attachChangeToCallback { new ->
                 childrenInternal.forEach { it.scene = new }
             }

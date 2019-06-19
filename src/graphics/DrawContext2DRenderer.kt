@@ -114,13 +114,12 @@ private fun circleVAO(numPoints: Int): GLVAO {
         }
     }
 
-    return circleCache.computeIfAbsent(numPoints) {
-        createElementGLVAO(
-                (1..numPoints).flatMap { i -> listOf(0, i, i % numPoints + 1) },
-                (listOf(vec3(0f)) + (0 until numPoints).map { i -> mat3_rotate(i / numPoints.toFloat() * Math.PI.toFloat() * 2, vec3(0f, 0f, -1f)) * vec3(1f, 0f, 0f) }),
-                List(numPoints + 1) { vec3(0f, 0f, 1f) }
-        )
-    }
+    return circleCache.computeIfAbsent(numPoints) { createVAO {
+        genVertexPositionBuffer((listOf(vec3(0f)) + (0 until numPoints).map { i -> mat3_rotate(i / numPoints.toFloat() * Math.PI.toFloat() * 2, vec3(0f, 0f, -1f)) * vec3(1f, 0f, 0f) }))
+        genVertexNormalBuffer(List(numPoints + 1) { vec3(0f, 0f, 1f) })
+        genVertexColourBuffer(numPoints * 3)
+        genElementBuffer((1..numPoints).flatMap { i -> listOf(0, i, i % numPoints + 1) })
+    } }
 }
 
 private var rectangleVAO: GLVAO = createVAO {

@@ -12,7 +12,7 @@ class UIContainer: UINode() {
     var colour by property(background.colour)
 
     init {
-        withProperty(::colour) {
+        p(::colour) {
             attachChangeToCallback { colour ->
                 background = replaceBackground(background, background.copy(colour = colour))
             }

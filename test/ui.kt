@@ -4,8 +4,10 @@ import graphics.circle
 import graphics.rectangle
 import ui.*
 import ui.elements.*
+import util.Easing
 import kotlin.math.min
 import kotlin.math.sin
+import kotlin.reflect.KProperty0
 
 fun main() = application("Hello world") {
     val context = DrawContext2D(viewport)
@@ -72,6 +74,7 @@ fun main() = application("Hello world") {
 
                     onClick { event ->
                         println("grid button ${it - 2} was clicked at ${event.position} with button ${event.button} and modifiers ${event.modifiers}")
+                        animateNullable(::height, 300f, easing=Easing.SMOOTH)
                     }
                 }
             }
@@ -108,8 +111,8 @@ fun main() = application("Hello world") {
                     event.ifNotHandled {
                         if (event.within(this)) {
                             event.handledBy(this)
-                            width = Math.random().toFloat() * 100f + 50f
-                            height = Math.random().toFloat() * 100f + 50f
+                            animateNullable(::width, Math.random().toFloat() * 100f + 50f, easing=Easing.SMOOTH)
+                            animateNullable(::height, Math.random().toFloat() * 100f + 50f, easing=Easing.SMOOTH)
                         }
                     }
                 }

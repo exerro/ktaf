@@ -4,13 +4,27 @@ import core.*
 import graphics.DrawContext2D
 import GLFWDisplay
 import setCursor
+import util.Animation
 
 class UIScene(val display: GLFWDisplay, val context: DrawContext2D) {
     internal var focussedNode: UINode? = null
     internal var firstRelativeMouseLocation = vec2(0f)
     internal var lastRelativeMouseLocation = vec2(0f)
     internal var mouseModifiers = setOf<GLFWMouseModifier>()
+    internal val animations: MutableMap<UINode, MutableMap<UIProperty<UINode, *>, Animation<*>>> = mutableMapOf()
     val roots = mutableListOf<UINode>()
+}
+
+fun <N: UINode, T> UIScene.animate(node: N, property: UIProperty<N, T>, animation: Animation<T>) {
+    animations.computeIfAbsent(node) { mutableMapOf() } [property] = animation
+}
+
+fun <N: UINode, T> UIScene.animateNullable(node: N, property: UIProperty<N, T?>, animation: Animation<T>) {
+    animations.computeIfAbsent(node) { mutableMapOf() } [property] = animation
+}
+
+fun <N: UINode, T> UIScene.cancelAnimation(node: N, property: UIProperty<N, T>) {
+    animations.computeIfAbsent(node) { mutableMapOf() } .remove(property)
 }
 
 fun UIScene.focusOn(node: UINode) {
@@ -32,6 +46,11 @@ fun UIScene.addRoot(root: UINode) {
 }
 
 fun UIScene.update(dt: Float) {
+    for ((_, m) in animations) for ((_, animation) in m)
+        animation.update(dt)
+
+    animations.map { (node, m) -> node to m.filterValues { !it.finished() } }
+
     roots.forEach {
         it.computeWidthInternal(context.viewport.width().toFloat())
         it.positionChildrenInternal(context.viewport.height().toFloat())

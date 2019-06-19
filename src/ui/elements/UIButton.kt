@@ -20,25 +20,25 @@ class UIButton(text: String): UINode() {
     var font by property(foregroundText.font)
 
     init {
-        withProperty(::colour) {
+        p(::colour) {
             attachChangeToCallback { colour ->
                 background = replaceBackground(background, background.copy(colour = colour))
             }
         }
 
-        withProperty(::text) {
+        p(::text) {
             attachChangeToCallback { text ->
                 foregroundText = replaceForeground(foregroundText, foregroundText.copy(text = text))
             }
         }
 
-        withProperty(::textColour) {
+        p(::textColour) {
             attachChangeToCallback { colour ->
                 foregroundText = replaceForeground(foregroundText, foregroundText.copy(colour = colour))
             }
         }
 
-        withProperty(::font) {
+        p(::font) {
             attachChangeToCallback { font ->
                 foregroundText = replaceForeground(foregroundText, foregroundText.copy(font = font))
             }

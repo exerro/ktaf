@@ -4,6 +4,8 @@ import graphics.*
 import kotlin.math.sin
 
 fun main() = application("Hello world") {
+    GL.debug()
+
     val context = DrawContext2D(viewport)
 //    val texture = loadTextureFile2D("img.jpg")
 
