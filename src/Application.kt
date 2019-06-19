@@ -147,7 +147,7 @@ private fun run(app: Application) {
         // call the update callbacks
         app.onUpdateCallbacks.map { it(dt / 1000f) }
 
-        // call the draw callbacks
+        // call the graphics.draw callbacks
         checkGLError { glFinish() }
         app.onDrawCallbacks.map { it() }
 

@@ -1,3 +1,8 @@
+package graphics
+
+import GLTexture2
+import GLVAO
+import vec2
 
 abstract class Font(val scale: Float) {
     val height: Float get() = scale * lineHeight

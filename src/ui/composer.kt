@@ -1,6 +1,6 @@
 package ui
 
-import DrawContext2D
+import graphics.DrawContext2D
 
 fun scene(context: DrawContext2D, init: UIScene.() -> Unit): UIScene {
     val root = UIScene(context)

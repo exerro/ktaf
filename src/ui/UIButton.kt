@@ -1,8 +1,8 @@
 package ui
 
-import DrawContext2D
+import graphics.DrawContext2D
 import RGB
-import rectangle
+import graphics.rectangle
 import vec2
 
 class UIButton: UINode() {
@@ -25,8 +25,10 @@ class UIButton: UINode() {
     }
 
     override fun draw(context: DrawContext2D, position: vec2, size: vec2) {
-        context.colour = colour
-        context.rectangle(position, size)
+        context.draw {
+            context.colour = colour
+            rectangle(position, size)
+        }
         super.draw(context, position, size)
     }
 }

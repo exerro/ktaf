@@ -1,16 +1,16 @@
 package ui
 
 import application
-import DrawContext2D
+import graphics.DrawContext2D
 import RGB
-import circle
+import graphics.circle
 import div
 import draw
 import onMouseDragged
 import onMouseMoved
 import onMousePressed
 import onMouseReleased
-import rectangle
+import graphics.rectangle
 import update
 import vec2
 import kotlin.math.min
@@ -86,10 +86,12 @@ fun main() = application("Hello world") {
                 height = 100f
 
                 onDraw { context, size ->
-                    context.colour = RGB(0f, 0f, 1f)
-                    context.rectangle(vec2(0f), size)
-                    context.colour = colour
-                    context.circle(size / 2f, min(size.x, size.y) / 2)
+                    context.draw {
+                        context.colour = RGB(0f, 0f, 1f)
+                        rectangle(vec2(0f), size)
+                        context.colour = colour
+                        circle(size / 2f, min(size.x, size.y) / 2)
+                    }
                 }
 
                 onMouseEnter {

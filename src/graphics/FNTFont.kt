@@ -1,6 +1,5 @@
-package font
+package graphics
 
-import Font
 import GLTexture2
 import GLVAO
 import createVAO

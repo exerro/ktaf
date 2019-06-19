@@ -1,6 +1,6 @@
 package ui
 
-import DrawContext2D
+import graphics.DrawContext2D
 import plus
 import vec2
 
