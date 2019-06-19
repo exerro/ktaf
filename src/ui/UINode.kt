@@ -148,6 +148,14 @@ fun <N: UINode> N.onMouseEvent(fn: N.(UIMouseEvent) -> Unit) {
     mouseEventHandlers.add { fn(this, it) }
 }
 
+fun <N: UINode> N.onMouseEnter(fn: N.(UIMouseEnterEvent) -> Unit) {
+    mouseEnterEventHandlers.add { fn(this, it) }
+}
+
+fun <N: UINode> N.onMouseExit(fn: N.(UIMouseExitEvent) -> Unit) {
+    mouseExitEventHandlers.add { fn(this, it) }
+}
+
 fun <N: UINode> N.onMousePress(fn: N.(UIMousePressEvent) -> Unit) {
     mousePressEventHandlers.add { fn(this, it) }
 }
@@ -156,7 +164,7 @@ fun <N: UINode> N.onMouseRelease(fn: N.(UIMouseReleaseEvent) -> Unit) {
     mouseReleaseEventHandlers.add { fn(this, it) }
 }
 
-fun <N: UINode> N.onClickEvent(fn: N.(UIMouseClickEvent) -> Unit) {
+fun <N: UINode> N.onMouseClick(fn: N.(UIMouseClickEvent) -> Unit) {
     mouseClickEventHandlers.add { fn(this, it) }
 }
 

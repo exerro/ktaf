@@ -3,19 +3,24 @@ package ui
 import application
 import DrawContext2D
 import RGB
+import circle
+import div
 import draw
 import onMouseDragged
 import onMouseMoved
 import onMousePressed
 import onMouseReleased
+import rectangle
 import update
 import vec2
+import kotlin.math.min
 import kotlin.math.sin
 
 fun main() = application("Hello world") {
     val context = DrawContext2D(viewport)
     val scene = scene(context) {
-        root(UIContainer()) {
+        lateinit var r: UIContainer
+        r = root(UIContainer()) {
             background = RGB(0f, 1f, 0.5f)
 
             val b1 = list {
@@ -27,7 +32,10 @@ fun main() = application("Hello world") {
                     height = 50f
 
                     onClick {
-                        println("Top button clicked")
+                        r.layout(GridLayout()) {
+                            horizontal = 5
+                            vertical = 5
+                        }
                     }
                 }
 
@@ -36,7 +44,10 @@ fun main() = application("Hello world") {
                     height = 30f
 
                     onClick {
-                        println("Bottom button clicked")
+                        r.layout(FlowLayout()) {
+                            horizontalSpacing = Spacing.SPACE_BETWEEN
+                            verticalSpacing = Spacing.SPACE_AFTER
+                        }
                     }
                 }
 
@@ -50,11 +61,14 @@ fun main() = application("Hello world") {
                 height = 30f
 
                 onClick {
-                    println("B2 was clicked")
+                    r.layout(ListLayout()) {
+                        alignment = 0.8f
+                        spacing = Spacing.SPACE_AFTER
+                    }
                 }
             }
 
-            val buttons = (3 .. 25).map { addChild(UIButton()) {
+            val buttons = (3 .. 17).map { addChild(UIButton()) {
                 colour = RGB(it.toFloat() / 25)
                 margin = Border(10f)
                 width = 100f
@@ -64,6 +78,40 @@ fun main() = application("Hello world") {
                     println("grid button ${it - 2} was clicked at ${event.position} with button ${event.button} and modifiers ${event.modifiers}")
                 }
             } }
+
+            addChild(UICanvas()) {
+                var colour = RGB(1f, 0f, 1f)
+
+                width = 100f
+                height = 100f
+
+                onDraw { context, size ->
+                    context.colour = RGB(0f, 0f, 1f)
+                    context.rectangle(vec2(0f), size)
+                    context.colour = colour
+                    context.circle(size / 2f, min(size.x, size.y) / 2)
+                }
+
+                onMouseEnter {
+                    println("Here")
+                    colour = RGB(Math.random().toFloat(), Math.random().toFloat(), Math.random().toFloat())
+                }
+
+                onMousePress { event -> event.ifNotHandled {
+                    if (event.within(this)) {
+                        event.handledBy(this)
+                    }
+                } }
+
+                onMouseClick { event -> event.ifNotHandled {
+                    if (event.within(this)) {
+                        event.handledBy(this)
+                        width = Math.random().toFloat() * 100f + 50f
+                        height = Math.random().toFloat() * 100f + 50f
+                    }
+                } }
+            }
+
             layout(FreeLayout()) {
                 alignment = vec2(0.5f)
 
@@ -90,23 +138,13 @@ fun main() = application("Hello world") {
                     leftOffset = i * 20f
                 } }
             }
-
-//            layout(GridLayout()) {
-//                horizontal = 5
-//                vertical = 5
-//            }
-//
-//            layout(FlowLayout()) {
-//                horizontalSpacing = Spacing.SPACE_BETWEEN
-//                verticalSpacing = Spacing.SPACE_AFTER
-//            }
         }
     }
 
     update { dt ->
         val before = System.currentTimeMillis()
         scene.update(dt)
-        println("${System.currentTimeMillis() - before}ms")
+//        println("${System.currentTimeMillis() - before}ms")
     }
 
     draw {

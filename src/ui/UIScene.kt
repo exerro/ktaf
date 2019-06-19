@@ -79,8 +79,8 @@ fun UIScene.mouseMoved(position: vec2, last: vec2) {
     val exit = UIMouseExitEvent(null, null, position)
     roots.forEach { it.handleEvent(event.relativeTo(vec2(it.computedX, it.computedY))) }
     val (inside, outside) = allChildren.partition { event.relativeTo(it.absolutePosition()).within(it) }
-    inside.filter { !it.mouseInside } .forEach { it.handleEvent(enter.relativeTo(it.absolutePosition())) }
-    outside.filter { !it.mouseInside } .forEach { it.handleEvent(exit.relativeTo(it.absolutePosition())) }
+    inside.filter { !it.mouseInside } .forEach { it.handleEvent(enter.relativeTo(it.absolutePosition())); it.mouseInside = true }
+    outside.filter { it.mouseInside } .forEach { it.handleEvent(exit.relativeTo(it.absolutePosition())); it.mouseInside = false }
 }
 
 fun UIScene.mouseDragged(position: vec2) {

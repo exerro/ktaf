@@ -91,8 +91,8 @@ private fun setup(title: String, width: Int, height: Int): Application {
     }
 
     GLFW.glfwSetCursorPosCallback(display.windowID) { _, xr, yr ->
-        val x = (xr * app.display.width).toInt()
-        val y = (yr * app.display.height).toInt()
+        val x = xr.toInt()
+        val y = yr.toInt()
         if (app.heldMouseButtons.isEmpty()) app.onMouseMovedCallbacks.map { it(x, y, app.lastMouseX, app.lastMouseY) }
         else app.onMouseDraggedCallbacks.map { it(x, y, app.lastMouseX, app.lastMouseY, app.firstMouseX, app.firstMouseY, app.heldMouseButtons.toSet()) }
         app.lastMouseX = x

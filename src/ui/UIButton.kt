@@ -16,7 +16,7 @@ class UIButton: UINode() {
             }
         } }
 
-        onClickEvent { event -> event.ifNotHandled {
+        onMouseClick { event -> event.ifNotHandled {
             if (event.within(this)) {
                 event.handledBy(this)
                 clickEventHandlers.forEach { it(event) }
