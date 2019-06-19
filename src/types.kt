@@ -10,14 +10,14 @@ class DeferredEvaluator<T>(val evaluator: () -> T) {
     }
 }
 
-enum class KeyModifier {
+enum class GLFWKeyModifier {
     CTRL,
     SHIFT,
     ALT,
     SUPER
 }
 
-enum class MouseModifier {
+enum class GLFWMouseModifier {
     CTRL,
     SHIFT,
     ALT,
@@ -27,11 +27,11 @@ enum class MouseModifier {
 typealias GLFWKey = Int
 typealias GLFWMouseButton = Int
 
-typealias KeyPressedCallback = (GLFWKey, Set<KeyModifier>) -> Unit
-typealias KeyReleasedCallback = (GLFWKey, Set<KeyModifier>) -> Unit
+typealias KeyPressedCallback = (GLFWKey, Set<GLFWKeyModifier>) -> Unit
+typealias KeyReleasedCallback = (GLFWKey, Set<GLFWKeyModifier>) -> Unit
 typealias TextInputCallback = (String) -> Unit
-typealias MousePressedCallback = (GLFWMouseButton, Int, Int, Set<MouseModifier>) -> Unit
-typealias MouseReleasedCallback = (GLFWMouseButton, Int, Int, Set<MouseModifier>) -> Unit
+typealias MousePressedCallback = (GLFWMouseButton, Int, Int, Set<GLFWMouseModifier>) -> Unit
+typealias MouseReleasedCallback = (GLFWMouseButton, Int, Int, Set<GLFWMouseModifier>) -> Unit
 typealias MouseMovedCallback = (Int, Int, Int, Int) -> Unit
 typealias MouseDraggedCallback = (Int, Int, Int, Int, Int, Int, Set<GLFWMouseButton>) -> Unit
 typealias DrawCallback = () -> Unit

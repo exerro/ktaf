@@ -34,11 +34,14 @@ class FreeLayout: UILayout() {
 class ListLayout: UILayout() {
     var alignment by property(0.5f)
     var spacing by property(Spacing.SPACE_AFTER)
+    // TODO: add spacing between elements
 }
 
 class FlowLayout: UILayout() {
     var horizontalSpacing by property(Spacing.SPACE_AFTER)
     var verticalSpacing by property(Spacing.SPACE_AFTER)
+    // TODO: add vertical alignment within row
+    // TODO: add spacing between elements
 }
 
 typealias LayoutLine = String

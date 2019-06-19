@@ -45,8 +45,18 @@ fun <T> Application.computeOnMainThread(fn: () -> T): T {
     while (true) { if (evaluator.hasValue()) return evaluator.getValue() }
 }
 
-fun Application.draw(draw: (Application).() -> Unit) = onDrawCallbacks.add { draw(this) }
-fun Application.update(update: (Application).(Float) -> Unit) = onUpdateCallbacks.add { update(this, it) }
+fun Application.draw(draw: (Application).() -> Unit)
+        = onDrawCallbacks.add { draw(this) }
+fun Application.update(update: (Application).(Float) -> Unit)
+        = onUpdateCallbacks.add { update(this, it) }
+fun Application.onMousePressed(handler: (Application).(GLFWMouseButton, Int, Int, Set<GLFWMouseModifier>) -> Unit)
+        = onMousePressedCallbacks.add { a, b, c, d -> handler(this, a, b, c, d) }
+fun Application.onMouseReleased(handler: (Application).(GLFWMouseButton, Int, Int, Set<GLFWMouseModifier>) -> Unit)
+        = onMouseReleasedCallbacks.add { a, b, c, d -> handler(this, a, b, c, d) }
+fun Application.onMouseMoved(handler: (Application).(Int, Int, Int, Int) -> Unit)
+        = onMouseMovedCallbacks.add { a, b, c, d -> handler(this, a, b, c, d) }
+fun Application.onMouseDragged(handler: (Application).(Int, Int, Int, Int, Int, Int, Set<GLFWMouseButton>) -> Unit)
+        = onMouseDraggedCallbacks.add { a, b, c, d, e, f, g -> handler(this, a, b, c, d, e, f, g) }
 
 fun application(name: String, load: (Application).() -> Unit) {
     val width = 1080
@@ -90,8 +100,11 @@ private fun setup(title: String, width: Int, height: Int): Application {
     }
 
     GLFW.glfwSetMouseButtonCallback(display.windowID) { _, button, action, mods ->
-        val x = 0 // TODO
-        val y = 0 // TODO
+        val xt = DoubleArray(1)
+        val yt = DoubleArray(1)
+        GLFW.glfwGetCursorPos(display.windowID, xt, yt)
+        val x = xt[0].toInt()
+        val y = yt[0].toInt()
 
         if (action == GLFW.GLFW_PRESS) {
             if (app.heldMouseButtons.isEmpty()) {
@@ -160,16 +173,16 @@ private fun destroy(app: Application) {
     GLFW.glfwSetErrorCallback(null)?.free()
 }
 
-private fun keyModifiers(mods: Int): Set<KeyModifier> = setOf(
-        KeyModifier.CTRL.takeIf { mods and GLFW.GLFW_MOD_CONTROL != 0 },
-        KeyModifier.ALT.takeIf { mods and GLFW.GLFW_MOD_ALT != 0 },
-        KeyModifier.SHIFT.takeIf { mods and GLFW.GLFW_MOD_SHIFT != 0 },
-        KeyModifier.SUPER.takeIf { mods and GLFW.GLFW_MOD_SUPER != 0 }
+private fun keyModifiers(mods: Int): Set<GLFWKeyModifier> = setOf(
+        GLFWKeyModifier.CTRL.takeIf { mods and GLFW.GLFW_MOD_CONTROL != 0 },
+        GLFWKeyModifier.ALT.takeIf { mods and GLFW.GLFW_MOD_ALT != 0 },
+        GLFWKeyModifier.SHIFT.takeIf { mods and GLFW.GLFW_MOD_SHIFT != 0 },
+        GLFWKeyModifier.SUPER.takeIf { mods and GLFW.GLFW_MOD_SUPER != 0 }
 ) .filter { it != null } .map { it!! } .toSet()
 
-private fun mouseModifiers(mods: Int): Set<MouseModifier> = setOf(
-        MouseModifier.CTRL.takeIf { mods and GLFW.GLFW_MOD_CONTROL != 0 },
-        MouseModifier.ALT.takeIf { mods and GLFW.GLFW_MOD_ALT != 0 },
-        MouseModifier.SHIFT.takeIf { mods and GLFW.GLFW_MOD_SHIFT != 0 },
-        MouseModifier.SUPER.takeIf { mods and GLFW.GLFW_MOD_SUPER != 0 }
+private fun mouseModifiers(mods: Int): Set<GLFWMouseModifier> = setOf(
+        GLFWMouseModifier.CTRL.takeIf { mods and GLFW.GLFW_MOD_CONTROL != 0 },
+        GLFWMouseModifier.ALT.takeIf { mods and GLFW.GLFW_MOD_ALT != 0 },
+        GLFWMouseModifier.SHIFT.takeIf { mods and GLFW.GLFW_MOD_SHIFT != 0 },
+        GLFWMouseModifier.SUPER.takeIf { mods and GLFW.GLFW_MOD_SUPER != 0 }
 ) .filter { it != null } .map { it!! } .toSet()

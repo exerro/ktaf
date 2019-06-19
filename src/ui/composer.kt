@@ -9,7 +9,7 @@ fun scene(context: DrawContext2D, init: UIScene.() -> Unit): UIScene {
 }
 
 fun <N: UINode> UIScene.root(node: N, init: N.() -> Unit): N {
-    roots.add(node)
+    addRoot(node)
     init(node)
     return node
 }

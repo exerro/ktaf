@@ -31,6 +31,12 @@ class UIProperty<out N, T>(private val self: N, private var value: T) {
     }
 }
 
+fun <N, T> UIProperty<N, T>.attachChangeToCallback(fn: N.(T) -> Unit): N.(T, T) -> Unit {
+    val cb: N.(T, T) -> Unit = { _, new -> fn(new) }
+    attachChangeCallback(cb)
+    return cb
+}
+
 internal inline fun <reified N: UI_t, reified T> N.property(value: T)
         = UIProperty(this, value)
 

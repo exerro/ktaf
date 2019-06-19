@@ -123,6 +123,7 @@ internal fun UINode.positionChildrenInternal(heightAllocated: Float?) {
                 if (x + child.margin.width + child.computedWidth > xOverflow) {
                     x = padding.left
                     y += flowRows.last().map { it.margin.height + it.computedHeight } .fold(0f, ::max)
+                    flowRows.add(mutableListOf())
                 }
 
                 child.computedX = x
@@ -143,8 +144,8 @@ internal fun UINode.positionChildrenInternal(heightAllocated: Float?) {
         // position children aligned within content box
         is FillLayout -> {
             children.forEach {
-                it.computedX = padding.left + align(l.alignment.x, computedWidth - padding.width, it.computedWidth + it.margin.width)
-                it.computedY = padding.top + align(l.alignment.y, computedHeight - padding.height, it.computedHeight + it.margin.height)
+                it.computedX = padding.left + it.margin.left + align(l.alignment.x, computedWidth - padding.width, it.computedWidth + it.margin.width)
+                it.computedY = padding.top + it.margin.top + align(l.alignment.y, computedHeight - padding.height, it.computedHeight + it.margin.height)
             }
         }
         is GridLayout -> {
@@ -156,8 +157,8 @@ internal fun UINode.positionChildrenInternal(heightAllocated: Float?) {
                         Triple(child, i % l.horizontal, i / l.horizontal)
                     }
                     .forEach { (it, x, y) ->
-                        it.computedX = padding.left + (cw + l.spacing.x) * x + align(l.alignment.x, cw, it.computedWidth + it.margin.width)
-                        it.computedY = padding.top + (ch + l.spacing.y) * y + align(l.alignment.y, ch, it.computedHeight + it.margin.height)
+                        it.computedX = padding.left + it.margin.left + (cw + l.spacing.x) * x + align(l.alignment.x, cw, it.computedWidth + it.margin.width)
+                        it.computedY = padding.top + it.margin.top + (ch + l.spacing.y) * y + align(l.alignment.y, ch, it.computedHeight + it.margin.height)
                     }
         }
         is FreeLayout -> {
@@ -170,8 +171,8 @@ internal fun UINode.positionChildrenInternal(heightAllocated: Float?) {
                 val bottom = evalh(l.hLines[l.nodeBottoms[child]]) ?: top + child.computedHeight
                 val right = evalw(l.vLines[l.nodeRights[child]]) ?: left + child.computedWidth
 
-                child.computedX = padding.left + left + align(l.alignment.x, right - left, child.computedWidth + child.margin.width)
-                child.computedY = padding.top + top + align(l.alignment.y, bottom - top, child.computedHeight + child.margin.height)
+                child.computedX = padding.left + child.margin.left + left + align(l.alignment.x, right - left, child.computedWidth + child.margin.width)
+                child.computedY = padding.top + child.margin.top + top + align(l.alignment.y, bottom - top, child.computedHeight + child.margin.height)
             }
         }
         is ListLayout -> {
@@ -179,8 +180,8 @@ internal fun UINode.positionChildrenInternal(heightAllocated: Float?) {
             val yd = l.spacing.iter(children.size, computedHeight, contentHeight)
 
             children.forEach {
-                it.computedX = padding.left + align(l.alignment, computedWidth - padding.width, it.computedWidth + it.margin.width)
-                it.computedY = y
+                it.computedX = padding.left + it.margin.left + align(l.alignment, computedWidth - padding.width, it.computedWidth + it.margin.width)
+                it.computedY = y + it.margin.top
                 y += it.computedHeight + it.margin.height + yd
             }
         }
@@ -194,8 +195,8 @@ internal fun UINode.positionChildrenInternal(heightAllocated: Float?) {
                 val xd = l.horizontalSpacing.iter(row.size, computedWidth, rowWidth)
 
                 row.forEach { c ->
-                    c.computedX += xOffset
-                    c.computedY += yOffset
+                    c.computedX += xOffset + c.margin.left
+                    c.computedY += yOffset + c.margin.left
 
                     xOffset += xd
                 }

@@ -8,9 +8,9 @@ import vec2
 class UIContainer: UINode() {
     var background by property(RGB(1f))
 
-    override fun draw(context: DrawContext2D, x: Float, y: Float, width: Float, height: Float) {
+    override fun draw(context: DrawContext2D, position: vec2, size: vec2) {
         context.colour = background
-        context.rectangle(vec2(x, y), vec2(width, height))
-        super.draw(context, x, y, width, height)
+        context.rectangle(position, size)
+        super.draw(context, position, size)
     }
 }
