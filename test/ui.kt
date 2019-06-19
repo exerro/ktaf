@@ -3,23 +3,20 @@ import graphics.DrawContext2D
 import graphics.circle
 import graphics.rectangle
 import ui.*
-import ui.elements.UIButton
-import ui.elements.UICanvas
-import ui.elements.onClick
-import ui.elements.onDraw
+import ui.elements.*
 import kotlin.math.min
 import kotlin.math.sin
 
 fun main() = application("Hello world") {
     val context = DrawContext2D(viewport)
-    val scene = scene(context) {
+    val scene = scene(display, context) {
         lateinit var r: UIContainer
         r = root(UIContainer()) {
-            background = rgba(0f, 1f, 0.5f)
+            colour = rgba(0f, 1f, 0.5f)
 
             val b1 = list {
                 width = 200f
-                background = rgba(1f, 0f, 0f)
+                colour = rgba(1f, 0f, 0f)
 
                 addChild(UIButton("Hello")) {
                     colour = rgba(0f, 1f, 0f)

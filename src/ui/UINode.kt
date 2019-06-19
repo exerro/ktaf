@@ -4,6 +4,7 @@ import core.minus
 import graphics.DrawContext2D
 import core.plus
 import core.vec2
+import GLFWCursor
 
 abstract class UINode: UI_t {
     internal val focusEventHandlers: EventHandlerList<UIFocusEvent> = mutableListOf()
@@ -28,6 +29,8 @@ abstract class UINode: UI_t {
     internal val childrenInternal = mutableListOf<UINode>()
     internal val foregroundsInternal = mutableListOf<Foreground>()
     internal val backgroundsInternal = mutableListOf<Background>()
+
+    open val cursor: GLFWCursor? = GLFWCursor.DEFAULT
 
     var margin by property(Border(0f))
     var padding by property(Border(0f))

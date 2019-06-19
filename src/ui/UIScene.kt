@@ -2,8 +2,10 @@ package ui
 
 import core.*
 import graphics.DrawContext2D
+import GLFWDisplay
+import setCursor
 
-class UIScene(val context: DrawContext2D) {
+class UIScene(val display: GLFWDisplay, val context: DrawContext2D) {
     internal var focussedNode: UINode? = null
     internal var firstRelativeMouseLocation = vec2(0f)
     internal var lastRelativeMouseLocation = vec2(0f)
@@ -70,14 +72,15 @@ fun UIScene.mouseReleased(button: GLFWMouseButton, position: vec2, modifiers: Se
 }
 
 fun UIScene.mouseMoved(position: vec2, last: vec2) {
-    val allChildren = generateSequence(roots.toList()) { nodes -> nodes.flatMap { n -> n.childrenInternal } .takeIf { it.isNotEmpty() } } .flatten()
+    val allChildren = generateSequence(roots.toList()) { nodes -> nodes.flatMap { n -> n.childrenInternal.reversed() } .takeIf { it.isNotEmpty() } } .flatten()
     val event = UIMouseMoveEvent(null, null, position, last)
     val enter = UIMouseEnterEvent(null, null, position)
     val exit = UIMouseExitEvent(null, null, position)
     roots.forEach { it.handleEvent(event.relativeTo(vec2(it.computedX, it.computedY))) }
     val (inside, outside) = allChildren.partition { event.relativeTo(it.absolutePosition()).within(it) }
-    inside.filter { !it.mouseInside } .forEach { it.handleEvent(enter.relativeTo(it.absolutePosition())); it.mouseInside = true }
     outside.filter { it.mouseInside } .forEach { it.handleEvent(exit.relativeTo(it.absolutePosition())); it.mouseInside = false }
+    inside.filter { !it.mouseInside } .forEach { it.handleEvent(enter.relativeTo(it.absolutePosition())); it.mouseInside = true }
+    inside.map { it.cursor } .firstOrNull { it != null } ?.let { display.setCursor(it) } ?: display.setCursor(GLFWCursor.DEFAULT)
 }
 
 fun UIScene.mouseDragged(position: vec2) {

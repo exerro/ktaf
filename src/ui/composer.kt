@@ -1,9 +1,11 @@
 package ui
 
 import graphics.DrawContext2D
+import GLFWDisplay
+import ui.elements.UIContainer
 
-fun scene(context: DrawContext2D, init: UIScene.() -> Unit): UIScene {
-    val root = UIScene(context)
+fun scene(display: GLFWDisplay, context: DrawContext2D, init: UIScene.() -> Unit): UIScene {
+    val root = UIScene(display, context)
     init(root)
     return root
 }

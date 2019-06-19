@@ -5,11 +5,14 @@ import core.vec2
 import graphics.DrawContext2D
 import graphics.rectangle
 import ui.*
+import GLFWCursor
 
 class UIButton(text: String): UINode() {
     internal val clickEventHandlers: EventHandlerList<UIMouseClickEvent> = mutableListOf()
     private var background = addBackground(ColourBackground(rgba(1f)))
     private var foregroundText = addForeground(TextForeground(text))
+
+    override val cursor: GLFWCursor? = GLFWCursor.POINTER
 
     var colour by property(background.colour)
     var text by property(foregroundText.text)
