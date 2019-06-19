@@ -1,8 +1,9 @@
 package ui
 
+import core.minus
 import graphics.DrawContext2D
-import plus
-import vec2
+import core.plus
+import core.vec2
 
 abstract class UINode: UI_t {
     internal val focusEventHandlers: EventHandlerList<UIFocusEvent> = mutableListOf()
@@ -24,7 +25,10 @@ abstract class UINode: UI_t {
     internal var computedY: Float = 0f
     internal var computedWidth: Float = 0f
     internal var computedHeight: Float = 0f
-    internal val children = mutableListOf<UINode>()
+    internal val childrenInternal = mutableListOf<UINode>()
+    internal val foregroundsInternal = mutableListOf<Foreground>()
+    internal val backgroundsInternal = mutableListOf<Background>()
+
     var margin by property(Border(0f))
     var padding by property(Border(0f))
     var layout by property(ListLayout() as UILayout)
@@ -32,19 +36,22 @@ abstract class UINode: UI_t {
     var height by property(null as Float?)
     var parent by property(null as UINode?)
     var scene by property(null as UIScene?)
+    val children get() = childrenInternal.toList()
+    val foregrounds get() = foregroundsInternal.toList()
+    val backgrounds get() = backgroundsInternal.toList()
 
     init {
         withProperty(::parent) {
             attachChangeCallback { old, new ->
-                old?.children?.remove(this@UINode)
-                new?.children?.add(this@UINode)
+                old?.childrenInternal?.remove(this@UINode)
+                new?.childrenInternal?.add(this@UINode)
                 this@UINode.scene = new?.scene
             }
         }
 
         withProperty(::scene) {
             attachChangeToCallback { new ->
-                children.forEach { it.scene = new }
+                childrenInternal.forEach { it.scene = new }
             }
         }
     }
@@ -54,11 +61,19 @@ abstract class UINode: UI_t {
     open fun update(dt: Float) {}
 
     open fun draw(context: DrawContext2D, position: vec2, size: vec2) {
-        children.forEach {
+        backgroundsInternal.reversed().forEach {
+            it.draw(context, position, size)
+        }
+
+        childrenInternal.forEach {
             it.draw(context,
                     position + vec2(it.computedX, it.computedY),
                     vec2(it.computedWidth, it.computedHeight)
             )
+        }
+
+        foregroundsInternal.forEach {
+            it.draw(context, position + vec2(padding.left, padding.top), size - padding.size)
         }
     }
 
@@ -72,7 +87,8 @@ abstract class UINode: UI_t {
         }
 
         when (event) {
-            is UITextInputEvent, is UIFocusEvent, is UIUnFocusEvent -> children.forEach { it.handleEvent(event) }
+            is UITextInputEvent, is UIFocusEvent, is UIUnFocusEvent -> childrenInternal.forEach { it.handleEvent(event) }
+            else -> { /* do nothing */ }
         }
     }
 
@@ -84,7 +100,7 @@ abstract class UINode: UI_t {
             is UIKeyReleaseEvent -> keyReleaseEventHandlers.forEach { it(event) }
         }
 
-        children.forEach { it.handleEvent(event) }
+        childrenInternal.forEach { it.handleEvent(event) }
     }
 
     open fun handleMouseEvent(event: UIMouseEvent) {
@@ -100,7 +116,7 @@ abstract class UINode: UI_t {
             is UIMouseDragEvent -> mouseDragEventHandlers.forEach { it(event) }
         }
 
-        children.reversed().forEach {
+        childrenInternal.reversed().forEach {
             it.handleEvent(event.relativeTo(vec2(padding.left, padding.top) + vec2(it.computedX, it.computedY)))
         }
     }
@@ -185,4 +201,36 @@ fun <C: UINode> UINode.addChild(child: C, init: C.() -> Unit = {}): C {
 fun <C: UINode> UINode.removeChild(child: C): C {
     if (child.parent == this) child.parent = null
     return child
+}
+
+fun <B: Background> UINode.addBackground(background: B, init: B.() -> Unit = {}): B {
+    init(background)
+    backgroundsInternal.add(background)
+    return background
+}
+
+fun <F: Foreground> UINode.addForeground(foreground: F, init: F.() -> Unit = {}): F {
+    init(foreground)
+    foregroundsInternal.add(foreground)
+    return foreground
+}
+
+fun <B: Background> UINode.removeBackground(background: B): B {
+    if (backgroundsInternal.contains(background)) backgroundsInternal.remove(background)
+    return background
+}
+
+fun <F: Foreground> UINode.removeForeground(foreground: F): F {
+    if (foregroundsInternal.contains(foreground)) foregroundsInternal.remove(foreground)
+    return foreground
+}
+
+fun <B: Background> UINode.replaceBackground(old: Background, new: B): B {
+    removeBackground(old)
+    return addBackground(new)
+}
+
+fun <F: Foreground> UINode.replaceForeground(old: Foreground, new: F): F {
+    removeForeground(old)
+    return addForeground(new)
 }

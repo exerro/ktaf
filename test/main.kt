@@ -1,33 +1,36 @@
+import core.*
 import graphics.FNTFont
 import graphics.*
+import kotlin.math.sin
 
 fun main() = application("Hello world") {
     val context = DrawContext2D(viewport)
 //    val texture = loadTextureFile2D("img.jpg")
 
     draw {
-        val width = FNTFont.DEFAULT_FONT.scaleTo(300f).widthOf("Hello g")
-        val height = FNTFont.DEFAULT_FONT.scaleTo(300f).height
+        val font = FNTFont.DEFAULT_FONT
+        val width = font.widthOf("Hello g")
+        val height = font.height
 
         context.draw {
             context.colour = RGBA(1f, 1f, 1f)
-            rectangle(vec2(10f), vec2(width / 2, height))
-            context.colour = RGBA(1f, 0f, 1f, 0.5f)
-            write("Hello g", FNTFont.DEFAULT_FONT.scaleTo(300f), vec2(10f))
+            rectangle(vec2(10f), vec2(width, height))
+            context.colour = RGBA(1f, 0f, 1f, sin(time) * 0.5f + 0.5f)
+            write("Hello g", font, vec2(10f))
         }
     }
 
     draw {
         context.push {
-//            translate(vec2(100f))
+//            translate(core.vec2(100f))
 //            colour = RGB(0f, 1f, 1f)
-//            scissor = AABB(vec2(30f), vec2(200f))
-//            graphics.image(texture, vec2(0f), vec2(0.3f))
+//            scissor = AABB(core.vec2(30f), core.vec2(200f))
+//            graphics.image(texture, core.vec2(0f), core.vec2(0.3f))
         }
 
 //        context.graphics.push()
-//        context.scissor = AABB(vec2(30f), vec2(200f))
-//        context.graphics.image(texture, vec2(0f), vec2(0.3f))
+//        context.scissor = AABB(core.vec2(30f), core.vec2(200f))
+//        context.graphics.image(texture, core.vec2(0f), core.vec2(0.3f))
 //        context.pop()
 
 

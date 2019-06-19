@@ -1,5 +1,5 @@
 package ui
-import vec2
+import core.vec2
 
 sealed class UILayout: UI_t
 
@@ -52,11 +52,13 @@ internal typealias LayoutNodeMapping = MutableMap<UINode, LayoutLine>
 class LineEditor internal constructor(private val lines: LayoutLineMapping, private val line: String) {
     var offset
         get() = lines.computeIfAbsent(line) { vec2(0f) } .x
-        set(value) { lines[line] = vec2(value, lines[line] ?. y ?: 0f) }
+        set(value) { lines[line] = vec2(value, lines[line]?.y ?: 0f)
+        }
 
     var percentage
         get() = lines.computeIfAbsent(line) { vec2(0f) } .y
-        set(value) { lines[line] = vec2(lines[line] ?. x ?: 0f, value) }
+        set(value) { lines[line] = vec2(lines[line]?.x ?: 0f, value)
+        }
 }
 
 class NodeEditor internal constructor(private val node: UINode, private val layout: FreeLayout) {

@@ -1,18 +1,12 @@
-package ui
-
-import application
+import core.*
 import graphics.DrawContext2D
-import RGB
 import graphics.circle
-import div
-import draw
-import onMouseDragged
-import onMouseMoved
-import onMousePressed
-import onMouseReleased
 import graphics.rectangle
-import update
-import vec2
+import ui.*
+import ui.elements.UIButton
+import ui.elements.UICanvas
+import ui.elements.onClick
+import ui.elements.onDraw
 import kotlin.math.min
 import kotlin.math.sin
 
@@ -21,14 +15,16 @@ fun main() = application("Hello world") {
     val scene = scene(context) {
         lateinit var r: UIContainer
         r = root(UIContainer()) {
-            background = RGB(0f, 1f, 0.5f)
+            background = rgba(0f, 1f, 0.5f)
 
             val b1 = list {
                 width = 200f
-                background = RGB(1f, 0f, 0f)
+                background = rgba(1f, 0f, 0f)
 
-                addChild(UIButton()) {
-                    colour = RGB(0f, 1f, 0f)
+                addChild(UIButton("Hello")) {
+                    colour = rgba(0f, 1f, 0f)
+                    textColour = rgba(1f, 0f, 1f)
+                    font = font.scaleTo(font.height * 1.3f)
                     height = 50f
 
                     onClick {
@@ -39,9 +35,10 @@ fun main() = application("Hello world") {
                     }
                 }
 
-                addChild(UIButton()) {
+                addChild(UIButton("Button")) {
                     width = 100f
                     height = 30f
+                    textColour = rgba(0f)
 
                     onClick {
                         r.layout(FlowLayout()) {
@@ -56,9 +53,10 @@ fun main() = application("Hello world") {
 //                }
             }
 
-            val b2 = addChild(UIButton()) {
+            val b2 = addChild(UIButton("Woah")) {
                 width = 200f
                 height = 30f
+                textColour = rgba(0f)
 
                 onClick {
                     r.layout(ListLayout()) {
@@ -68,26 +66,28 @@ fun main() = application("Hello world") {
                 }
             }
 
-            val buttons = (3 .. 17).map { addChild(UIButton()) {
-                colour = RGB(it.toFloat() / 25)
-                margin = Border(10f)
-                width = 100f
-                height = 50f
+            val buttons = (3..17).map {
+                addChild(UIButton("B${it-2}")) {
+                    colour = rgba(it.toFloat() / 25)
+                    margin = Border(10f)
+                    width = 100f
+                    height = 50f
 
-                onClick { event ->
-                    println("grid button ${it - 2} was clicked at ${event.position} with button ${event.button} and modifiers ${event.modifiers}")
+                    onClick { event ->
+                        println("grid button ${it - 2} was clicked at ${event.position} with button ${event.button} and modifiers ${event.modifiers}")
+                    }
                 }
-            } }
+            }
 
             addChild(UICanvas()) {
-                var colour = RGB(1f, 0f, 1f)
+                var colour = rgba(1f, 0f, 1f)
 
                 width = 100f
                 height = 100f
 
                 onDraw { context, size ->
                     context.draw {
-                        context.colour = RGB(0f, 0f, 1f)
+                        context.colour = rgba(0f, 0f, 1f)
                         rectangle(vec2(0f), size)
                         context.colour = colour
                         circle(size / 2f, min(size.x, size.y) / 2)
@@ -96,22 +96,26 @@ fun main() = application("Hello world") {
 
                 onMouseEnter {
                     println("Here")
-                    colour = RGB(Math.random().toFloat(), Math.random().toFloat(), Math.random().toFloat())
+                    colour = rgba(Math.random().toFloat(), Math.random().toFloat(), Math.random().toFloat())
                 }
 
-                onMousePress { event -> event.ifNotHandled {
-                    if (event.within(this)) {
-                        event.handledBy(this)
+                onMousePress { event ->
+                    event.ifNotHandled {
+                        if (event.within(this)) {
+                            event.handledBy(this)
+                        }
                     }
-                } }
+                }
 
-                onMouseClick { event -> event.ifNotHandled {
-                    if (event.within(this)) {
-                        event.handledBy(this)
-                        width = Math.random().toFloat() * 100f + 50f
-                        height = Math.random().toFloat() * 100f + 50f
+                onMouseClick { event ->
+                    event.ifNotHandled {
+                        if (event.within(this)) {
+                            event.handledBy(this)
+                            width = Math.random().toFloat() * 100f + 50f
+                            height = Math.random().toFloat() * 100f + 50f
+                        }
                     }
-                } }
+                }
             }
 
             layout(FreeLayout()) {
@@ -135,37 +139,15 @@ fun main() = application("Hello world") {
                     rightPercentage = 100f
                 }
 
-                buttons.forEachIndexed { i, it -> elem(it) {
-                    topOffset = sin(i.toFloat() / 3f) * 80f + 80f
-                    leftOffset = i * 20f
-                } }
+                buttons.forEachIndexed { i, it ->
+                    elem(it) {
+                        topOffset = sin(i.toFloat() / 3f) * 80f + 80f
+                        leftOffset = i * 20f
+                    }
+                }
             }
         }
     }
 
-    update { dt ->
-        val before = System.currentTimeMillis()
-        scene.update(dt)
-//        println("${System.currentTimeMillis() - before}ms")
-    }
-
-    draw {
-        scene.draw()
-    }
-
-    onMousePressed { button, x, y, modifiers ->
-        scene.mousePressed(button, vec2(x.toFloat(), y.toFloat()), modifiers)
-    }
-
-    onMouseReleased { button, x, y, modifiers ->
-        scene.mouseReleased(button, vec2(x.toFloat(), y.toFloat()), modifiers)
-    }
-
-    onMouseMoved { x, y, lx, ly ->
-        scene.mouseMoved(vec2(x.toFloat(), y.toFloat()), vec2(lx.toFloat(), ly.toFloat()))
-    }
-
-    onMouseDragged { x, y, _, _, _, _, _ ->
-        scene.mouseDragged(vec2(x.toFloat(), y.toFloat()))
-    }
+    scene.attachCallbacks(this)
 }

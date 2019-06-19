@@ -1,6 +1,6 @@
 package ui
 
-import vec2
+import core.vec2
 
 data class Border(
         val top: Float,

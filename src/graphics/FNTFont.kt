@@ -2,19 +2,10 @@ package graphics
 
 import GLTexture2
 import GLVAO
+import core.*
 import createVAO
-import div
-import genElementBuffer
-import genVertexColourBuffer
-import genVertexNormalBuffer
-import genVertexPositionBuffer
-import genVertexUVBuffer
 import loadTexture2D
 import org.lwjgl.BufferUtils
-import plus
-import times
-import vec2
-import vec3
 import java.io.InputStream
 import java.nio.file.Files
 import java.nio.file.Paths
@@ -140,7 +131,7 @@ fun FNTFont.Companion.preload(content: String): FNTFontPreloader {
         val page = match.groupValues[9].toInt()
         val char = id.toChar()
         val uv = vec2(x.toFloat(), y.toFloat()) / vec2(scaleW.toFloat(), scaleH.toFloat())
-        val duv = vec2(width.toFloat(), height.toFloat()) /  vec2(scaleW.toFloat(), scaleH.toFloat())
+        val duv = vec2(width.toFloat(), height.toFloat()) / vec2(scaleW.toFloat(), scaleH.toFloat())
 
         charSizes[char] = vec2(width.toFloat(), height.toFloat())
         charOffsets[char] = vec2(xoffset.toFloat(), yoffset.toFloat())
@@ -179,9 +170,9 @@ fun FNTFont.Companion.load(preloader: FNTFontPreloader): FNTFont {
 //    internal val lineHeight: Float,
 //    internal val baseline: Float,
 //    internal val pages: Map<Int, String>,
-//    internal val charSizes: MutableMap<Char, vec2>,
-//    internal val charOffsets: MutableMap<Char, vec2>,
-//    internal val charUVs: MutableMap<Char, List<vec2>>,
+//    internal val charSizes: MutableMap<Char, core.vec2>,
+//    internal val charOffsets: MutableMap<Char, core.vec2>,
+//    internal val charUVs: MutableMap<Char, List<core.vec2>>,
 //    internal val charAdvances: MutableMap<Char, Float>,
 //    internal val charPages: MutableMap<Char, Int>
     val vaos = preloader.charUVs.map { (char, uvs) ->

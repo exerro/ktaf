@@ -1,10 +1,7 @@
 package ui
 
+import core.*
 import graphics.DrawContext2D
-import GLFWMouseButton
-import GLFWMouseModifier
-import minus
-import vec2
 
 class UIScene(val context: DrawContext2D) {
     internal var focussedNode: UINode? = null
@@ -73,7 +70,7 @@ fun UIScene.mouseReleased(button: GLFWMouseButton, position: vec2, modifiers: Se
 }
 
 fun UIScene.mouseMoved(position: vec2, last: vec2) {
-    val allChildren = generateSequence(roots.toList()) { nodes -> nodes.flatMap { n -> n.children } .takeIf { it.isNotEmpty() } } .flatten()
+    val allChildren = generateSequence(roots.toList()) { nodes -> nodes.flatMap { n -> n.childrenInternal } .takeIf { it.isNotEmpty() } } .flatten()
     val event = UIMouseMoveEvent(null, null, position, last)
     val enter = UIMouseEnterEvent(null, null, position)
     val exit = UIMouseExitEvent(null, null, position)
@@ -87,5 +84,33 @@ fun UIScene.mouseDragged(position: vec2) {
     focussedNode ?.let { node ->
         node.handleEvent(UIMouseDragEvent(null, null, position, lastRelativeMouseLocation, firstRelativeMouseLocation, mouseModifiers))
         lastRelativeMouseLocation = position - node.absolutePosition()
+    }
+}
+
+fun UIScene.attachCallbacks(app: Application) {
+    val scene = this
+
+    app.update { dt ->
+        scene.update(dt)
+    }
+
+    app.draw {
+        scene.draw()
+    }
+
+    app.onMousePressed { button, x, y, modifiers ->
+        scene.mousePressed(button, vec2(x.toFloat(), y.toFloat()), modifiers)
+    }
+
+    app.onMouseReleased { button, x, y, modifiers ->
+        scene.mouseReleased(button, vec2(x.toFloat(), y.toFloat()), modifiers)
+    }
+
+    app.onMouseMoved { x, y, lx, ly ->
+        scene.mouseMoved(vec2(x.toFloat(), y.toFloat()), vec2(lx.toFloat(), ly.toFloat()))
+    }
+
+    app.onMouseDragged { x, y, _, _, _, _, _ ->
+        scene.mouseDragged(vec2(x.toFloat(), y.toFloat()))
     }
 }

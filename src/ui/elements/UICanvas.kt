@@ -1,10 +1,11 @@
-package ui
+package ui.elements
 
-import AABB
 import graphics.DrawContext2D
-import plus
+import core.plus
 import graphics.push
-import vec2
+import core.vec2
+import ui.UINode
+import util.AABB
 
 class UICanvas : UINode() {
     internal val onDrawCallbacks = mutableListOf<UICanvas.(DrawContext2D, vec2) -> Unit>()

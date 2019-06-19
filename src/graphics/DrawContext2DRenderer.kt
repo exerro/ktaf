@@ -4,27 +4,14 @@ import GLTexture2
 import GLVAO
 import GLDrawMode
 import bindIn
-import createElementGLVAO
+import core.*
 import createVAO
-import genElementBuffer
-import genVertexColourBuffer
-import genVertexNormalBuffer
-import genVertexPositionBuffer
-import genVertexUVBuffer
-import mat3_rotate
-import mat3_scale
-import mat4
-import mat4_identity
-import mat4_translate
 import postFragmentShaderState
 import rasterState
 import stopUsing
-import times
-import uniform
 import use
 import useIn
-import vec2
-import vec3
+import util.createElementGLVAO
 import kotlin.math.max
 
 class DrawContext2DRenderer(val context: DrawContext2D) { init {
@@ -45,7 +32,7 @@ fun DrawContext2DRenderer.vao(vao: GLVAO, vertexCount: Int, transform: mat4 = ma
     context.shader.uniform("colour", context.colour)
     context.shader.uniform("useTexture", textured)
     vao.bindIn {
-        GLDraw.drawElements(mode, vertexCount, 0)
+        GL.drawElements(mode, vertexCount, 0)
     }
 }
 

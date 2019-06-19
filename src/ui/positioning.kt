@@ -13,23 +13,23 @@ import kotlin.math.max
  */
 internal fun UINode.computeWidthInternal(widthAllocated: Float?) {
     // width allocated to children is either
-    // * this' width minus its padding
-    // * width allocated to this, minus this' margin and padding
+    // * this' width core.minus its padding
+    // * width allocated to this, core.minus this' margin and padding
     val widthAllocatedInternal = width ?.let { w -> w - padding.width } ?: widthAllocated ?.let { w -> w - margin.width - padding.width }
     val contentWidth by when (val l = layout) {
         // compute the width of all children
         // content width computed is the largest of children widths
         is FillLayout -> {
-            children.forEach { it.computeWidthInternal(widthAllocatedInternal) }
-            lazy { children .map { it.computedWidth + it.margin.width } .fold(0f, ::max) }
+            childrenInternal.forEach { it.computeWidthInternal(widthAllocatedInternal) }
+            lazy { childrenInternal .map { it.computedWidth + it.margin.width } .fold(0f, ::max) }
         }
         // compute the width of all children
-        //  width allocated to child is normal width allocation, minus the spacing between elements, and finally
+        //  width allocated to child is normal width allocation, core.minus the spacing between elements, and finally
         //  divided by the number of horizontal blocks
         // a grid has no content width as content width scales linearly with width allocated
         is GridLayout -> {
             val wa = widthAllocatedInternal ?.let { w -> (w - (l.horizontal - 1) * l.spacing.x) / l.horizontal }
-            children.forEach { it.computeWidthInternal(wa) }
+            childrenInternal.forEach { it.computeWidthInternal(wa) }
             lazy { 0f }
         }
         // compute the width of all children
@@ -40,7 +40,7 @@ internal fun UINode.computeWidthInternal(widthAllocated: Float?) {
         is FreeLayout -> {
             fun eval(l: LayoutLineValue) = l.x + (widthAllocatedInternal ?: 0f) * l.y / 100f
 
-            children.forEach { child ->
+            childrenInternal.forEach { child ->
                 val left = l.vLines[l.nodeLefts[child]]
                 val right = l.vLines[l.nodeRights[child]]
                 val width = left ?.let { right ?.let { eval(right) - eval(left) + 1 } } ?: child.width
@@ -48,7 +48,7 @@ internal fun UINode.computeWidthInternal(widthAllocated: Float?) {
                 child.computeWidthInternal(width)
             }
 
-            lazy { children.map { child ->
+            lazy { childrenInternal.map { child ->
                 val left = l.vLines[l.nodeLefts[child]]
                 val right = l.vLines[l.nodeRights[child]]
                 right ?.let { eval(right) } ?: (left ?.let { eval(left) } ?: 0f) + child.computedWidth - 1
@@ -57,15 +57,15 @@ internal fun UINode.computeWidthInternal(widthAllocated: Float?) {
         // compute the width of all children
         // content width computed is the largest of children widths
         is ListLayout -> {
-            children.forEach { it.computeWidthInternal(widthAllocatedInternal) }
-            lazy { children .map { it.computedWidth + it.margin.width } .fold(0f, ::max) }
+            childrenInternal.forEach { it.computeWidthInternal(widthAllocatedInternal) }
+            lazy { childrenInternal .map { it.computedWidth + it.margin.width } .fold(0f, ::max) }
         }
         // compute the width of all children
         // content width computed is the sum of children widths
         //  with no allocated width, the flow should expand horizontally as far as possible...
         is FlowLayout -> {
-            children.forEach { it.computeWidthInternal(null) }
-            lazy { children.map { it.computedWidth + it.margin.width } .sum() }
+            childrenInternal.forEach { it.computeWidthInternal(null) }
+            lazy { childrenInternal.map { it.computedWidth + it.margin.width } .sum() }
         }
     }
 
@@ -77,24 +77,24 @@ internal fun UINode.computeWidthInternal(widthAllocated: Float?) {
  */
 internal fun UINode.positionChildrenInternal(heightAllocated: Float?) {
     // height allocated to children is either
-    // * this' height minus its padding
-    // * height allocated to this, minus this' margin and padding
+    // * this' height core.minus its padding
+    // * height allocated to this, core.minus this' margin and padding
     val heightAllocatedInternal = height ?.let { h -> h - padding.height } ?: heightAllocated ?.let { h -> h - margin.height - padding.height }
     val flowRows = mutableListOf(mutableListOf<UINode>())
     val contentHeight by when (val l = layout) {
         is FillLayout -> {
-            children.forEach { it.positionChildrenInternal(heightAllocatedInternal) }
-            lazy { children .map { it.computedHeight + it.margin.height } .fold(0f, ::max) }
+            childrenInternal.forEach { it.positionChildrenInternal(heightAllocatedInternal) }
+            lazy { childrenInternal .map { it.computedHeight + it.margin.height } .fold(0f, ::max) }
         }
         is GridLayout -> {
             val ha = heightAllocatedInternal ?.let { w -> (w - (l.horizontal - 1) * l.spacing.x) / l.horizontal }
-            children.forEach { it.positionChildrenInternal(ha) }
+            childrenInternal.forEach { it.positionChildrenInternal(ha) }
             lazy { 0f }
         }
         is FreeLayout -> {
             fun evalh(l: LayoutLineValue) = l.x + (heightAllocatedInternal ?: 0f) * l.y / 100f
 
-            children.forEach { child ->
+            childrenInternal.forEach { child ->
                 val top = l.hLines[l.nodeTops[child]]
                 val bottom = l.hLines[l.nodeBottoms[child]]
                 val height = top ?.let { bottom ?.let { evalh(bottom) - evalh(top) + 1 } } ?: child.height
@@ -102,22 +102,22 @@ internal fun UINode.positionChildrenInternal(heightAllocated: Float?) {
                 child.positionChildrenInternal(height)
             }
 
-            lazy { children.map { child ->
+            lazy { childrenInternal.map { child ->
                 val top = l.hLines[l.nodeTops[child]]
                 val bottom = l.hLines[l.nodeBottoms[child]]
                 bottom ?.let { evalh(bottom) } ?: (top ?.let { evalh(top) } ?: 0f) + child.computedHeight - 1
             } .fold(0f, ::max) }
         }
         is ListLayout -> {
-            children.forEach { it.positionChildrenInternal(null) }
-            lazy { children .map { it.computedHeight + it.margin.height } .sum() }
+            childrenInternal.forEach { it.positionChildrenInternal(null) }
+            lazy { childrenInternal .map { it.computedHeight + it.margin.height } .sum() }
         }
         is FlowLayout -> {
             var x = padding.left
             var y = padding.top
             val xOverflow = computedWidth - padding.right
 
-            children.forEach { child ->
+            childrenInternal.forEach { child ->
                 child.positionChildrenInternal(null)
 
                 if (x + child.margin.width + child.computedWidth > xOverflow) {
@@ -143,7 +143,7 @@ internal fun UINode.positionChildrenInternal(heightAllocated: Float?) {
         // compute height of all children
         // position children aligned within content box
         is FillLayout -> {
-            children.forEach {
+            childrenInternal.forEach {
                 it.computedX = padding.left + it.margin.left + align(l.alignment.x, computedWidth - padding.width, it.computedWidth + it.margin.width)
                 it.computedY = padding.top + it.margin.top + align(l.alignment.y, computedHeight - padding.height, it.computedHeight + it.margin.height)
             }
@@ -152,7 +152,7 @@ internal fun UINode.positionChildrenInternal(heightAllocated: Float?) {
             val cw = (computedWidth - padding.width - l.spacing.x * (l.horizontal - 1)) / l.horizontal
             val ch = (computedHeight - padding.height - l.spacing.y * (l.vertical - 1)) / l.vertical
 
-            children
+            childrenInternal
                     .mapIndexed { i, child ->
                         Triple(child, i % l.horizontal, i / l.horizontal)
                     }
@@ -165,7 +165,7 @@ internal fun UINode.positionChildrenInternal(heightAllocated: Float?) {
             fun evalw(l: LayoutLineValue?) = l ?.let { l.x + computedWidth * l.y / 100f }
             fun evalh(l: LayoutLineValue?) = l ?.let { l.x + computedHeight * l.y / 100f }
 
-            children.forEach { child ->
+            childrenInternal.forEach { child ->
                 val top = evalh(l.hLines[l.nodeTops[child]]) ?: 0f
                 val left = evalw(l.vLines[l.nodeLefts[child]]) ?: 0f
                 val bottom = evalh(l.hLines[l.nodeBottoms[child]]) ?: top + child.computedHeight
@@ -176,10 +176,10 @@ internal fun UINode.positionChildrenInternal(heightAllocated: Float?) {
             }
         }
         is ListLayout -> {
-            var y = padding.top + l.spacing.init(children.size, computedHeight, contentHeight)
-            val yd = l.spacing.iter(children.size, computedHeight, contentHeight)
+            var y = padding.top + l.spacing.init(childrenInternal.size, computedHeight, contentHeight)
+            val yd = l.spacing.iter(childrenInternal.size, computedHeight, contentHeight)
 
-            children.forEach {
+            childrenInternal.forEach {
                 it.computedX = padding.left + it.margin.left + align(l.alignment, computedWidth - padding.width, it.computedWidth + it.margin.width)
                 it.computedY = y + it.margin.top
                 y += it.computedHeight + it.margin.height + yd

@@ -1,3 +1,7 @@
+package util
+
+import core.*
+import createVAO
 
 fun createStandardGLVAO(vertices: List<vec3>, normals: List<vec3>, uvs: List<vec2>, colours: List<vec3>) = createVAO {
     genVertexPositionBuffer(vertices)

@@ -1,31 +1,16 @@
 package graphics
 
-import AABB
 import GLShaderProgram
 import GLShaderType
 import GLViewport
-import RGBA
+import core.*
 import createGLShaderProgram
 import detach
-import intersection
 import link
-import mat3_rotate
-import mat3_scale
-import mat4
-import mat4_identity
-import mat4_translate
-import minus
-import offset
-import plus
-import shader
-import size
-import times
-import unaryMinus
 import useIn
+import util.AABB
+import util.intersection
 import validate
-import vec2
-import vec3
-import vec4
 
 fun <T> DrawContext2D.draw(fn: DrawContext2D.() -> T)
         = fn(this)
@@ -98,7 +83,7 @@ class DrawContext2D(val viewport: GLViewport) {
 
     fun draw(fn: DrawContext2DRenderer.() -> Unit) {
         val sOffset = viewport.offset + vec2(scissor?.min?.x ?: 0f, viewport.size.y - (scissor?.max?.y
-            ?: viewport.size.y))
+                ?: viewport.size.y))
         val sSize = scissor?.max?.minus(scissor?.min ?: vec2(0f)) ?: viewport.size
         GLViewport(sOffset.x.toInt(), sOffset.y.toInt(), sSize.x.toInt(), sSize.y.toInt()).setGLViewport()
         val renderer = DrawContext2DRenderer(this)

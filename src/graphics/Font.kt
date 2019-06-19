@@ -2,7 +2,7 @@ package graphics
 
 import GLTexture2
 import GLVAO
-import vec2
+import core.vec2
 
 abstract class Font(val scale: Float) {
     val height: Float get() = scale * lineHeight
@@ -18,6 +18,10 @@ abstract class Font(val scale: Float) {
     abstract fun getVAO(char: Char): GLVAO
     abstract fun getVAOVertexCount(char: Char): Int
     abstract fun getTexture(char: Char): GLTexture2?
+
+    companion object {
+        val DEFAULT_FONT by lazy { FNTFont.DEFAULT_FONT as Font }
+    }
 }
 
 fun Font.widthOf(text: String)

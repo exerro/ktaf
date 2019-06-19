@@ -1,3 +1,7 @@
+package core
+
+import kotlin.math.max
+import kotlin.math.min
 import kotlin.math.sqrt
 
 data class vec4(val x: Float, val y: Float = x, val z: Float = y, val w: Float = 1f)
@@ -23,14 +27,22 @@ infix fun vec2.dot(v: vec2) = x * v.x + y * v.y
 infix fun vec3.dot(v: vec3) = x * v.x + y * v.y + z * v.z
 
 infix fun vec3.cross(v: vec3) = vec3(
-        y*v.z - z*v.y,
-        z*v.x - x*v.z,
-        x*v.y - y*v.x
+        y * v.z - z * v.y,
+        z * v.x - x * v.z,
+        x * v.y - y * v.x
 )
 
 fun vec2.unpack(): Array<Float> = arrayOf(x, y)
 fun vec3.unpack(): Array<Float> = arrayOf(x, y, z)
 fun vec4.unpack(): Array<Float> = arrayOf(x, y, z, w)
+
+fun vec2.min() = min(x, y)
+fun vec3.min() = min(min(x, y), z)
+fun vec4.min() = min(min(min(x, y), z), w)
+
+fun vec2.max() = max(x, y)
+fun vec3.max() = max(max(x, y), z)
+fun vec4.max() = max(max(max(x, y), z), w)
 
 fun vec2.rotate90CCW(): vec2 = vec2(-y, x)
 fun vec2.rotate90CW(): vec2 = vec2(y, -x)

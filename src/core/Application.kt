@@ -1,12 +1,23 @@
+package core
+
+import GLFWDisplay
+import GLViewport
+import checkGLError
+import closeGL
+import freeUnreferencedGLObjects
 import org.lwjgl.glfw.Callbacks
 import org.lwjgl.glfw.GLFW
-import org.lwjgl.opengl.GL46.*
+import setup
 
 const val DISPLAY_FPS_READINGS = 10
 
 class Application(val display: GLFWDisplay) {
+    private val startTime = System.currentTimeMillis()
+    internal var fpsInternal = 0
+
     var running = true
-    var fps = 0
+    val time get() = (System.currentTimeMillis() - startTime) / 1000f
+    val fps get() = fpsInternal
 
     val viewport
         get() = GLViewport({0}, {0}, {display.width}, {display.height})
@@ -131,10 +142,8 @@ private fun run(app: Application) {
     // run the rendering loop until the user has attempted to close the window or has pressed the ESCAPE key
     while (app.running && !GLFW.glfwWindowShouldClose(app.display.windowID)) {
         // set the clear colour to black and clear the framebuffer
-        checkGLError {
-            glClearColor(0.0f, 0.0f, 0.0f, 0.0f)
-            glClear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
-        }
+        GL.clearColour(0.0f, 0.0f, 0.0f, 0.0f)
+        GL.clear(GLClearBuffer.GL_COLOR_BUFFER_BIT, GLClearBuffer.GL_DEPTH_BUFFER_BIT)
 
         val t = System.currentTimeMillis()
         val dt = (t - lastUpdate).toFloat()
@@ -142,13 +151,13 @@ private fun run(app: Application) {
 
         // calculate the FPS based on past FPS readings
         fpsReadings = (listOf(1000/dt) + fpsReadings).take(DISPLAY_FPS_READINGS)
-        app.fps = (fpsReadings.fold(dt) { acc, it -> acc + it } / (fpsReadings.size + 1)).toInt()
+        app.fpsInternal = (fpsReadings.fold(dt) { acc, it -> acc + it } / (fpsReadings.size + 1)).toInt()
 
         // call the update callbacks
         app.onUpdateCallbacks.map { it(dt / 1000f) }
 
         // call the graphics.draw callbacks
-        checkGLError { glFinish() }
+        checkGLError { GL.finish() }
         app.onDrawCallbacks.map { it() }
 
         // run the main thread functions

@@ -1,3 +1,6 @@
+package core
+
+import core.vec4
 
 class DeferredEvaluator<T>(val evaluator: () -> T) {
     @Volatile private var value: T? = null
@@ -37,6 +40,3 @@ typealias MouseDraggedCallback = (Int, Int, Int, Int, Int, Int, Set<GLFWMouseBut
 typealias DrawCallback = () -> Unit
 typealias UpdateCallback = (Float) -> Unit
 typealias ResizeCallback = (Int, Int) -> Unit
-
-typealias RGB = vec4
-typealias RGBA = vec4

@@ -1,11 +1,6 @@
 package ui
 
-import GLFWKey
-import GLFWMouseButton
-import GLFWMouseModifier
-import GLFWKeyModifier
-import minus
-import vec2
+import core.*
 
 internal typealias EventHandler<T> = (T) -> Unit
 internal typealias EventHandlerList<T> = MutableList<EventHandler<T>>
@@ -54,36 +49,36 @@ class UIMouseExitEvent internal constructor(handler: UINode?, parent: UIMouseEve
 }
 
 class UIMousePressEvent internal constructor(handler: UINode?, parent: UIMouseEvent?, position: vec2,
-        val button: GLFWMouseButton,
-        val modifiers: Set<GLFWMouseModifier>
+                                             val button: GLFWMouseButton,
+                                             val modifiers: Set<GLFWMouseModifier>
 ): UIMouseEvent(handler, parent, position) {
     override fun relativeTo(origin: vec2) = UIMousePressEvent(handler, this, position - origin, button, modifiers)
 }
 
 class UIMouseReleaseEvent internal constructor(handler: UINode?, parent: UIMouseEvent?, position: vec2,
-        val button: GLFWMouseButton,
-        val modifiers: Set<GLFWMouseModifier>
+                                               val button: GLFWMouseButton,
+                                               val modifiers: Set<GLFWMouseModifier>
 ): UIMouseEvent(handler, parent, position) {
     override fun relativeTo(origin: vec2) = UIMouseReleaseEvent(handler, this, position - origin, button, modifiers)
 }
 
 class UIMouseClickEvent internal constructor(handler: UINode?, parent: UIMouseEvent?, position: vec2,
-        val button: GLFWMouseButton,
-        val modifiers: Set<GLFWMouseModifier>
+                                             val button: GLFWMouseButton,
+                                             val modifiers: Set<GLFWMouseModifier>
 ): UIMouseEvent(handler, parent, position) {
     override fun relativeTo(origin: vec2) = UIMouseClickEvent(handler, this, position - origin, button, modifiers)
 }
 
 class UIMouseMoveEvent internal constructor(handler: UINode?, parent: UIMouseEvent?, position: vec2,
-        val lastPosition: vec2
+                                            val lastPosition: vec2
 ): UIMouseEvent(handler, parent, position) {
     override fun relativeTo(origin: vec2) = UIMouseMoveEvent(handler, this, position - origin, lastPosition - origin)
 }
 
 class UIMouseDragEvent internal constructor(handler: UINode?, parent: UIMouseEvent?, position: vec2,
-        val lastPosition: vec2,
-        val firstPosition: vec2,
-        val modifiers: Set<GLFWMouseModifier>
+                                            val lastPosition: vec2,
+                                            val firstPosition: vec2,
+                                            val modifiers: Set<GLFWMouseModifier>
 ): UIMouseEvent(handler, parent, position) {
     override fun relativeTo(origin: vec2) = UIMouseDragEvent(handler, this, position - origin, lastPosition - origin, firstPosition - origin, modifiers)
 }
