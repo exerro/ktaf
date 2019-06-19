@@ -167,6 +167,7 @@ private fun run(app: Application) {
 }
 
 private fun destroy(app: Application) {
+    closeGL()
     Callbacks.glfwFreeCallbacks(app.display.windowID)
     GLFW.glfwDestroyWindow(app.display.windowID)
     GLFW.glfwTerminate()

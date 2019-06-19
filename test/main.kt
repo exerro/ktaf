@@ -1,10 +1,17 @@
 import font.FNTFont
-import font.loadFile
 
 fun main() = application("Hello world") {
     val context = DrawContext2D(viewport)
-    val texture = loadTextureFile2D("img.jpg")
-    val font = FNTFont.loadFile("test/open-sans/OpenSans-Regular.fnt")
+//    val texture = loadTextureFile2D("img.jpg")
+
+    draw {
+        val width = FNTFont.DEFAULT_FONT.scaleTo(300f).widthOf("Hello g")
+        val height = FNTFont.DEFAULT_FONT.scaleTo(300f).height
+        context.colour = RGB(1f)
+        context.rectangle(vec2(10f), vec2(width + 1, height))
+        context.colour = RGB(1f, 0f, 1f)
+        context.write("Hello g", FNTFont.DEFAULT_FONT.scaleTo(300f), vec2(10f))
+    }
 
     draw {
         context.push {
@@ -19,7 +26,7 @@ fun main() = application("Hello world") {
 //        context.image(texture, vec2(0f), vec2(0.3f))
 //        context.pop()
 
-        context.write("Hello", font.scaleTo(300f))
+
     }
 
     update {

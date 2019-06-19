@@ -48,13 +48,14 @@ fun DrawContext2D.image(image: GLTexture2, position: vec2 = vec2(0f), scale: vec
 }
 
 fun DrawContext2D.write(text: String, font: Font, position: vec2 = vec2(0f)) {
-    var x = 0f
+    var x = position.x
+    val y = position.y + (font.lineHeight - font.baseline) * font.scale
 
     (text.zip(text.drop(1)) + listOf(text.last() to null)).forEach { (char, next) ->
         val offset = font.getCharOffset(char)
         font.getTexture(char)?.use(0)
         vao(font.getVAO(char), font.getVAOVertexCount(char),
-                mat4_translate(vec3(position.x + x + offset.x * font.scale, position.y + offset.y * font.scale, 0f)) *
+                mat4_translate(vec3(x + offset.x * font.scale, y + offset.y * font.scale, 0f)) *
                 mat3_scale(vec3(font.scale)).mat4(),
                 font.getTexture(char) != null)
         font.getTexture(char)?.stopUsing()

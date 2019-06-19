@@ -1,8 +1,6 @@
 package font
 
 import Font
-import vec2
-import vec3
 import GLTexture2
 import GLVAO
 import createVAO
@@ -12,24 +10,30 @@ import genVertexColourBuffer
 import genVertexNormalBuffer
 import genVertexPositionBuffer
 import genVertexUVBuffer
-import loadTextureFile2D
+import loadTexture2D
+import org.lwjgl.BufferUtils
 import plus
 import times
+import vec2
+import vec3
+import java.io.InputStream
 import java.nio.file.Files
 import java.nio.file.Paths
 
 private typealias CharMap<T> = Map<Char, T>
 
+// TODO: use baseline!
+
 class FNTFont internal constructor(
         scale: Float,
         override val lineHeight: Float,
         override val baseline: Float,
-        val charSizes: CharMap<vec2>,
-        val charOffsets: CharMap<vec2>,
-        val charAdvances: CharMap<Float>,
-        val charKernings: CharMap<CharMap<Float>>,
-        val charVAOs: CharMap<GLVAO>,
-        val charTextures: CharMap<GLTexture2>
+        private val charSizes: CharMap<vec2>,
+        private val charOffsets: CharMap<vec2>,
+        private val charAdvances: CharMap<Float>,
+        private val charKernings: CharMap<CharMap<Float>>,
+        private val charVAOs: CharMap<GLVAO>,
+        private val charTextures: CharMap<GLTexture2>
 ): Font(scale) {
     override fun scaleTo(height: Float): Font = FNTFont(
             height / lineHeight,
@@ -51,7 +55,11 @@ class FNTFont internal constructor(
     override fun getVAOVertexCount(char: Char) = 6
     override fun getTexture(char: Char): GLTexture2? = charTextures[char]
 
-    companion object
+    companion object {
+        val DEFAULT_FONT by lazy {
+            load(FNTFont::class.java.getResourceAsStream("/font/open-sans/OpenSans-Regular.fnt"))
+        }
+    }
 }
 
 class FNTFontPreloader(
@@ -99,6 +107,15 @@ fun FNTFont.Companion.preload(content: String): FNTFontPreloader {
                 generateSequence(regex.find(content)) { regex.find(content, it.range.last + 1) }
             }
 
+    val kerningMatches = Regex("<kerning\\s+" +
+            "first=\"(\\d+)\"\\s+" +
+            "second=\"(\\d+)\"\\s+" +
+            "amount=\"([+-]?\\d+)\"\\s+" +
+            "/>")
+            .let { regex ->
+                generateSequence(regex.find(content)) { regex.find(content, it.range.last + 1) }
+            }
+
     val lineHeight = commonMatch.groupValues[1].toInt()
     val baseline = commonMatch.groupValues[2].toInt()
     val scaleW = commonMatch.groupValues[3].toInt()
@@ -131,6 +148,14 @@ fun FNTFont.Companion.preload(content: String): FNTFontPreloader {
         charUVs[char] = listOf(uv, uv + vec2(0f, duv.y), uv + duv, uv + vec2(duv.x, 0f))
         charAdvances[char] = xadvance.toFloat()
         charPages[char] = page
+    }
+
+    kerningMatches.forEach { match ->
+        val first = match.groupValues[1].toInt()
+        val second = match.groupValues[2].toInt()
+        val amount = match.groupValues[3].toInt()
+
+        (kernings.computeIfAbsent(first.toChar()) { mutableMapOf() }) [second.toChar()] = amount.toFloat()
     }
 
     pageIDs.forEach { if (!pages.contains(it)) error("Missing page '$it'") }
@@ -176,7 +201,12 @@ fun FNTFont.Companion.load(preloader: FNTFontPreloader): FNTFont {
     } .toMap()
 
     val textureObjects = preloader.pages.map { (page, file) ->
-        page to loadTextureFile2D(file)
+        val input = FNTFont::class.java.getResourceAsStream(file)
+        val byteArray = input.readAllBytes()
+        val byteBuffer = BufferUtils.createByteBuffer(byteArray.size)
+        byteBuffer.put(byteArray)
+        byteBuffer.flip()
+        page to loadTexture2D(byteBuffer)
     } .toMap()
 
     val textures = preloader.charPages.map { (char, page) ->
@@ -198,6 +228,9 @@ fun FNTFont.Companion.load(preloader: FNTFontPreloader): FNTFont {
 
 fun FNTFont.Companion.load(content: String): FNTFont
         = load(preload(content))
+
+fun FNTFont.Companion.load(input: InputStream): FNTFont
+        = load(String(input.readAllBytes()))
 
 fun FNTFont.Companion.loadFile(file: String): FNTFont
         = load(preloadFile(file))
