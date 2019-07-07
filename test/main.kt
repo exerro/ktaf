@@ -1,6 +1,6 @@
-import core.*
-import graphics.FNTFont
-import graphics.*
+import ktaf.core.*
+import ktaf.graphics.*
+import lwjglkt.GL
 import kotlin.math.sin
 
 fun main() = application("Hello world") {
@@ -24,15 +24,15 @@ fun main() = application("Hello world") {
 
     draw {
         context.push {
-//            translate(core.vec2(100f))
+            //            translate(ktaf.core.vec2(100f))
 //            colour = RGB(0f, 1f, 1f)
-//            scissor = AABB(core.vec2(30f), core.vec2(200f))
-//            graphics.image(texture, core.vec2(0f), core.vec2(0.3f))
+//            scissor = AABB(ktaf.core.vec2(30f), ktaf.core.vec2(200f))
+//            ktaf.graphics.image(texture, ktaf.core.vec2(0f), ktaf.core.vec2(0.3f))
         }
 
-//        context.graphics.push()
-//        context.scissor = AABB(core.vec2(30f), core.vec2(200f))
-//        context.graphics.image(texture, core.vec2(0f), core.vec2(0.3f))
+//        context.ktaf.graphics.push()
+//        context.scissor = AABB(ktaf.core.vec2(30f), ktaf.core.vec2(200f))
+//        context.ktaf.graphics.image(texture, ktaf.core.vec2(0f), ktaf.core.vec2(0.3f))
 //        context.pop()
 
 

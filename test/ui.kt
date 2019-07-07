@@ -1,19 +1,22 @@
-import core.*
-import graphics.DrawContext2D
-import graphics.circle
-import graphics.rectangle
-import ui.*
-import ui.elements.*
-import util.Easing
+
+import ktaf.core.application
+import ktaf.core.div
+import ktaf.core.vec2
+import ktaf.graphics.DrawContext2D
+import ktaf.graphics.circle
+import ktaf.graphics.rectangle
+import ktaf.core.rgba
+import ktaf.ui.*
+import ktaf.ui.elements.*
+import ktaf.util.Easing
 import kotlin.math.min
 import kotlin.math.sin
-import kotlin.reflect.KProperty0
 
 fun main() = application("Hello world") {
     val context = DrawContext2D(viewport)
     val scene = scene(display, context) {
         lateinit var r: UIContainer
-        r = root(UIContainer()) {
+        r = addRoot(UIContainer()) {
             colour = rgba(0f, 1f, 0.5f)
 
             val b1 = list {
@@ -66,7 +69,7 @@ fun main() = application("Hello world") {
             }
 
             val buttons = (3..17).map {
-                addChild(UIButton("B${it-2}")) {
+                addChild(UIButton("B${it - 2}")) {
                     colour = rgba(it.toFloat() / 25)
                     margin = Border(10f)
                     width = 100f
@@ -74,7 +77,7 @@ fun main() = application("Hello world") {
 
                     onClick { event ->
                         println("grid button ${it - 2} was clicked at ${event.position} with button ${event.button} and modifiers ${event.modifiers}")
-                        animateNullable(::height, 300f, easing=Easing.SMOOTH)
+                        animateNullable(::height, 300f, easing = Easing.SMOOTH)
                     }
                 }
             }
@@ -111,8 +114,8 @@ fun main() = application("Hello world") {
                     event.ifNotHandled {
                         if (event.within(this)) {
                             event.handledBy(this)
-                            animateNullable(::width, Math.random().toFloat() * 100f + 50f, easing=Easing.SMOOTH)
-                            animateNullable(::height, Math.random().toFloat() * 100f + 50f, easing=Easing.SMOOTH)
+                            animateNullable(::width, Math.random().toFloat() * 100f + 50f, easing = Easing.SMOOTH)
+                            animateNullable(::height, Math.random().toFloat() * 100f + 50f, easing = Easing.SMOOTH)
                         }
                     }
                 }
