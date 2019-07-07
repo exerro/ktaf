@@ -1,4 +1,4 @@
-package ktaf.ui
+package ktaf.ui.layout
 
 typealias SpacingFunction = (Int, Float, Float) -> Float
 data class Spacing(val init: SpacingFunction, val iter: SpacingFunction) {
@@ -27,6 +27,6 @@ data class Spacing(val init: SpacingFunction, val iter: SpacingFunction) {
 }
 
 infix fun Spacing.within(other: Spacing) = Spacing(
-        { n, s, c -> other.init(n, s, c + (n-1) + this.iter(n, s, c) + 2 * this.init(n, s, c)) },
+        { n, s, c -> other.init(n, s, c + (n - 1) + this.iter(n, s, c) + 2 * this.init(n, s, c)) },
         this.iter
 )

@@ -25,5 +25,5 @@ abstract class Font(val scale: Float) {
 }
 
 fun Font.widthOf(text: String)
-        = (text.zip(text.drop(1)).map { (a, b) -> getKerning(a, b) + getCharAdvance(a) } .sum() +
+        = if (text == "") 0f else (text.zip(text.drop(1)).map { (a, b) -> getKerning(a, b) + getCharAdvance(a) } .sum() +
            getCharSize(text.last()).x + getCharOffset(text.last()).x) * scale

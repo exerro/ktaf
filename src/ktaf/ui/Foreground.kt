@@ -10,6 +10,7 @@ import ktaf.util.wrapText
 
 abstract class Foreground {
     abstract fun draw(context: DrawContext2D, position: vec2, size: vec2)
+    open fun getHeight(width: Float): Float? = null
 }
 
 data class TextForeground(
@@ -31,6 +32,8 @@ data class TextForeground(
             }
         }
     }
+
+    // TODO: override fun getHeight(width: Float): Float? = height of wrapped text
 }
 
 data class ImageForeground(
@@ -48,4 +51,6 @@ data class ImageForeground(
             }
         }
     }
+
+    // TODO: override fun getHeight(width: Float): Float? = height of scaled image
 }

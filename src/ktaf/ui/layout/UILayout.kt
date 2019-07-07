@@ -1,5 +1,7 @@
-package ktaf.ui
+package ktaf.ui.layout
 import ktaf.core.vec2
+import ktaf.ui.*
+import ktaf.ui.UI_t
 
 sealed class UILayout: UI_t
 
@@ -10,8 +12,8 @@ class FillLayout: UILayout() {
 class GridLayout: UILayout() {
     var alignment by property(vec2(0.5f))
     var spacing by property(vec2(0f))
-    var horizontal by property(1)
-    var vertical by property(1)
+    var columns by property(1)
+    var rows by property(1)
 }
 
 class FreeLayout: UILayout() {
@@ -45,20 +47,18 @@ class FlowLayout: UILayout() {
 }
 
 typealias LayoutLine = String
-internal typealias LayoutLineValue = vec2
+internal typealias LayoutLineValue = RelativeSize
 internal typealias LayoutLineMapping = MutableMap<LayoutLine, LayoutLineValue>
 internal typealias LayoutNodeMapping = MutableMap<UINode, LayoutLine>
 
 class LineEditor internal constructor(private val lines: LayoutLineMapping, private val line: String) {
     var offset
-        get() = lines.computeIfAbsent(line) { vec2(0f) } .x
-        set(value) { lines[line] = vec2(value, lines[line]?.y ?: 0f)
-        }
+        get() = lines.computeIfAbsent(line) { fixed(0f) } .fixed
+        set(value) { lines[line] = RelativeSize(value, lines[line]?.ratio ?: 0f) }
 
     var percentage
-        get() = lines.computeIfAbsent(line) { vec2(0f) } .y
-        set(value) { lines[line] = vec2(lines[line]?.x ?: 0f, value)
-        }
+        get() = lines.computeIfAbsent(line) { fixed(0f) } .ratio
+        set(value) { lines[line] = RelativeSize(lines[line]?.fixed ?: 0f, value / 100f) }
 }
 
 class NodeEditor internal constructor(private val node: UINode, private val layout: FreeLayout) {
@@ -79,44 +79,52 @@ class NodeEditor internal constructor(private val node: UINode, private val layo
         set(value) { value ?.let { layout.nodeRights[node] = value } }
 
     var topOffset
-        get() = layout.hLines[layout.nodeTops[node]] ?.x ?: 0f
-        set(value) { top = genLine(layout.hLines, vec2(value, topPercentage)) }
+        get() = layout.hLines[layout.nodeTops[node]] ?.fixed ?: 0f
+        set(value) { top = genLine(layout.hLines, RelativeSize(value, topPercentage))
+        }
 
     var bottomOffset
-        get() = layout.hLines[layout.nodeBottoms[node]] ?.x ?: 0f
-        set(value) { bottom = genLine(layout.hLines, vec2(value, bottomPercentage)) }
+        get() = layout.hLines[layout.nodeBottoms[node]] ?.fixed ?: 0f
+        set(value) { bottom = genLine(layout.hLines, RelativeSize(value, bottomPercentage))
+        }
 
     var leftOffset
-        get() = layout.vLines[layout.nodeLefts[node]] ?.x ?: 0f
-        set(value) { left = genLine(layout.vLines, vec2(value, leftPercentage)) }
+        get() = layout.vLines[layout.nodeLefts[node]] ?.fixed ?: 0f
+        set(value) { left = genLine(layout.vLines, RelativeSize(value, leftPercentage))
+        }
 
     var rightOffset
-        get() = layout.vLines[layout.nodeRights[node]] ?.x ?: 0f
-        set(value) { right = genLine(layout.vLines, vec2(value, rightPercentage)) }
+        get() = layout.vLines[layout.nodeRights[node]] ?.fixed ?: 0f
+        set(value) { right = genLine(layout.vLines, RelativeSize(value, rightPercentage))
+        }
 
     var topPercentage
-        get() = layout.hLines[layout.nodeTops[node]] ?.y ?: 0f
-        set(value) { top = genLine(layout.hLines, vec2(topOffset, value)) }
+        get() = layout.hLines[layout.nodeTops[node]] ?.fixed ?: 0f
+        set(value) { top = genLine(layout.hLines, RelativeSize(topOffset, value / 100f))
+        }
 
     var bottomPercentage
-        get() = layout.hLines[layout.nodeBottoms[node]] ?.y ?: 0f
-        set(value) { bottom = genLine(layout.hLines, vec2(bottomOffset, value)) }
+        get() = layout.hLines[layout.nodeBottoms[node]] ?.ratio ?: 0f
+        set(value) { bottom = genLine(layout.hLines, RelativeSize(bottomOffset, value / 100f))
+        }
 
     var leftPercentage
-        get() = layout.vLines[layout.nodeLefts[node]] ?.y ?: 0f
-        set(value) { left = genLine(layout.vLines, vec2(leftOffset, value)) }
+        get() = layout.vLines[layout.nodeLefts[node]] ?.ratio ?: 0f
+        set(value) { left = genLine(layout.vLines, RelativeSize(leftOffset, value / 100f))
+        }
 
     var rightPercentage
-        get() = layout.vLines[layout.nodeRights[node]] ?.y ?: 0f
-        set(value) { right = genLine(layout.vLines, vec2(rightOffset, value)) }
+        get() = layout.vLines[layout.nodeRights[node]] ?.ratio ?: 0f
+        set(value) { right = genLine(layout.vLines, RelativeSize(rightOffset, value / 100f))
+        }
 }
 
 fun FreeLayout.hline(line: String, fn: LineEditor.() -> Unit) = fn(LineEditor(hLines, line))
 fun FreeLayout.vline(line: String, fn: LineEditor.() -> Unit) = fn(LineEditor(vLines, line))
-fun FreeLayout.hline(line: String, value: vec2) { hLines[line] = value }
-fun FreeLayout.vline(line: String, value: vec2) { vLines[line] = value }
+fun FreeLayout.hline(line: String, value: RelativeSize) { hLines[line] = value }
+fun FreeLayout.vline(line: String, value: RelativeSize) { vLines[line] = value }
 fun FreeLayout.line(line: String, fn: LineEditor.() -> Unit) { fn(LineEditor(hLines, line)); fn(LineEditor(vLines, line)) }
-fun FreeLayout.line(line: String, value: vec2) { hLines[line] = value; vLines[line] = value }
+fun FreeLayout.line(line: String, value: RelativeSize) { hLines[line] = value; vLines[line] = value }
 
 fun FreeLayout.elem(node: UINode, fn: NodeEditor.() -> Unit) = fn(NodeEditor(node, this))
 

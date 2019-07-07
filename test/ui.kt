@@ -8,6 +8,7 @@ import ktaf.graphics.rectangle
 import ktaf.core.rgba
 import ktaf.ui.*
 import ktaf.ui.elements.*
+import ktaf.ui.layout.*
 import ktaf.util.Easing
 import kotlin.math.min
 import kotlin.math.sin
@@ -20,8 +21,9 @@ fun main() = application("Hello world") {
             colour = rgba(0f, 1f, 0.5f)
 
             val b1 = list {
-                width = 200f
                 colour = rgba(1f, 0f, 0f)
+
+                shrink()
 
                 addChild(UIButton("Hello")) {
                     colour = rgba(0f, 1f, 0f)
@@ -29,10 +31,12 @@ fun main() = application("Hello world") {
                     font = font.scaleTo(font.height * 1.3f)
                     height = 50f
 
+                    fill()
+
                     onClick {
                         r.layout(GridLayout()) {
-                            horizontal = 5
-                            vertical = 5
+                            columns = 5
+                            rows = 5
                         }
                     }
                 }
@@ -56,7 +60,7 @@ fun main() = application("Hello world") {
             }
 
             val b2 = addChild(UIButton("Woah")) {
-                width = 200f
+                fill()
                 height = 30f
                 textColour = rgba(0f)
 

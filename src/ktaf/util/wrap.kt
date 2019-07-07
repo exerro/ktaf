@@ -10,7 +10,7 @@ fun lineWrapText(text: String, font: Font, width: Float): Pair<String, String?> 
         return trimmedText to null
 
     // TODO: fix issues with very small widths
-    val overflow = (1 until trimmedText.length).first { font.widthOf(trimmedText.substring(0, it + 1)) > width }
+    val overflow = (1 until trimmedText.length).firstOrNull { font.widthOf(trimmedText.substring(0, it + 1)) > width } ?: 1
     val length = (overflow - 1 downTo 0).first { !trimmedText[it].isWhitespace() }
 
     return trimmedText.substring(0, length + 1) to trimmedText.substring(overflow)

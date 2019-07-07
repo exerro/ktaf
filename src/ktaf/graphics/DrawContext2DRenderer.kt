@@ -74,6 +74,8 @@ fun DrawContext2DRenderer.image(image: GLTexture2, position: vec2 = vec2(0f), sc
 }
 
 fun DrawContext2DRenderer.write(text: String, font: Font, position: vec2 = vec2(0f)) {
+    if (text == "") return
+
     var x = position.x
     val y = position.y + (font.lineHeight - font.baseline) * font.scale
 

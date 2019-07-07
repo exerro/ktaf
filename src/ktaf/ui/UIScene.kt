@@ -2,6 +2,8 @@ package ktaf.ui
 
 import ktaf.core.*
 import ktaf.graphics.DrawContext2D
+import ktaf.ui.layout.computeWidthInternal
+import ktaf.ui.layout.positionChildrenInternal
 import lwjglkt.GLFWCursor
 import lwjglkt.GLFWDisplay
 import lwjglkt.setCursor

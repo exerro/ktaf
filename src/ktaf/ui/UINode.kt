@@ -4,9 +4,31 @@ import ktaf.core.minus
 import ktaf.graphics.DrawContext2D
 import ktaf.core.plus
 import ktaf.core.vec2
+import ktaf.ui.layout.ListLayout
+import ktaf.ui.layout.UILayout
 import lwjglkt.GLFWCursor
 
 abstract class UINode: UI_t {
+    // structure
+    internal var sceneInternal: UIScene? = null
+    internal val childrenInternal = mutableListOf<UINode>()
+    val scene get() = sceneInternal
+    val children get() = childrenInternal.toList()
+    var parent by property(null as UINode?)
+
+    // configuration
+    internal val foregroundsInternal = mutableListOf<Foreground>()
+    internal val backgroundsInternal = mutableListOf<Background>()
+    internal open var fillAllocatedSize = true
+    internal open val cursor: GLFWCursor? = GLFWCursor.DEFAULT
+
+    var margin by property(Border(0f))
+    var padding by property(Border(0f))
+    var layout by property(ListLayout() as UILayout)
+    var width by property(null as Float?)
+    var height by property(null as Float?)
+
+    // callbacks
     internal val focusEventHandlers: EventHandlerList<UIFocusEvent> = mutableListOf()
     internal val unFocusEventHandlers: EventHandlerList<UIUnFocusEvent> = mutableListOf()
     internal val mouseEventHandlers: EventHandlerList<UIMouseEvent> = mutableListOf()
@@ -21,28 +43,13 @@ abstract class UINode: UI_t {
     internal val keyPressEventHandlers: EventHandlerList<UIKeyPressEvent> = mutableListOf()
     internal val keyReleaseEventHandlers: EventHandlerList<UIKeyReleaseEvent> = mutableListOf()
     internal val textInputEventHandlers: EventHandlerList<UITextInputEvent> = mutableListOf()
+
+    // state
     internal var mouseInside = false
     internal var computedX: Float = 0f
     internal var computedY: Float = 0f
     internal var computedWidth: Float = 0f
     internal var computedHeight: Float = 0f
-    internal val childrenInternal = mutableListOf<UINode>()
-    internal val foregroundsInternal = mutableListOf<Foreground>()
-    internal val backgroundsInternal = mutableListOf<Background>()
-    internal var sceneInternal: UIScene? = null
-
-    open val cursor: GLFWCursor? = GLFWCursor.DEFAULT
-
-    var margin by property(Border(0f))
-    var padding by property(Border(0f))
-    var layout by property(ListLayout() as UILayout)
-    var width by property(null as Float?)
-    var height by property(null as Float?)
-    var parent by property(null as UINode?)
-    val children get() = childrenInternal.toList()
-    val foregrounds get() = foregroundsInternal.toList()
-    val backgrounds get() = backgroundsInternal.toList()
-    val scene get() = sceneInternal
 
     init {
         p(::parent) {
@@ -120,75 +127,15 @@ abstract class UINode: UI_t {
     }
 }
 
+fun UINode.fill() { fillAllocatedSize = true }
+fun UINode.shrink() { fillAllocatedSize = false }
+
 fun UINode.absolutePosition(): vec2
         = (parent?.absolutePosition() ?: vec2(0f)) + (parent?.padding?.tl ?: vec2(0f)) + vec2(computedX, computedY)
 
-fun UINode.requestFocus() {
-    sceneInternal?.focusOn(this)
-}
-
-fun UINode.unfocus() {
-    if (isFocused()) sceneInternal?.unfocus()
-}
-
-fun UINode.isFocused()
-        = sceneInternal?.focussedNode == this
-
-fun <N: UINode> N.onFocus(fn: N.(UIFocusEvent) -> Unit) {
-    focusEventHandlers.add { fn(this, it) }
-}
-
-fun <N: UINode> N.onFocusLost(fn: N.(UIUnFocusEvent) -> Unit) {
-    unFocusEventHandlers.add { fn(this, it) }
-}
-
-fun <N: UINode> N.onKeyEvent(fn: N.(UIKeyEvent) -> Unit) {
-    keyEventHandlers.add { fn(this, it) }
-}
-
-fun <N: UINode> N.onKeyPress(fn: N.(UIKeyPressEvent) -> Unit) {
-    keyPressEventHandlers.add { fn(this, it) }
-}
-
-fun <N: UINode> N.onKeyRelease(fn: N.(UIKeyReleaseEvent) -> Unit) {
-    keyReleaseEventHandlers.add { fn(this, it) }
-}
-
-fun <N: UINode> N.onTextInput(fn: N.(UITextInputEvent) -> Unit) {
-    textInputEventHandlers.add { fn(this, it) }
-}
-
-fun <N: UINode> N.onMouseEvent(fn: N.(UIMouseEvent) -> Unit) {
-    mouseEventHandlers.add { fn(this, it) }
-}
-
-fun <N: UINode> N.onMouseEnter(fn: N.(UIMouseEnterEvent) -> Unit) {
-    mouseEnterEventHandlers.add { fn(this, it) }
-}
-
-fun <N: UINode> N.onMouseExit(fn: N.(UIMouseExitEvent) -> Unit) {
-    mouseExitEventHandlers.add { fn(this, it) }
-}
-
-fun <N: UINode> N.onMousePress(fn: N.(UIMousePressEvent) -> Unit) {
-    mousePressEventHandlers.add { fn(this, it) }
-}
-
-fun <N: UINode> N.onMouseRelease(fn: N.(UIMouseReleaseEvent) -> Unit) {
-    mouseReleaseEventHandlers.add { fn(this, it) }
-}
-
-fun <N: UINode> N.onMouseClick(fn: N.(UIMouseClickEvent) -> Unit) {
-    mouseClickEventHandlers.add { fn(this, it) }
-}
-
-fun <N: UINode> N.onMouseMove(fn: N.(UIMouseMoveEvent) -> Unit) {
-    mouseMoveEventHandlers.add { fn(this, it) }
-}
-
-fun <N: UINode> N.onMouseDrag(fn: N.(UIMouseDragEvent) -> Unit) {
-    mouseDragEventHandlers.add { fn(this, it) }
-}
+fun UINode.requestFocus() { sceneInternal?.focusOn(this) }
+fun UINode.unfocus() { if (isFocused()) sceneInternal?.unfocus() }
+fun UINode.isFocused() = sceneInternal?.focussedNode == this
 
 fun <C: UINode> UINode.addChild(child: C, init: C.() -> Unit = {}): C {
     child.parent = this
@@ -207,25 +154,25 @@ fun <B: Background> UINode.addBackground(background: B, init: B.() -> Unit = {})
     return background
 }
 
+fun <B: Background> UINode.removeBackground(background: B): B {
+    if (backgroundsInternal.contains(background)) backgroundsInternal.remove(background)
+    return background
+}
+
+fun <B: Background> UINode.replaceBackground(old: Background, new: B): B {
+    removeBackground(old)
+    return addBackground(new)
+}
+
 fun <F: Foreground> UINode.addForeground(foreground: F, init: F.() -> Unit = {}): F {
     init(foreground)
     foregroundsInternal.add(foreground)
     return foreground
 }
 
-fun <B: Background> UINode.removeBackground(background: B): B {
-    if (backgroundsInternal.contains(background)) backgroundsInternal.remove(background)
-    return background
-}
-
 fun <F: Foreground> UINode.removeForeground(foreground: F): F {
     if (foregroundsInternal.contains(foreground)) foregroundsInternal.remove(foreground)
     return foreground
-}
-
-fun <B: Background> UINode.replaceBackground(old: Background, new: B): B {
-    removeBackground(old)
-    return addBackground(new)
 }
 
 fun <F: Foreground> UINode.replaceForeground(old: Foreground, new: F): F {
