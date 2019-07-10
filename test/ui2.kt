@@ -31,11 +31,11 @@ fun clearRootsRight(scene: UIScene, node: UINode) {
 fun loadProjectsList(scene: UIScene, node: UINode) {
     node.addChild(UIContainer()) {
         val header = addChild(UIContainer()) {
-            colour.set(rgba(0.08f, 0.09f, 0.11f))
-            padding.set(Border(10f))
+            colour.rgba(0.08f, 0.09f, 0.11f)
+            padding.set(10f)
 
             val title = addChild(UIButton("Projects")) {
-                colour.set(rgba(0f, 0f))
+                colour.rgba(0f, 0f)
                 font.set(font.get().scaleTo(32f))
             }
 
@@ -43,15 +43,15 @@ fun loadProjectsList(scene: UIScene, node: UINode) {
         }
 
         val content = addChild(UIContainer()) {
-            colour.set(rgba(0.14f, 0.15f, 0.17f))
-            padding.set(Border(0f, 0f, 50f, 0f))
+            colour.rgba(0.14f, 0.15f, 0.17f)
+            padding.set(0f, 0f, 50f, 0f)
 
             val plist = addChild(UIContainer()) {
-                colour.set(rgba(0f, 0f))
+                colour.rgba(0f, 0f)
 
                 for (item in listOf("Project 1", "Project 2", "Project 3")) {
                     addChild(UIButton(item)) {
-                        colour.set(rgba(0.3f, 0.6f, 0.9f))
+                        colour.rgba(0.3f, 0.6f, 0.9f)
                         height.set(50f)
                         font.set(font.get().scaleTo(28f))
 
@@ -68,7 +68,7 @@ fun loadProjectsList(scene: UIScene, node: UINode) {
             }
 
             val newButton = addChild(UIButton("NEW")) {
-                colour.set(rgba(0.9f, 0.35f, 0.3f))
+                colour.rgba(0.9f, 0.35f, 0.3f)
             }
 
             layout(FreeLayout()) {
@@ -122,8 +122,8 @@ fun loadProjectsList(scene: UIScene, node: UINode) {
 fun loadProjectPage(scene: UIScene, node: UINode, name: String) {
     node.addChild(UIContainer()) {
         val header = addChild(UIContainer()) {
-            colour.set(rgba(0.08f, 0.09f, 0.11f))
-            padding.set(Border(10f))
+            colour.rgba(0.08f, 0.09f, 0.11f)
+            padding.set(10f)
 
             val back = addChild(UIButton("BACK")) {
                 width.set(100f)
@@ -135,7 +135,7 @@ fun loadProjectPage(scene: UIScene, node: UINode, name: String) {
             }
 
             val title = addChild(UIButton(name)) {
-                colour.set(rgba(0f, 0f))
+                colour.rgba(0f, 0f)
                 font.set(font.get().scaleTo(32f))
             }
 
@@ -159,8 +159,8 @@ fun loadProjectPage(scene: UIScene, node: UINode, name: String) {
         }
 
         val content = addChild(UIContainer()) {
-            padding.set(Border(16f))
-            colour.set(rgba(0.14f, 0.15f, 0.17f))
+            padding.set(16f)
+            colour.rgba(0.14f, 0.15f, 0.17f)
 
             val board = addChild(UICanvas()) {
 

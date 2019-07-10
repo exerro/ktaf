@@ -1,5 +1,6 @@
 package ktaf.core
 
+import ktaf.KTAFMutableValue
 import ktaf.typeclass.Add
 import ktaf.typeclass.Mul
 import ktaf.typeclass.Sub
@@ -86,3 +87,7 @@ fun vec3.toInverseRotationMatrix(): mat3
         = mat3_rotate(-z, vec3(0f, 0f, 1f)) *
         mat3_rotate(-x, vec3(1f, 0f, 0f)) *
         mat3_rotate(-y, vec3(0f, 1f, 0f))
+
+fun KTAFMutableValue<vec2>.set(x: Float, y: Float = x) = set(vec2(x, y))
+fun KTAFMutableValue<vec3>.set(x: Float, y: Float = x, z: Float = y) = set(vec3(x, y, z))
+fun KTAFMutableValue<vec4>.set(x: Float, y: Float = x, z: Float = y, w: Float = 1f) = set(vec4(x, y, z, w))

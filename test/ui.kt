@@ -1,8 +1,5 @@
 
-import ktaf.core.application
-import ktaf.core.div
-import ktaf.core.rgba
-import ktaf.core.vec2
+import ktaf.core.*
 import ktaf.graphics.DrawContext2D
 import ktaf.graphics.circle
 import ktaf.graphics.rectangle
@@ -17,16 +14,16 @@ fun main() = application("Hello world") {
     val scene = scene(display, context) {
         lateinit var r: UIContainer
         r = addRoot(UIContainer()) {
-            colour.set(rgba(0f, 1f, 0.5f))
+            colour.rgba(0f, 1f, 0.5f)
 
             val b1 = list {
-                colour.set(rgba(1f, 0f, 0f))
+                colour.rgba(1f, 0f, 0f)
 
                 shrink()
 
                 addChild(UIButton("Hello")) {
-                    colour.set(rgba(0f, 1f, 0f))
-                    textColour.set(rgba(1f, 0f, 1f))
+                    colour.rgba(0f, 1f, 0f)
+                    textColour.rgba(1f, 0f, 1f)
                     font.set(font.get().scaleTo(font.get().height * 1.3f))
                     height.set(50f)
 
@@ -43,7 +40,7 @@ fun main() = application("Hello world") {
                 addChild(UIButton("Button")) {
                     width.set(100f)
                     height.set(30f)
-                    textColour.set(rgba(0f))
+                    textColour.rgba(0f)
 
                     onClick {
                         r.layout(FlowLayout()) {
@@ -61,7 +58,7 @@ fun main() = application("Hello world") {
             val b2 = addChild(UIButton("Woah")) {
                 fill()
                 height.set(30f)
-                textColour.set(rgba(0f))
+                textColour.rgba(0f)
 
                 onClick {
                     r.layout(ListLayout()) {
@@ -73,8 +70,8 @@ fun main() = application("Hello world") {
 
             val buttons = (3..17).map {
                 addChild(UIButton("B${it - 2}")) {
-                    colour.set(rgba(it.toFloat() / 25))
-                    margin.set(Border(10f))
+                    colour.rgba(it.toFloat() / 25)
+                    margin.set(10f)
                     width.set(100f)
                     height.set(50f)
 
@@ -125,7 +122,7 @@ fun main() = application("Hello world") {
             }
 
             layout(FreeLayout()) {
-                alignment.set(vec2(0.5f))
+                alignment.set(0.5f)
 
                 hline("top") { percentage = 0f }
                 hline("middle") { percentage = 80f }

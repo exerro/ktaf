@@ -1,5 +1,6 @@
 package ktaf.ui
 
+import ktaf.KTAFMutableValue
 import ktaf.core.vec2
 
 data class Border(
@@ -20,3 +21,5 @@ val Border.width
 
 val Border.height
         get() = top + bottom
+
+fun KTAFMutableValue<Border>.set(top: Float, right: Float = top, bottom: Float = top, left: Float = right) { set(Border(top, right, bottom, left)) }

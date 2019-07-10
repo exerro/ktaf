@@ -4,7 +4,7 @@ import ktaf.KTAFMutableValue
 import ktaf.core.*
 import ktaf.graphics.DrawContext2D
 import ktaf.typeclass.Animateable
-import ktaf.typeclass.lerpTo
+import ktaf.typeclass.transitionTo
 import ktaf.typeclass.minus
 import ktaf.ui.layout.computeWidthInternal
 import ktaf.ui.layout.positionChildrenInternal
@@ -36,7 +36,7 @@ fun <T: Animateable<T>> UIScene.animate(owner: Any, property: String, value: KTA
             to,
             duration,
             easing,
-            { a, b, t -> a.lerpTo(b, t) },
+            { a, b, t -> a.transitionTo(b, t) },
             value::set
     )
 }
@@ -57,7 +57,7 @@ fun <T: Animateable<T>> UIScene.animateNullable(owner: Any, property: String, va
             to,
             duration,
             easing,
-            { a, b, t -> a.lerpTo(b, t) },
+            { a, b, t -> a.transitionTo(b, t) },
             value::set
     )
 }
