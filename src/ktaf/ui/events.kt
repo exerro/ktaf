@@ -90,7 +90,7 @@ fun <E: UIEvent> E.ifNotHandled(fn: () -> Unit) {
 }
 
 fun UIMouseEvent.within(node: UINode): Boolean {
-    return position.x >= 0 && position.y >= 0 && position.x < node.computedWidth && position.y < node.computedHeight
+    return position.x >= 0 && position.y >= 0 && position.x < node.computedWidthInternal && position.y < node.computedHeightInternal
 }
 
 fun <E: UIMouseEvent> E.ifWithin(node: UINode, fn: () -> Unit) {

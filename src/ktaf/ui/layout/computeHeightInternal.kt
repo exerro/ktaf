@@ -12,17 +12,17 @@ internal fun UINode.computeHeightInternal(heightAllocated: Float?): MutableList<
     // height allocated to children is either
     // * this' height minus its padding
     // * height allocated to this, minus this' margin and padding
-    val heightAllocatedInternal = computeHeight(computedWidth) ?.let { h -> h - padding.height } ?: heightAllocated ?.let { h -> h - margin.height - padding.height }
+    val heightAllocatedInternal by lazy { computeHeight(computedWidthInternal) ?.let { h -> h - padding.height } ?: heightAllocated ?.let { h -> h - margin.height - padding.height } }
     val flowRows = mutableListOf(mutableListOf<UINode>())
     val contentHeight by when (val l = layout) {
         is FillLayout -> computeFillHeight(heightAllocatedInternal)
         is GridLayout -> computeGridHeight(l, heightAllocatedInternal)
         is FreeLayout -> computeFreeHeight(l, heightAllocatedInternal)
-        is ListLayout -> computeListHeight(l, heightAllocatedInternal)
-        is FlowLayout -> computeFlowHeight(l, heightAllocatedInternal, flowRows)
+        is ListLayout -> computeListHeight()
+        is FlowLayout -> computeFlowHeight(flowRows)
     }
 
-    computedHeight = height ?: heightAllocated ?.let { h -> h - margin.height } .takeIf { fillAllocatedSize } ?: contentHeight + padding.height
+    computedHeightInternal = height ?: heightAllocated ?.let { h -> h - margin.height } .takeIf { fillAllocatedSize } ?: contentHeight + padding.height
 
     return flowRows
 }
@@ -30,7 +30,7 @@ internal fun UINode.computeHeightInternal(heightAllocated: Float?): MutableList<
 // TODO: description
 private fun UINode.computeFillHeight(heightAllocatedInternal: Float?): Lazy<Float> {
     childrenInternal.forEach { it.positionChildrenInternal(heightAllocatedInternal) }
-    return lazy { childrenInternal .map { it.computedHeight + it.margin.height } .fold(0f, ::max) }
+    return lazy { childrenInternal .map { it.computedHeightInternal + it.margin.height } .fold(0f, ::max) }
 }
 
 // TODO: description
@@ -39,7 +39,7 @@ private fun UINode.computeGridHeight(l: GridLayout, heightAllocatedInternal: Flo
     childrenInternal.forEach { it.positionChildrenInternal(ha) }
     return lazy {
         val rows = childrenInternal.chunked(l.columns)
-        rows.map { it.map { node -> node.computedHeight } .fold(0f, ::max) } .sum() + l.spacing.y * (l.rows - 1)
+        rows.map { it.map { node -> node.computedHeightInternal } .fold(0f, ::max) } .sum() + l.spacing.y * (l.rows - 1)
     }
 }
 
@@ -50,7 +50,7 @@ private fun UINode.computeFreeHeight(l: FreeLayout, heightAllocatedInternal: Flo
     childrenInternal.forEach { child ->
         val top = l.hLines[l.nodeTops[child]]
         val bottom = l.hLines[l.nodeBottoms[child]]
-        val height = top ?.let { bottom ?.let { evalh(bottom) - evalh(top) + 1 } } ?: child.height
+        val height = top ?.let { bottom ?.let { evalh(bottom) - evalh(top) + 1 } } ?: child.height ?: heightAllocatedInternal
 
         child.positionChildrenInternal(height)
     }
@@ -58,37 +58,32 @@ private fun UINode.computeFreeHeight(l: FreeLayout, heightAllocatedInternal: Flo
     return lazy { childrenInternal.map { child ->
         val top = l.hLines[l.nodeTops[child]]
         val bottom = l.hLines[l.nodeBottoms[child]]
-        bottom ?.let { evalh(bottom) } ?: (top ?.let { evalh(top) } ?: 0f) + child.computedHeight - 1
+        bottom ?.let { evalh(bottom) } ?: (top ?.let { evalh(top) } ?: 0f) + child.computedHeightInternal - 1
     } .fold(0f, ::max) }
 }
 
 // TODO: description
-private fun UINode.computeListHeight(l: ListLayout, heightAllocatedInternal: Float?): Lazy<Float> {
+private fun UINode.computeListHeight(): Lazy<Float> {
     childrenInternal.forEach { it.positionChildrenInternal(null) }
-    return lazy { childrenInternal .map { it.computedHeight + it.margin.height } .sum() }
+    return lazy { childrenInternal .map { it.computedHeightInternal + it.margin.height } .sum() }
 }
 
 // TODO: description
-private fun UINode.computeFlowHeight(l: FlowLayout, heightAllocatedInternal: Float?, flowRows: MutableList<MutableList<UINode>>): Lazy<Float> {
+private fun UINode.computeFlowHeight(flowRows: MutableList<MutableList<UINode>>): Lazy<Float> {
     var x = 0f
-    var y = 0f
-    val xOverflow = computedWidth - padding.right
+    val xOverflow = computedWidthInternal - padding.right
 
     childrenInternal.forEach { child ->
         child.positionChildrenInternal(null)
 
-        if (x + child.margin.width + child.computedWidth > xOverflow) {
+        if (x + child.margin.width + child.computedWidthInternal > xOverflow) {
             x = padding.left
-            y += flowRows.last().map { it.margin.height + it.computedHeight } .fold(0f, ::max)
             flowRows.add(mutableListOf())
         }
 
-        child.computedX = x
-        child.computedY = y
-
         flowRows.last().add(child)
-        x += child.margin.width + child.computedWidth
+        x += child.margin.width + child.computedWidthInternal
     }
 
-    return lazy { flowRows.map { it.map { c -> c.computedHeight + c.margin.height } .fold(0f, ::max) } .sum() }
+    return lazy { flowRows.map { it.map { c -> c.computedHeightInternal + c.margin.height } .fold(0f, ::max) } .sum() }
 }

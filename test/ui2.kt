@@ -8,12 +8,28 @@ import ktaf.ui.elements.UIContainer
 import ktaf.ui.elements.onClick
 import ktaf.ui.layout.*
 
-fun clearRoots(scene: UIScene) {
-    scene.roots.forEach { scene.removeRoot(it) }
+/** Moves * to left in transition */
+fun clearRootsLeft(scene: UIScene, node: UINode) {
+//    scene.roots.forEach { scene.removeRoot(it) }
+    when (val l = node.layout) {
+        is FreeLayout -> l.elem(node.children.last()) {
+            leftPercentage = -100f
+        }
+    }
 }
 
-fun loadProjectsList(scene: UIScene) {
-    scene.addRoot(UIContainer()) {
+/** Moves * to right in transition */
+fun clearRootsRight(scene: UIScene, node: UINode) {
+//    scene.roots.forEach { scene.removeRoot(it) }
+    when (val l = node.layout) {
+        is FreeLayout -> l.elem(node.children.last()) {
+            leftPercentage = 100f
+        }
+    }
+}
+
+fun loadProjectsList(scene: UIScene, node: UINode) {
+    node.addChild(UIContainer()) {
         val header = addChild(UIContainer()) {
             colour = rgba(0.08f, 0.09f, 0.11f)
             padding = Border(10f)
@@ -40,8 +56,8 @@ fun loadProjectsList(scene: UIScene) {
                         font = font.scaleTo(28f)
 
                         onClick {
-                            clearRoots(scene)
-                            loadProjectPage(scene, item)
+                            clearRootsLeft(scene, node)
+                            loadProjectPage(scene, node, item)
                         }
                     }
                 }
@@ -103,8 +119,8 @@ fun loadProjectsList(scene: UIScene) {
     }
 }
 
-fun loadProjectPage(scene: UIScene, name: String) {
-    scene.addRoot(UIContainer()) {
+fun loadProjectPage(scene: UIScene, node: UINode, name: String) {
+    node.addChild(UIContainer()) {
         val header = addChild(UIContainer()) {
             colour = rgba(0.08f, 0.09f, 0.11f)
             padding = Border(10f)
@@ -113,8 +129,8 @@ fun loadProjectPage(scene: UIScene, name: String) {
                 width = 100f
 
                 onClick {
-                    clearRoots(scene)
-                    loadProjectsList(scene)
+                    clearRootsRight(scene, node)
+                    loadProjectsList(scene, node)
                 }
             }
 
@@ -259,8 +275,13 @@ fun loadProjectPage(scene: UIScene, name: String) {
 fun main() = application("UI Test 2") {
     val context = DrawContext2D(viewport)
     val scene = scene(display, context)
+    val node = scene.addRoot(UIContainer()) {
+        layout(FreeLayout()) {
 
-    loadProjectsList(scene)
+        }
+    }
+
+    loadProjectsList(scene, node)
 
     scene.attachCallbacks(this)
 }

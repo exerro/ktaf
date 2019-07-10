@@ -6,7 +6,11 @@ import ktaf.core.plus
 import ktaf.core.vec2
 import ktaf.ui.layout.ListLayout
 import ktaf.ui.layout.UILayout
+import ktaf.util.Animation
+import ktaf.util.AnimationProperties
+import ktaf.util.Easing
 import lwjglkt.GLFWCursor
+import kotlin.properties.Delegates
 
 abstract class UINode: UI_t {
     // structure
@@ -45,11 +49,24 @@ abstract class UINode: UI_t {
     internal val textInputEventHandlers: EventHandlerList<UITextInputEvent> = mutableListOf()
 
     // state
+    private val positionAnimationProperties = AnimationProperties(Animation.NORMAL, Easing.SMOOTH, Animation.Float)
     internal var mouseInside = false
-    internal var computedX: Float = 0f
-    internal var computedY: Float = 0f
-    internal var computedWidth: Float = 0f
-    internal var computedHeight: Float = 0f
+    internal var computedXInternal: Float by Delegates.observable(0f) { _, old, new -> if (old != new) scene?.animate2(this, "computedXInternal", Animation(
+            computedXAnimated, new, positionAnimationProperties.duration, positionAnimationProperties.easing, positionAnimationProperties.eval
+    ) { computedXAnimated = it } ) }
+    internal var computedYInternal: Float by Delegates.observable(0f) { _, old, new -> if (old != new) scene?.animate2(this, "computedYInternal", Animation(
+            computedYAnimated, new, positionAnimationProperties.duration, positionAnimationProperties.easing, positionAnimationProperties.eval
+    ) { computedYAnimated = it } ) }
+    internal var computedWidthInternal: Float by Delegates.observable(0f) { _, old, new -> if (old != new) scene?.animate2(this, "computedWidthInternal", Animation(
+            computedWidthAnimated, new, positionAnimationProperties.duration, positionAnimationProperties.easing, positionAnimationProperties.eval
+    ) { computedWidthAnimated = it } ) }
+    internal var computedHeightInternal: Float by Delegates.observable(0f) { _, old, new -> if (old != new) scene?.animate2(this, "computedHeightInternal", Animation(
+            computedHeightAnimated, new, positionAnimationProperties.duration, positionAnimationProperties.easing, positionAnimationProperties.eval
+    ) { computedHeightAnimated = it } ) }
+    internal var computedXAnimated: Float = 0f
+    internal var computedYAnimated: Float = 0f
+    internal var computedWidthAnimated: Float = 0f
+    internal var computedHeightAnimated: Float = 0f
 
     init {
         p(::parent) {
@@ -72,8 +89,8 @@ abstract class UINode: UI_t {
 
         childrenInternal.forEach {
             it.draw(context,
-                    position + padding.tl + vec2(it.computedX, it.computedY),
-                    vec2(it.computedWidth, it.computedHeight)
+                    position + padding.tl + vec2(it.computedXAnimated, it.computedYAnimated),
+                    vec2(it.computedWidthAnimated, it.computedHeightAnimated)
             )
         }
 
@@ -122,7 +139,7 @@ abstract class UINode: UI_t {
         }
 
         childrenInternal.reversed().forEach {
-            it.handleEvent(event.relativeTo(padding.tl + vec2(it.computedX, it.computedY)))
+            it.handleEvent(event.relativeTo(padding.tl + vec2(it.computedXAnimated, it.computedYAnimated)))
         }
     }
 }
@@ -131,7 +148,7 @@ fun UINode.fill() { fillAllocatedSize = true }
 fun UINode.shrink() { fillAllocatedSize = false }
 
 fun UINode.absolutePosition(): vec2
-        = (parent?.absolutePosition() ?: vec2(0f)) + (parent?.padding?.tl ?: vec2(0f)) + vec2(computedX, computedY)
+        = (parent?.absolutePosition() ?: vec2(0f)) + (parent?.padding?.tl ?: vec2(0f)) + vec2(computedXAnimated, computedYAnimated)
 
 fun UINode.requestFocus() { sceneInternal?.focusOn(this) }
 fun UINode.unfocus() { if (isFocused()) sceneInternal?.unfocus() }

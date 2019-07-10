@@ -15,9 +15,22 @@ class UIScene(val display: GLFWDisplay, val context: DrawContext2D) {
     internal var lastRelativeMouseLocation = vec2(0f)
     internal var mouseModifiers = setOf<GLFWMouseModifier>()
     internal val animations: MutableMap<UINode, MutableMap<UIProperty<UINode, *>, Animation<*>>> = mutableMapOf()
+    internal val animations2: MutableMap<UINode, MutableMap<String, Animation<*>>> = mutableMapOf()
     internal val rootsInternal = mutableListOf<UINode>()
 
     val roots get() = rootsInternal.toList()
+}
+
+fun <N: UINode, T> UIScene.animate2(node: N, property: String, animation: Animation<T>) {
+    animations2.computeIfAbsent(node) { mutableMapOf() } [property] = animation
+}
+
+fun <N: UINode, T> UIScene.animateNullable2(node: N, property: String, animation: Animation<T>) {
+    animations2.computeIfAbsent(node) { mutableMapOf() } [property] = animation
+}
+
+fun <N: UINode, T> UIScene.cancelAnimation2(node: N, property: String) {
+    animations2.computeIfAbsent(node) { mutableMapOf() } .remove(property)
 }
 
 fun <N: UINode, T> UIScene.animate(node: N, property: UIProperty<N, T>, animation: Animation<T>) {
@@ -67,12 +80,17 @@ fun UIScene.update(dt: Float) {
 
     animations.map { (node, m) -> node to m.filterValues { !it.finished() } }
 
+    for ((_, m) in animations2) for ((_, animation) in m)
+        animation.update(dt)
+
+    animations2.map { (node, m) -> node to m.filterValues { !it.finished() } }
+
     rootsInternal.forEach {
         it.computeWidthInternal(context.viewport.width().toFloat())
         it.positionChildrenInternal(context.viewport.height().toFloat())
         it.update(dt)
-        it.computedX = 0f
-        it.computedY = 0f
+        it.computedXInternal = 0f
+        it.computedYInternal = 0f
     }
 }
 
@@ -89,7 +107,7 @@ fun UIScene.draw() {
 
 fun UIScene.mousePressed(button: GLFWMouseButton, position: vec2, modifiers: Set<GLFWMouseModifier>) {
     val event = UIMousePressEvent(null, null, position, button, modifiers)
-    rootsInternal.forEach { it.handleEvent(event.relativeTo(vec2(it.computedX, it.computedY))) }
+    rootsInternal.forEach { it.handleEvent(event.relativeTo(vec2(it.computedXInternal, it.computedYInternal))) }
     event.handler ?. let { node ->
         focusOn(node)
         firstRelativeMouseLocation = position - node.absolutePosition()
@@ -111,7 +129,7 @@ fun UIScene.mouseMoved(position: vec2, last: vec2) {
     val event = UIMouseMoveEvent(null, null, position, last)
     val enter = UIMouseEnterEvent(null, null, position)
     val exit = UIMouseExitEvent(null, null, position)
-    rootsInternal.forEach { it.handleEvent(event.relativeTo(vec2(it.computedX, it.computedY))) }
+    rootsInternal.forEach { it.handleEvent(event.relativeTo(vec2(it.computedXInternal, it.computedYInternal))) }
     val (inside, outside) = allChildren.partition { event.relativeTo(it.absolutePosition()).within(it) }
     outside.filter { it.mouseInside } .forEach { it.handleEvent(exit.relativeTo(it.absolutePosition())); it.mouseInside = false }
     inside.filter { !it.mouseInside } .forEach { it.handleEvent(enter.relativeTo(it.absolutePosition())); it.mouseInside = true }
