@@ -2,6 +2,7 @@ package ktaf.util
 
 import ktaf.core.plus
 import ktaf.core.vec2
+import ktaf.typeclass.plus
 import kotlin.math.max
 import kotlin.math.min
 

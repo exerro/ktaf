@@ -5,6 +5,7 @@ import ktaf.core.*
 import ktaf.graphics.Font
 import ktaf.graphics.widthOf
 import ktaf.graphics.*
+import ktaf.typeclass.plus
 import lwjglkt.GLTexture2
 import ktaf.util.wrapText
 

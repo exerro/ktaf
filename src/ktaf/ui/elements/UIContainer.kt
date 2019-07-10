@@ -1,5 +1,6 @@
 package ktaf.ui.elements
 
+import ktaf.KTAFMutableValue
 import lwjglkt.GLFWCursor
 import ktaf.core.rgba
 import ktaf.ui.*
@@ -9,13 +10,11 @@ class UIContainer: UINode() {
 
     override val cursor: GLFWCursor? = null
 
-    var colour by property(background.colour)
+    var colour = KTAFMutableValue(background.colour)
 
     init {
-        p(::colour) {
-            attachChangeToCallback { colour ->
-                background = replaceBackground(background, background.copy(colour = colour))
-            }
+        colour.connect { colour ->
+            background = replaceBackground(background, background.copy(colour = colour))
         }
     }
 }

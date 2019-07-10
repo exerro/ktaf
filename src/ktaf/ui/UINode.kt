@@ -1,36 +1,121 @@
 package ktaf.ui
 
-import ktaf.core.minus
+import ktaf.KTAFMutableList
+import ktaf.KTAFMutableValue
 import ktaf.graphics.DrawContext2D
-import ktaf.core.plus
 import ktaf.core.vec2
+import ktaf.typeclass.minus
+import ktaf.typeclass.plus
 import ktaf.ui.layout.ListLayout
 import ktaf.ui.layout.UILayout
-import ktaf.util.Animation
-import ktaf.util.AnimationProperties
-import ktaf.util.Easing
 import lwjglkt.GLFWCursor
 import kotlin.properties.Delegates
 
-abstract class UINode: UI_t {
+abstract class UINode {
     // structure
-    internal var sceneInternal: UIScene? = null
-    internal val childrenInternal = mutableListOf<UINode>()
-    val scene get() = sceneInternal
-    val children get() = childrenInternal.toList()
-    var parent by property(null as UINode?)
+    val children = KTAFMutableList<UINode>()
+    val scene = KTAFMutableValue<UIScene?>(null)
+    val parent = KTAFMutableValue<UINode?>(null)
 
     // configuration
-    internal val foregroundsInternal = mutableListOf<Foreground>()
-    internal val backgroundsInternal = mutableListOf<Background>()
-    internal open var fillAllocatedSize = true
-    internal open val cursor: GLFWCursor? = GLFWCursor.DEFAULT
+    val width = KTAFMutableValue<Float?>(null)
+    val height = KTAFMutableValue<Float?>(null)
+    val layout = KTAFMutableValue<UILayout>(ListLayout())
+    val margin = KTAFMutableValue(Border(0f))
+    val padding = KTAFMutableValue(Border(0f))
 
-    var margin by property(Border(0f))
-    var padding by property(Border(0f))
-    var layout by property(ListLayout() as UILayout)
-    var width by property(null as Float?)
-    var height by property(null as Float?)
+    // state
+    val computedX = KTAFMutableValue(0f)
+    val computedY = KTAFMutableValue(0f)
+    val computedWidth = KTAFMutableValue(0f)
+    val computedHeight = KTAFMutableValue(0f)
+
+    init {
+        scene.connect { scene ->
+            children.forEach { it.scene.set(scene) }
+        }
+
+        parent.connectComparator { old, new ->
+            old?.children?.remove(this)
+            new?.children?.add(this)
+            Unit
+        }
+
+        children.connectAdded { child ->
+            child.parent.set(this)
+            child.scene.set(scene.get())
+        }
+
+        children.connectRemoved { child ->
+            child.parent.set(null)
+            child.scene.set(null)
+        }
+    }
+
+    open fun computeHeight(width: Float) = height.get()
+
+    open fun update(dt: Float) {}
+
+    open fun draw(context: DrawContext2D, position: vec2, size: vec2) {
+        backgroundsInternal.reversed().forEach {
+            it.draw(context, position, size)
+        }
+
+        children.forEach {
+            it.draw(context,
+                    position + padding.get().tl + vec2(it.computedX.get(), it.computedY.get()),
+                    vec2(it.computedWidth.get(), it.computedHeight.get())
+            )
+        }
+
+        foregroundsInternal.forEach {
+            it.draw(context, position + padding.get().tl, size - padding.get().size)
+        }
+    }
+
+    open fun handleEvent(event: UIEvent) {
+        when (event) {
+            is UIKeyEvent -> handleKeyEvent(event)
+            is UIMouseEvent -> handleMouseEvent(event)
+            is UITextInputEvent -> textInputEventHandlers.forEach { it(event) }
+            is UIFocusEvent -> focusEventHandlers.forEach { it(event) }
+            is UIUnFocusEvent -> unFocusEventHandlers.forEach { it(event) }
+        }
+
+        when (event) {
+            is UITextInputEvent, is UIFocusEvent, is UIUnFocusEvent -> children.forEach { it.handleEvent(event) }
+            else -> { /* do nothing */ }
+        }
+    }
+
+    open fun handleKeyEvent(event: UIKeyEvent) {
+        keyEventHandlers.forEach { it(event) }
+
+        when (event) {
+            is UIKeyPressEvent -> keyPressEventHandlers.forEach { it(event) }
+            is UIKeyReleaseEvent -> keyReleaseEventHandlers.forEach { it(event) }
+        }
+
+        children.forEach { it.handleEvent(event) }
+    }
+
+    open fun handleMouseEvent(event: UIMouseEvent) {
+        mouseEventHandlers.forEach { it(event) }
+
+        when (event) {
+            is UIMouseEnterEvent -> mouseEnterEventHandlers.forEach { it(event) }
+            is UIMouseExitEvent -> mouseExitEventHandlers.forEach { it(event) }
+            is UIMousePressEvent -> mousePressEventHandlers.forEach { it(event) }
+            is UIMouseReleaseEvent -> mouseReleaseEventHandlers.forEach { it(event) }
+            is UIMouseClickEvent -> mouseClickEventHandlers.forEach { it(event) }
+            is UIMouseMoveEvent -> mouseMoveEventHandlers.forEach { it(event) }
+            is UIMouseDragEvent -> mouseDragEventHandlers.forEach { it(event) }
+        }
+
+        children.reversed().forEach {
+            it.handleEvent(event.relativeTo(padding.get().tl + vec2(it.computedX.get(), it.computedY.get())))
+        }
+    }
 
     // callbacks
     internal val focusEventHandlers: EventHandlerList<UIFocusEvent> = mutableListOf()
@@ -48,99 +133,25 @@ abstract class UINode: UI_t {
     internal val keyReleaseEventHandlers: EventHandlerList<UIKeyReleaseEvent> = mutableListOf()
     internal val textInputEventHandlers: EventHandlerList<UITextInputEvent> = mutableListOf()
 
+    // configuration internals
+    internal val foregroundsInternal = mutableListOf<Foreground>()
+    internal val backgroundsInternal = mutableListOf<Background>()
+    internal open var fillAllocatedSize = true
+    internal open val cursor: GLFWCursor? = GLFWCursor.DEFAULT
+
     // state
-    private val positionAnimationProperties = AnimationProperties(Animation.NORMAL, Easing.SMOOTH, Animation.Float)
     internal var mouseInside = false
-    internal var computedXInternal: Float by Delegates.observable(0f) { _, old, new -> if (old != new) scene?.animate2(this, "computedXInternal", Animation(
-            computedXAnimated, new, positionAnimationProperties.duration, positionAnimationProperties.easing, positionAnimationProperties.eval
-    ) { computedXAnimated = it } ) }
-    internal var computedYInternal: Float by Delegates.observable(0f) { _, old, new -> if (old != new) scene?.animate2(this, "computedYInternal", Animation(
-            computedYAnimated, new, positionAnimationProperties.duration, positionAnimationProperties.easing, positionAnimationProperties.eval
-    ) { computedYAnimated = it } ) }
-    internal var computedWidthInternal: Float by Delegates.observable(0f) { _, old, new -> if (old != new) scene?.animate2(this, "computedWidthInternal", Animation(
-            computedWidthAnimated, new, positionAnimationProperties.duration, positionAnimationProperties.easing, positionAnimationProperties.eval
-    ) { computedWidthAnimated = it } ) }
-    internal var computedHeightInternal: Float by Delegates.observable(0f) { _, old, new -> if (old != new) scene?.animate2(this, "computedHeightInternal", Animation(
-            computedHeightAnimated, new, positionAnimationProperties.duration, positionAnimationProperties.easing, positionAnimationProperties.eval
-    ) { computedHeightAnimated = it } ) }
-    internal var computedXAnimated: Float = 0f
-    internal var computedYAnimated: Float = 0f
-    internal var computedWidthAnimated: Float = 0f
-    internal var computedHeightAnimated: Float = 0f
-
-    init {
-        p(::parent) {
-            attachChangeCallback { old, new ->
-                old?.childrenInternal?.remove(this@UINode)
-                new?.childrenInternal?.add(this@UINode)
-                this@UINode.sceneInternal = new?.sceneInternal
-            }
-        }
+    internal var computedXCachedSetter: Float by Delegates.observable(0f) { _, old, new ->
+        if (old != new) { scene.get()?.animate(this, ::computedX, new) }
     }
-
-    open fun computeHeight(width: Float) = height
-
-    open fun update(dt: Float) {}
-
-    open fun draw(context: DrawContext2D, position: vec2, size: vec2) {
-        backgroundsInternal.reversed().forEach {
-            it.draw(context, position, size)
-        }
-
-        childrenInternal.forEach {
-            it.draw(context,
-                    position + padding.tl + vec2(it.computedXAnimated, it.computedYAnimated),
-                    vec2(it.computedWidthAnimated, it.computedHeightAnimated)
-            )
-        }
-
-        foregroundsInternal.forEach {
-            it.draw(context, position + padding.tl, size - padding.size)
-        }
+    internal var computedYCachedSetter: Float by Delegates.observable(0f) { _, old, new ->
+        if (old != new) { scene.get()?.animate(this, ::computedY, new) }
     }
-
-    open fun handleEvent(event: UIEvent) {
-        when (event) {
-            is UIKeyEvent -> handleKeyEvent(event)
-            is UIMouseEvent -> handleMouseEvent(event)
-            is UITextInputEvent -> textInputEventHandlers.forEach { it(event) }
-            is UIFocusEvent -> focusEventHandlers.forEach { it(event) }
-            is UIUnFocusEvent -> unFocusEventHandlers.forEach { it(event) }
-        }
-
-        when (event) {
-            is UITextInputEvent, is UIFocusEvent, is UIUnFocusEvent -> childrenInternal.forEach { it.handleEvent(event) }
-            else -> { /* do nothing */ }
-        }
+    internal var computedWidthCachedSetter: Float by Delegates.observable(0f) { _, old, new ->
+        if (old != new) { scene.get()?.animate(this, ::computedWidth, new) }
     }
-
-    open fun handleKeyEvent(event: UIKeyEvent) {
-        keyEventHandlers.forEach { it(event) }
-
-        when (event) {
-            is UIKeyPressEvent -> keyPressEventHandlers.forEach { it(event) }
-            is UIKeyReleaseEvent -> keyReleaseEventHandlers.forEach { it(event) }
-        }
-
-        childrenInternal.forEach { it.handleEvent(event) }
-    }
-
-    open fun handleMouseEvent(event: UIMouseEvent) {
-        mouseEventHandlers.forEach { it(event) }
-
-        when (event) {
-            is UIMouseEnterEvent -> mouseEnterEventHandlers.forEach { it(event) }
-            is UIMouseExitEvent -> mouseExitEventHandlers.forEach { it(event) }
-            is UIMousePressEvent -> mousePressEventHandlers.forEach { it(event) }
-            is UIMouseReleaseEvent -> mouseReleaseEventHandlers.forEach { it(event) }
-            is UIMouseClickEvent -> mouseClickEventHandlers.forEach { it(event) }
-            is UIMouseMoveEvent -> mouseMoveEventHandlers.forEach { it(event) }
-            is UIMouseDragEvent -> mouseDragEventHandlers.forEach { it(event) }
-        }
-
-        childrenInternal.reversed().forEach {
-            it.handleEvent(event.relativeTo(padding.tl + vec2(it.computedXAnimated, it.computedYAnimated)))
-        }
+    internal var computedHeightCachedSetter: Float by Delegates.observable(0f) { _, old, new ->
+        if (old != new) { scene.get()?.animate(this, ::computedHeight, new) }
     }
 }
 
@@ -148,20 +159,20 @@ fun UINode.fill() { fillAllocatedSize = true }
 fun UINode.shrink() { fillAllocatedSize = false }
 
 fun UINode.absolutePosition(): vec2
-        = (parent?.absolutePosition() ?: vec2(0f)) + (parent?.padding?.tl ?: vec2(0f)) + vec2(computedXAnimated, computedYAnimated)
+        = (parent.get()?.absolutePosition() ?: vec2(0f)) + (parent.get()?.padding?.get()?.tl ?: vec2(0f)) + vec2(computedX.get(), computedY.get())
 
-fun UINode.requestFocus() { sceneInternal?.focusOn(this) }
-fun UINode.unfocus() { if (isFocused()) sceneInternal?.unfocus() }
-fun UINode.isFocused() = sceneInternal?.focussedNode == this
+fun UINode.requestFocus() { scene.get()?.focusOn(this) }
+fun UINode.unfocus() { if (isFocused()) scene.get()?.unfocus() }
+fun UINode.isFocused() = scene.get()?.focussedNode == this
 
 fun <C: UINode> UINode.addChild(child: C, init: C.() -> Unit = {}): C {
-    child.parent = this
+    child.parent.set(this)
     init(child)
     return child
 }
 
 fun <C: UINode> UINode.removeChild(child: C): C {
-    if (child.parent == this) child.parent = null
+    if (child.parent == this) child.parent.set(null)
     return child
 }
 

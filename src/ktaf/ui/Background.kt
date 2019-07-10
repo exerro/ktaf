@@ -2,6 +2,7 @@ package ktaf.ui
 
 import ktaf.core.*
 import ktaf.graphics.*
+import ktaf.typeclass.plus
 import lwjglkt.GLTexture2
 import ktaf.util.AABB
 

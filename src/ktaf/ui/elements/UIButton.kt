@@ -1,5 +1,6 @@
 package ktaf.ui.elements
 
+import ktaf.KTAFMutableValue
 import ktaf.core.rgba
 import lwjglkt.GLFWCursor
 import ktaf.ui.*
@@ -11,34 +12,26 @@ class UIButton(text: String): UINode() {
 
     override val cursor: GLFWCursor? = GLFWCursor.POINTER
 
-    var colour by property(background.colour)
-    var text by property(foregroundText.text)
-    var textColour by property(foregroundText.colour)
-    var font by property(foregroundText.font)
+    var colour = KTAFMutableValue(background.colour)
+    var text = KTAFMutableValue(foregroundText.text)
+    var textColour = KTAFMutableValue(foregroundText.colour)
+    var font = KTAFMutableValue(foregroundText.font)
 
     init {
-        p(::colour) {
-            attachChangeToCallback { colour ->
-                background = replaceBackground(background, background.copy(colour = colour))
-            }
+        colour.connect { colour ->
+            background = replaceBackground(background, background.copy(colour = colour))
         }
 
-        p(this::text) {
-            attachChangeToCallback { text ->
-                foregroundText = replaceForeground(foregroundText, foregroundText.copy(text = text))
-            }
+        this.text.connect { text ->
+            foregroundText = replaceForeground(foregroundText, foregroundText.copy(text = text))
         }
 
-        p(::textColour) {
-            attachChangeToCallback { colour ->
-                foregroundText = replaceForeground(foregroundText, foregroundText.copy(colour = colour))
-            }
+        textColour.connect { colour ->
+            foregroundText = replaceForeground(foregroundText, foregroundText.copy(colour = colour))
         }
 
-        p(::font) {
-            attachChangeToCallback { font ->
-                foregroundText = replaceForeground(foregroundText, foregroundText.copy(font = font))
-            }
+        font.connect { font ->
+            foregroundText = replaceForeground(foregroundText, foregroundText.copy(font = font))
         }
 
         onMousePress { event -> event.ifNotHandled {

@@ -1,6 +1,8 @@
 package ktaf.graphics
 
 import ktaf.core.*
+import ktaf.typeclass.minus
+import ktaf.typeclass.plus
 import ktaf.util.*
 import lwjglkt.*
 

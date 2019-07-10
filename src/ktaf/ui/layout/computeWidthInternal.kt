@@ -11,8 +11,8 @@ internal fun UINode.computeWidthInternal(widthAllocated: Float) {
     // width allocated to children is either
     // * this' width minus its padding
     // * width allocated to this, minus this' margin and padding
-    val widthAllocatedInternal = width ?.let { w -> w - padding.width } ?: widthAllocated - margin.width - padding.width
-    val contentWidth by when (val l = layout) {
+    val widthAllocatedInternal = width.get() ?.let { w -> w - padding.get().width } ?: widthAllocated - margin.get().width - padding.get().width
+    val contentWidth by when (val l = layout.get()) {
         is FillLayout -> computeFillWidth(widthAllocatedInternal)
         is GridLayout -> computeGridWidth(l, widthAllocatedInternal)
         is FreeLayout -> computeFreeWidth(l, widthAllocatedInternal)
@@ -20,26 +20,26 @@ internal fun UINode.computeWidthInternal(widthAllocated: Float) {
         is FlowLayout -> computeFlowWidth(widthAllocatedInternal)
     }
 
-    computedWidthInternal = width ?: if (fillAllocatedSize) widthAllocated - margin.width else contentWidth + padding.width
+    computedWidthCachedSetter = width.get() ?: if (fillAllocatedSize) widthAllocated - margin.get().width else contentWidth + padding.get().width
 }
 
 // width allocated to each child is width allocated to this
 // content width computed is the largest of children widths
 private fun UINode.computeFillWidth(widthAllocatedInternal: Float): Lazy<Float> {
-    childrenInternal.forEach { it.computeWidthInternal(widthAllocatedInternal) }
-    return lazy { childrenInternal .map { it.computedWidthInternal + it.margin.width } .fold(0f, ::max) }
+    children.forEach { it.computeWidthInternal(widthAllocatedInternal) }
+    return lazy { children .map { it.computedWidthCachedSetter + it.margin.get().width } .fold(0f, ::max) }
 }
 
 // width allocated to child is normal width allocation, minus the spacing between elements, and finally
 // divided by the number of horizontal blocks
 // content width is sum of the largest widths of each column plus padding
 private fun UINode.computeGridWidth(l: GridLayout, widthAllocatedInternal: Float): Lazy<Float> {
-    val wa = (widthAllocatedInternal - (l.columns - 1) * l.spacing.x) / l.columns
-    childrenInternal.forEach { it.computeWidthInternal(wa) }
+    val wa = (widthAllocatedInternal - (l.columns.get() - 1) * l.spacing.get().x) / l.columns.get()
+    children.forEach { it.computeWidthInternal(wa) }
     return lazy {
-        val rows = childrenInternal.chunked(l.columns)
-        val columns = (0 until l.columns).map { column -> rows.map { it.getOrNull(column)?.computedWidthInternal ?: 0f } }
-        columns.map { it.fold(0f, ::max) } .sum() + l.spacing.x * (l.columns - 1)
+        val rows = children.chunked(l.columns.get())
+        val columns = (0 until l.columns.get()).map { column -> rows.map { it.getOrNull(column)?.computedWidthCachedSetter ?: 0f } }
+        columns.map { it.fold(0f, ::max) } .sum() + l.spacing.get().x * (l.columns.get() - 1)
     }
 }
 
@@ -50,31 +50,31 @@ private fun UINode.computeGridWidth(l: GridLayout, widthAllocatedInternal: Float
 private fun UINode.computeFreeWidth(l: FreeLayout, widthAllocatedInternal: Float): Lazy<Float> {
     fun eval(l: LayoutLineValue) = l.fixed + widthAllocatedInternal * l.ratio
 
-    childrenInternal.forEach { child ->
+    children.forEach { child ->
         val left = l.vLines[l.nodeLefts[child]]
         val right = l.vLines[l.nodeRights[child]]
-        val width = left ?.let { right ?.let { eval(right) - eval(left) + 1 } } ?: child.width ?: widthAllocatedInternal
+        val width = left ?.let { right ?.let { eval(right) - eval(left) + 1 } } ?: child.width.get() ?: widthAllocatedInternal
 
         child.computeWidthInternal(width)
     }
 
-    return lazy { childrenInternal.map { child ->
+    return lazy { children.map { child ->
         val left = l.vLines[l.nodeLefts[child]]
         val right = l.vLines[l.nodeRights[child]]
-        right ?.let { eval(right) } ?: (left ?.let { eval(left) } ?: 0f) + child.computedWidthInternal - 1
+        right ?.let { eval(right) } ?: (left ?.let { eval(left) } ?: 0f) + child.computedWidthCachedSetter - 1
     } .fold(0f, ::max) }
 }
 
 // width allocated to each child is width allocated to this
 // content width computed is the largest of children widths
 private fun UINode.computeListWidth(widthAllocatedInternal: Float): Lazy<Float> {
-    childrenInternal.forEach { it.computeWidthInternal(widthAllocatedInternal) }
-    return lazy { childrenInternal .map { it.computedWidthInternal + it.margin.width } .fold(0f, ::max) }
+    children.forEach { it.computeWidthInternal(widthAllocatedInternal) }
+    return lazy { children .map { it.computedWidthCachedSetter + it.margin.get().width } .fold(0f, ::max) }
 }
 
 // width allocated to each child is width allocated to this
 // content width computed is the sum of children widths
 private fun UINode.computeFlowWidth(widthAllocatedInternal: Float): Lazy<Float> {
-    childrenInternal.forEach { it.computeWidthInternal(widthAllocatedInternal) }
-    return lazy { childrenInternal.map { it.computedWidthInternal + it.margin.width } .sum() }
+    children.forEach { it.computeWidthInternal(widthAllocatedInternal) }
+    return lazy { children.map { it.computedWidthCachedSetter + it.margin.get().width } .sum() }
 }

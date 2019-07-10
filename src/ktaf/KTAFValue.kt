@@ -1,12 +1,12 @@
 package ktaf
 
-class KTAFReference<T>(
+class KTAFValue<T>(
         private val value: T
 ) {
     fun get(): T = value
 }
 
-class KTAFListReference<T>(
+class KTAFList<T>(
         private val value: List<T> = listOf()
 ): List<T> {
     override val size: Int get() = value.size
@@ -19,10 +19,10 @@ class KTAFListReference<T>(
     override fun lastIndexOf(element: T): Int = value.lastIndexOf(element)
     override fun listIterator(): ListIterator<T> = value.listIterator()
     override fun listIterator(index: Int): ListIterator<T> = value.listIterator(index)
-    override fun subList(fromIndex: Int, toIndex: Int): KTAFListReference<T> = KTAFListReference(value.subList(fromIndex, toIndex))
+    override fun subList(fromIndex: Int, toIndex: Int): KTAFList<T> = KTAFList(value.subList(fromIndex, toIndex))
 }
 
-class KTAFMutableReference<T>(
+class KTAFMutableValue<T>(
         private var value: T
 ) {
     fun get(): T = value
@@ -35,19 +35,19 @@ class KTAFMutableReference<T>(
         }
     }
 
-    fun connect(fn: (T) -> Any?) {
+    fun connect(fn: (T) -> Unit) {
         connections.add(fn)
     }
 
-    fun connectComparator(fn: (T, T) -> Any?) {
+    fun connectComparator(fn: (T, T) -> Unit) {
         connections2.add(fn)
     }
 
-    fun disconnect(fn: (T) -> Any?) {
+    fun disconnect(fn: (T) -> Unit) {
         connections.remove(fn)
     }
 
-    fun disconnectComparator(fn: (T, T) -> Any?) {
+    fun disconnectComparator(fn: (T, T) -> Unit) {
         connections2.remove(fn)
     }
 
@@ -55,7 +55,7 @@ class KTAFMutableReference<T>(
     private var connections2 = mutableListOf<(T, T) -> Any?>()
 }
 
-class KTAFMutableListReference<T>(
+class KTAFMutableList<T>(
         private val value: MutableList<T> = mutableListOf()
 ): MutableList<T> {
     override val size: Int get() = value.size
@@ -69,7 +69,7 @@ class KTAFMutableListReference<T>(
     override fun listIterator(): MutableListIterator<T> = value.listIterator()
     override fun listIterator(index: Int): MutableListIterator<T> = value.listIterator(index)
     override fun removeAll(elements: Collection<T>): Boolean = elements.map { remove(it) } .any { it }
-    override fun subList(fromIndex: Int, toIndex: Int): KTAFMutableListReference<T> = KTAFMutableListReference(value.subList(fromIndex, toIndex))
+    override fun subList(fromIndex: Int, toIndex: Int): KTAFMutableList<T> = KTAFMutableList(value.subList(fromIndex, toIndex))
 
     override fun add(element: T): Boolean {
         value.add(element)

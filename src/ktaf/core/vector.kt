@@ -1,12 +1,24 @@
 package ktaf.core
 
+import ktaf.typeclass.Add
+import ktaf.typeclass.Mul
+import ktaf.typeclass.Sub
+import ktaf.typeclass.times
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.sqrt
 
 data class vec4(val x: Float, val y: Float = x, val z: Float = y, val w: Float = 1f)
-data class vec3(val x: Float, val y: Float = x, val z: Float = y)
-data class vec2(val x: Float, val y: Float = x)
+data class vec3(val x: Float, val y: Float = x, val z: Float = y): Add<vec3, vec3>, Sub<vec3, vec3>, Mul<Float, vec3> {
+    override fun add(v: vec3): vec3 = vec3(x + v.x, y + v.y, z + v.z)
+    override fun sub(v: vec3): vec3 = vec3(x - v.x, y - v.y, z - v.z)
+    override fun mul(v: Float): vec3 = vec3(x * v, y * v, z * v)
+}
+data class vec2(val x: Float, val y: Float = x): Add<vec2, vec2>, Sub<vec2, vec2>, Mul<Float, vec2> {
+    override fun add(v: vec2): vec2 = vec2(x + v.x, y + v.y)
+    override fun sub(v: vec2): vec2 = vec2(x - v.x, y - v.y)
+    override fun mul(v: Float): vec2 = vec2(x * v, y * v)
+}
 
 fun vec4.vec3() = vec3(x, y, z)
 fun vec3.vec2() = vec2(x, y)
@@ -55,19 +67,13 @@ operator fun vec4.times(s: Float) = vec4(x * s, y * s, z * s, w * s)
 operator fun vec4.div(v: vec4) = vec4(x / v.x, y / v.y, z / v.z, w / v.w)
 operator fun vec4.div(s: Float) = this * (1/s)
 
-operator fun vec3.plus(v: vec3) = vec3(x + v.x, y + v.y, z + v.z)
-operator fun vec3.minus(v: vec3) = vec3(x - v.x, y - v.y, z - v.z)
 operator fun vec3.unaryMinus() = vec3(-x, -y, -z)
 operator fun vec3.times(v: vec3) = vec3(x * v.x, y * v.y, z * v.z)
-operator fun vec3.times(s: Float) = vec3(x * s, y * s, z * s)
 operator fun vec3.div(v: vec3) = vec3(x / v.x, y / v.y, z / v.z)
 operator fun vec3.div(s: Float) = this * (1/s)
 
-operator fun vec2.plus(v: vec2) = vec2(x + v.x, y + v.y)
-operator fun vec2.minus(v: vec2) = vec2(x - v.x, y - v.y)
 operator fun vec2.unaryMinus() = vec2(-x, -y)
 operator fun vec2.times(v: vec2) = vec2(x * v.x, y * v.y)
-operator fun vec2.times(s: Float) = vec2(x * s, y * s)
 operator fun vec2.div(v: vec2) = vec2(x / v.x, y / v.y)
 operator fun vec2.div(s: Float) = this * (1/s)
 
