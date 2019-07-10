@@ -34,6 +34,10 @@ sealed class UIMouseEvent(handler: UINode?,
         val parent: UIMouseEvent?,
         val position: vec2
 ): UIEvent(handler) {
+    init {
+        if (parent != null && parent.handled()) super.handledBy(parent.handler!!)
+    }
+
     abstract fun relativeTo(origin: vec2): UIMouseEvent
     override fun handledBy(handler: UINode) {
         super.handledBy(handler)

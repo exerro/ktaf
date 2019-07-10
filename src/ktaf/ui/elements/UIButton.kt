@@ -1,9 +1,11 @@
 package ktaf.ui.elements
 
-import ktaf.KTAFMutableValue
 import ktaf.core.rgba
-import lwjglkt.GLFWCursor
+import ktaf.core.vec3
+import ktaf.typeclass.times
 import ktaf.ui.*
+import ktaf.util.Animation
+import lwjglkt.GLFWCursor
 
 class UIButton(text: String): UINode() {
     internal val clickEventHandlers: EventHandlerList<UIMouseClickEvent> = mutableListOf()
@@ -12,12 +14,18 @@ class UIButton(text: String): UINode() {
 
     override val cursor: GLFWCursor? = GLFWCursor.POINTER
 
-    var colour = KTAFMutableValue(background.colour)
-    var text = KTAFMutableValue(foregroundText.text)
-    var textColour = KTAFMutableValue(foregroundText.colour)
-    var font = KTAFMutableValue(foregroundText.font)
+    var text = UIProperty(foregroundText.text)
+    var textColour = UIAnimatedProperty(foregroundText.colour, this, "textColour", duration = Animation.QUICK)
+    var colour = UIAnimatedProperty(background.colour, this, "colour", duration = Animation.QUICK)
+    var font = UIProperty(foregroundText.font)
 
     init {
+        state.connect(colour::setState)
+        state.connect(this.text::setState)
+        state.connect(textColour::setState)
+        state.connect(font::setState)
+        colour.set(rgba(0.4f, 0.7f, 1f), "hover")
+
         colour.connect { colour ->
             background = replaceBackground(background, background.copy(colour = colour))
         }
@@ -33,6 +41,9 @@ class UIButton(text: String): UINode() {
         font.connect { font ->
             foregroundText = replaceForeground(foregroundText, foregroundText.copy(font = font))
         }
+
+        onMouseEnter { if (!it.handled()) { it.handledBy(this); state.set("hover") } }
+        onMouseExit { state.clear() }
 
         onMousePress { event -> event.ifNotHandled {
             if (event.within(this)) {

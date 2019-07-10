@@ -37,7 +37,7 @@ fun <T: Animateable<T>> UIScene.animate(owner: Any, property: String, value: KTA
             duration,
             easing,
             { a, b, t -> a.transitionTo(b, t) },
-            value::set
+            value::setValue
     )
 }
 
@@ -48,7 +48,7 @@ fun <T: Animateable<T>> UIScene.animateNullable(owner: Any, property: String, va
     val prev = value.get()
 
     if (prev == null || to == null) {
-        value.set(to)
+        value.setValue(to)
         return
     }
 
@@ -58,7 +58,7 @@ fun <T: Animateable<T>> UIScene.animateNullable(owner: Any, property: String, va
             duration,
             easing,
             { a, b, t -> a.transitionTo(b, t) },
-            value::set
+            value::setValue
     )
 }
 
@@ -72,7 +72,7 @@ fun UIScene.animate(owner: Any, property: String, value: KTAFMutableValue<Float>
             duration,
             easing,
             { a, b, t -> a + (b - a) * t },
-            value::set
+            value::setValue
     )
 }
 
@@ -83,7 +83,7 @@ fun UIScene.animateNullable(owner: Any, property: String, value: KTAFMutableValu
     val prev = value.get()
 
     if (prev == null || to == null) {
-        value.set(to)
+        value.setValue(to)
         return
     }
 
@@ -93,7 +93,7 @@ fun UIScene.animateNullable(owner: Any, property: String, value: KTAFMutableValu
             duration,
             easing,
             { a, b, t -> a + (b - a) * t },
-            value::set
+            value::setValue
     )
 }
 

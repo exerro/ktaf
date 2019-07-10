@@ -22,11 +22,11 @@ class KTAFList<T>(
     override fun subList(fromIndex: Int, toIndex: Int): KTAFList<T> = KTAFList(value.subList(fromIndex, toIndex))
 }
 
-class KTAFMutableValue<T>(
+open class KTAFMutableValue<T>(
         private var value: T
 ) {
     fun get(): T = value
-    fun set(value: T) {
+    fun setValue(value: T) {
         val oldValue = this.value
         if (this.value != value) {
             this.value = value
@@ -34,6 +34,8 @@ class KTAFMutableValue<T>(
             connections2.forEach { it(oldValue, value) }
         }
     }
+
+    open fun set(value: T) { setValue(value) }
 
     fun connect(fn: (T) -> Unit) {
         connections.add(fn)

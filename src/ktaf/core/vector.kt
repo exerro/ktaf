@@ -1,21 +1,22 @@
 package ktaf.core
 
 import ktaf.KTAFMutableValue
-import ktaf.typeclass.Add
-import ktaf.typeclass.Mul
-import ktaf.typeclass.Sub
-import ktaf.typeclass.times
+import ktaf.typeclass.*
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.sqrt
 
-data class vec4(val x: Float, val y: Float = x, val z: Float = y, val w: Float = 1f)
-data class vec3(val x: Float, val y: Float = x, val z: Float = y): Add<vec3, vec3>, Sub<vec3, vec3>, Mul<Float, vec3> {
+data class vec4(val x: Float, val y: Float = x, val z: Float = y, val w: Float = 1f): Add<vec4, vec4>, Sub<vec4, vec4>, Mul<Float, vec4>, Animateable<vec4> {
+    override fun add(v: vec4): vec4 = vec4(x + v.x, y + v.y, z + v.z, w + v.w)
+    override fun sub(v: vec4): vec4 = vec4(x - v.x, y - v.y, z - v.z, w - v.w)
+    override fun mul(v: Float): vec4 = vec4(x * v, y * v, z * v, w * v)
+}
+data class vec3(val x: Float, val y: Float = x, val z: Float = y): Add<vec3, vec3>, Sub<vec3, vec3>, Mul<Float, vec3>, Animateable<vec3> {
     override fun add(v: vec3): vec3 = vec3(x + v.x, y + v.y, z + v.z)
     override fun sub(v: vec3): vec3 = vec3(x - v.x, y - v.y, z - v.z)
     override fun mul(v: Float): vec3 = vec3(x * v, y * v, z * v)
 }
-data class vec2(val x: Float, val y: Float = x): Add<vec2, vec2>, Sub<vec2, vec2>, Mul<Float, vec2> {
+data class vec2(val x: Float, val y: Float = x): Add<vec2, vec2>, Sub<vec2, vec2>, Mul<Float, vec2>, Animateable<vec2> {
     override fun add(v: vec2): vec2 = vec2(x + v.x, y + v.y)
     override fun sub(v: vec2): vec2 = vec2(x - v.x, y - v.y)
     override fun mul(v: Float): vec2 = vec2(x * v, y * v)

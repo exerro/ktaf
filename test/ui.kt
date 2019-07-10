@@ -22,7 +22,9 @@ fun main() = application("Hello world") {
                 shrink()
 
                 addChild(UIButton("Hello")) {
-                    colour.rgba(0f, 1f, 0f)
+                    colour.set(rgba(0.3f, 0.9f, 0.6f))
+                    width.set(100f, "hover")
+                    margin.set(Border(0f, 32f), "hover")
                     textColour.rgba(1f, 0f, 1f)
                     font.set(font.get().scaleTo(font.get().height * 1.3f))
                     height.set(50f)
