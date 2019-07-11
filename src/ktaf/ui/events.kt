@@ -3,7 +3,16 @@ package ktaf.ui
 import ktaf.core.*
 
 typealias EventHandler<T> = (T) -> Unit
-typealias EventHandlerList<T> = MutableList<EventHandler<T>>
+
+class EventHandlerList<T: UIEvent> {
+    private val handlers: MutableList<EventHandler<T>> = mutableListOf()
+
+    fun connect(handler: EventHandler<T>) { handlers.add(handler) }
+    fun disconnect(handler: EventHandler<T>) { handlers.remove(handler) }
+    fun trigger(event: T) { handlers.forEach { it(event) } }
+
+    operator fun invoke(handler: EventHandler<T>) { handlers.add(handler) }
+}
 
 sealed class UIEvent
 sealed class UIKeyEvent(val key: GLFWKey, val modifiers: Set<GLFWKeyModifier>): UIEvent()

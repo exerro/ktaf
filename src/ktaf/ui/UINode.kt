@@ -62,40 +62,40 @@ abstract class UINode {
         when (event) {
             is UIKeyEvent -> handleKeyEvent(event)
             is UIMouseEvent -> handleMouseEvent(event)
-            is UITextInputEvent -> textInputEventHandlers.forEach { it(event) }
-            is UIFocusEvent -> focusEventHandlers.forEach { it(event) }
-            is UIUnFocusEvent -> unFocusEventHandlers.forEach { it(event) }
+            is UITextInputEvent -> onTextInput.trigger(event)
+            is UIFocusEvent -> onFocus.trigger(event)
+            is UIUnFocusEvent -> onUnFocus.trigger(event)
         }
     }
 
     open fun handleKeyEvent(event: UIKeyEvent) {
-        keyEventHandlers.forEach { it(event) }
+        onKeyEvent.trigger(event)
 
         when (event) {
-            is UIKeyPressEvent -> keyPressEventHandlers.forEach { it(event) }
-            is UIKeyReleaseEvent -> keyReleaseEventHandlers.forEach { it(event) }
+            is UIKeyPressEvent -> onKeyPress.trigger(event)
+            is UIKeyReleaseEvent -> onKeyRelease.trigger(event)
         }
     }
 
     open fun handleMouseButtonEvent(event: UIMouseButtonEvent) {
-        mouseButtonEventHandlers.forEach { it(event) }
+        onMouseButtonEvent.trigger(event)
 
         when (event) {
-            is UIMousePressEvent -> mousePressEventHandlers.forEach { it(event) }
-            is UIMouseReleaseEvent -> mouseReleaseEventHandlers.forEach { it(event) }
-            is UIMouseClickEvent -> mouseClickEventHandlers.forEach { it(event) }
+            is UIMousePressEvent -> onMousePress.trigger(event)
+            is UIMouseReleaseEvent -> onMouseRelease.trigger(event)
+            is UIMouseClickEvent -> onClick.trigger(event)
         }
     }
 
     open fun handleMouseEvent(event: UIMouseEvent) {
-        mouseEventHandlers.forEach { it(event) }
+        onMouseEvent.trigger(event)
 
         when (event) {
             is UIMouseButtonEvent -> handleMouseButtonEvent(event)
-            is UIMouseEnterEvent -> mouseEnterEventHandlers.forEach { it(event) }
-            is UIMouseExitEvent -> mouseExitEventHandlers.forEach { it(event) }
-            is UIMouseMoveEvent -> mouseMoveEventHandlers.forEach { it(event) }
-            is UIMouseDragEvent -> mouseDragEventHandlers.forEach { it(event) }
+            is UIMouseEnterEvent -> onMouseEnter.trigger(event)
+            is UIMouseExitEvent -> onMouseExit.trigger(event)
+            is UIMouseMoveEvent -> onMouseMove.trigger(event)
+            is UIMouseDragEvent -> onMouseDrag.trigger(event)
         }
     }
 
@@ -130,21 +130,21 @@ abstract class UINode {
     }
 
     // callbacks
-    internal val focusEventHandlers: EventHandlerList<UIFocusEvent> = mutableListOf()
-    internal val unFocusEventHandlers: EventHandlerList<UIUnFocusEvent> = mutableListOf()
-    internal val mouseEventHandlers: EventHandlerList<UIMouseEvent> = mutableListOf()
-    internal val mouseButtonEventHandlers: EventHandlerList<UIMouseButtonEvent> = mutableListOf()
-    internal val mouseEnterEventHandlers: EventHandlerList<UIMouseEnterEvent> = mutableListOf()
-    internal val mouseExitEventHandlers: EventHandlerList<UIMouseExitEvent> = mutableListOf()
-    internal val mousePressEventHandlers: EventHandlerList<UIMousePressEvent> = mutableListOf()
-    internal val mouseReleaseEventHandlers: EventHandlerList<UIMouseReleaseEvent> = mutableListOf()
-    internal val mouseClickEventHandlers: EventHandlerList<UIMouseClickEvent> = mutableListOf()
-    internal val mouseMoveEventHandlers: EventHandlerList<UIMouseMoveEvent> = mutableListOf()
-    internal val mouseDragEventHandlers: EventHandlerList<UIMouseDragEvent> = mutableListOf()
-    internal val keyEventHandlers: EventHandlerList<UIKeyEvent> = mutableListOf()
-    internal val keyPressEventHandlers: EventHandlerList<UIKeyPressEvent> = mutableListOf()
-    internal val keyReleaseEventHandlers: EventHandlerList<UIKeyReleaseEvent> = mutableListOf()
-    internal val textInputEventHandlers: EventHandlerList<UITextInputEvent> = mutableListOf()
+    internal val onFocus = EventHandlerList<UIFocusEvent>()
+    internal val onUnFocus = EventHandlerList<UIUnFocusEvent>()
+    internal val onMouseEvent = EventHandlerList<UIMouseEvent>()
+    internal val onMouseButtonEvent = EventHandlerList<UIMouseButtonEvent>()
+    internal val onMouseEnter = EventHandlerList<UIMouseEnterEvent>()
+    internal val onMouseExit = EventHandlerList<UIMouseExitEvent>()
+    internal val onMousePress = EventHandlerList<UIMousePressEvent>()
+    internal val onMouseRelease = EventHandlerList<UIMouseReleaseEvent>()
+    internal val onClick = EventHandlerList<UIMouseClickEvent>()
+    internal val onMouseMove = EventHandlerList<UIMouseMoveEvent>()
+    internal val onMouseDrag = EventHandlerList<UIMouseDragEvent>()
+    internal val onKeyEvent = EventHandlerList<UIKeyEvent>()
+    internal val onKeyPress = EventHandlerList<UIKeyPressEvent>()
+    internal val onKeyRelease = EventHandlerList<UIKeyReleaseEvent>()
+    internal val onTextInput = EventHandlerList<UITextInputEvent>()
 
     // configuration internals
     internal val foregroundsInternal = mutableListOf<Foreground>()

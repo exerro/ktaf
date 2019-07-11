@@ -16,7 +16,7 @@ import lwjglkt.setCursor
 import kotlin.reflect.KProperty0
 
 class UIScene(val display: GLFWDisplay, val context: DrawContext2D) {
-    internal val focussedNodeHover = KTAFMutableValue<UINode?>(null)
+    internal var focussedNodeHover: UINode? = null
     internal var firstRelativeMouseLocation = vec2(0f)
     internal var lastRelativeMouseLocation = vec2(0f)
     internal var mouseModifiers = setOf<GLFWMouseModifier>()
@@ -134,7 +134,7 @@ fun UIScene.update(dt: Float) {
 }
 
 fun UIScene.draw() {
-    display.setCursor(focussedNodeHover.get()?.cursor ?: GLFWCursor.DEFAULT)
+    display.setCursor(focussedNodeHover?.cursor ?: GLFWCursor.DEFAULT)
 
     root.get()?.let {
         it.draw(context, it.margin.get().tl,
@@ -167,7 +167,7 @@ fun UIScene.mouseReleased(button: GLFWMouseButton, position: vec2, modifiers: Se
 }
 
 fun UIScene.mouseMoved(position: vec2, last: vec2) {
-    val previousFocussedNode = focussedNodeHover.get()
+    val previousFocussedNode = focussedNodeHover
 
     root.get() ?.let { root ->
         val currentFocussedNode = root.getMouseHandler(position - root.computedPosition.get())
@@ -178,7 +178,7 @@ fun UIScene.mouseMoved(position: vec2, last: vec2) {
         ))
 
         if (previousFocussedNode != currentFocussedNode) {
-            focussedNodeHover.set(currentFocussedNode)
+            focussedNodeHover = currentFocussedNode
             previousFocussedNode?.handleEvent(UIMouseExitEvent(position - previousFocussedNode.absolutePosition()))
             currentFocussedNode?.handleEvent(UIMouseEnterEvent(position - currentFocussedNode.absolutePosition()))
         }

@@ -107,7 +107,7 @@ fun main() = application("Hello world") {
                     colour = rgba(Math.random().toFloat(), Math.random().toFloat(), Math.random().toFloat())
                 }
 
-                onMouseClick {
+                onClick {
                     width(Math.random().toFloat() * 100f + 50f)
                     height(Math.random().toFloat() * 100f + 50f)
                 }

@@ -5,7 +5,6 @@ import ktaf.ui.*
 import ktaf.ui.elements.UIButton
 import ktaf.ui.elements.UICanvas
 import ktaf.ui.elements.UIContainer
-import ktaf.ui.elements.onClick
 import ktaf.ui.layout.*
 
 /** Moves * to left in transition */

@@ -6,7 +6,6 @@ import ktaf.util.Animation
 import lwjglkt.GLFWCursor
 
 class UIButton(text: String): UINode() {
-    internal val clickEventHandlers: EventHandlerList<UIMouseClickEvent> = mutableListOf()
     private var background = addBackground(ColourBackground(rgba(0.3f, 0.6f, 0.9f)))
     private var foregroundText = addForeground(TextForeground(text))
 
@@ -42,10 +41,5 @@ class UIButton(text: String): UINode() {
 
         onMouseEnter { state.set("hover") }
         onMouseExit { state.clear() }
-        onMouseClick { event -> clickEventHandlers.forEach { it(event) } }
     }
-}
-
-fun UIButton.onClick(fn: UIButton.(UIMouseClickEvent) -> Unit) {
-    clickEventHandlers.add { fn(this, it) }
 }
