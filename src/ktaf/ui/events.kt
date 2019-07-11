@@ -1,6 +1,7 @@
 package ktaf.ui
 
 import ktaf.core.*
+import ktaf.ui.node.UINode
 
 typealias EventHandler<T> = (T) -> Unit
 

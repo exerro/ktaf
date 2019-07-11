@@ -1,6 +1,6 @@
 package ktaf.ui.layout
 
-import ktaf.ui.UINode
+import ktaf.ui.node.UINode
 import ktaf.ui.height
 import ktaf.ui.width
 import kotlin.math.max

@@ -2,6 +2,9 @@ package ktaf.ui.elements
 
 import ktaf.core.rgba
 import ktaf.ui.*
+import ktaf.ui.graphics.ColourBackground
+import ktaf.ui.graphics.TextForeground
+import ktaf.ui.node.*
 import ktaf.util.Animation
 import lwjglkt.GLFWCursor
 
@@ -39,7 +42,7 @@ class UIButton(text: String): UINode() {
             foregroundText = replaceForeground(foregroundText, foregroundText.copy(font = font))
         }
 
-        onMouseEnter { state.set("hover") }
+        onMouseEnter { state("hover") }
         onMouseExit { state.clear() }
     }
 }

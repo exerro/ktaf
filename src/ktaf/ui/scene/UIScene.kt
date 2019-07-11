@@ -1,12 +1,15 @@
-package ktaf.ui
+package ktaf.ui.scene
 
 import ktaf.core.*
 import ktaf.graphics.DrawContext2D
 import ktaf.typeclass.Animateable
 import ktaf.typeclass.minus
 import ktaf.typeclass.transitionTo
+import ktaf.ui.*
 import ktaf.ui.layout.computeWidthInternal
 import ktaf.ui.layout.positionChildrenInternal
+import ktaf.ui.node.UINode
+import ktaf.ui.node.absolutePosition
 import ktaf.util.Animation
 import ktaf.util.Easing
 import ktaf.util.EasingFunction
@@ -36,86 +39,6 @@ class UIScene(val display: GLFWDisplay, val context: DrawContext2D) {
             new?.scene?.set(this)
         }
     }
-}
-
-fun <T: Animateable<T>> UIScene.animate(owner: Any, property: KProperty0<KTAFMutableValue<T>>, to: T, duration: Float = Animation.NORMAL, easing: EasingFunction = Easing.SMOOTH)
-        = animate(owner, property.name, property.get(), to, duration, easing)
-
-fun <T: Animateable<T>> UIScene.animate(owner: Any, property: String, value: KTAFMutableValue<T>, to: T, duration: Float = Animation.NORMAL, easing: EasingFunction = Easing.SMOOTH) {
-    animations.computeIfAbsent(owner) { mutableMapOf() } [property] = Animation(
-            value.get(),
-            to,
-            duration,
-            easing,
-            { a, b, t -> a.transitionTo(b, t) },
-            value::setValue
-    )
-}
-
-fun <T: Animateable<T>> UIScene.animateNullable(owner: Any, property: KProperty0<KTAFMutableValue<T?>>, to: T?, duration: Float = Animation.NORMAL, easing: EasingFunction = Easing.SMOOTH)
-        = animateNullable(owner, property.name, property.get(), to, duration, easing)
-
-fun <T: Animateable<T>> UIScene.animateNullable(owner: Any, property: String, value: KTAFMutableValue<T?>, to: T?, duration: Float = Animation.NORMAL, easing: EasingFunction = Easing.SMOOTH) {
-    val prev = value.get()
-
-    if (prev == null || to == null) {
-        value.setValue(to)
-        return
-    }
-
-    animations.computeIfAbsent(owner) { mutableMapOf() } [property] = Animation(
-            prev,
-            to,
-            duration,
-            easing,
-            { a, b, t -> a.transitionTo(b, t) },
-            value::setValue
-    )
-}
-
-fun UIScene.animate(owner: Any, property: KProperty0<KTAFMutableValue<Float>>, to: Float, duration: Float = Animation.NORMAL, easing: EasingFunction = Easing.SMOOTH)
-        = animate(owner, property.name, property.get(), to, duration, easing)
-
-fun UIScene.animate(owner: Any, property: String, value: KTAFMutableValue<Float>, to: Float, duration: Float = Animation.NORMAL, easing: EasingFunction = Easing.SMOOTH) {
-    animations.computeIfAbsent(owner) { mutableMapOf() } [property] = Animation(
-            value.get(),
-            to,
-            duration,
-            easing,
-            { a, b, t -> a + (b - a) * t },
-            value::setValue
-    )
-}
-
-fun UIScene.animateNullable(owner: Any, property: KProperty0<KTAFMutableValue<Float?>>, to: Float?, duration: Float = Animation.NORMAL, easing: EasingFunction = Easing.SMOOTH)
-        = animateNullable(owner, property.name, property.get(), to, duration, easing)
-
-fun UIScene.animateNullable(owner: Any, property: String, value: KTAFMutableValue<Float?>, to: Float?, duration: Float = Animation.NORMAL, easing: EasingFunction = Easing.SMOOTH) {
-    val prev = value.get()
-
-    if (prev == null || to == null) {
-        value.setValue(to)
-        return
-    }
-
-    animations.computeIfAbsent(owner) { mutableMapOf() } [property] = Animation(
-            prev,
-            to,
-            duration,
-            easing,
-            { a, b, t -> a + (b - a) * t },
-            value::setValue
-    )
-}
-
-fun <N: UINode, T> UIScene.cancelAnimation(node: N, property: String) {
-    animations.computeIfAbsent(node) { mutableMapOf() } .remove(property)
-}
-
-fun <N: UINode> UIScene.setRoot(root: N, init: N.() -> Unit = {}): N {
-    init(root)
-    this.root.set(root)
-    return root
 }
 
 fun UIScene.update(dt: Float) {
@@ -150,7 +73,7 @@ fun UIScene.mousePressed(button: GLFWMouseButton, position: vec2, modifiers: Set
     root.get() ?.let { root ->
         root.getMouseHandler(position - root.computedPosition.get()) ?.let { target ->
             target.handleEvent(UIMousePressEvent(position - target.absolutePosition(), button, modifiers))
-            focussedNode.set(target)
+            focussedNode(target)
             firstRelativeMouseLocation = position - target.absolutePosition()
         }
 

@@ -6,6 +6,9 @@ import ktaf.ui.elements.UIButton
 import ktaf.ui.elements.UICanvas
 import ktaf.ui.elements.UIContainer
 import ktaf.ui.layout.*
+import ktaf.ui.node.UINode
+import ktaf.ui.scene.UIScene
+import ktaf.ui.scene.attachCallbacks
 
 /** Moves * to left in transition */
 fun clearRootsLeft(scene: UIScene, node: UINode) {
@@ -28,47 +31,47 @@ fun clearRootsRight(scene: UIScene, node: UINode) {
 }
 
 fun loadProjectsList(scene: UIScene, node: UINode) {
-    node.addChild(UIContainer()) {
-        val header = addChild(UIContainer()) {
-            colour.rgba(0.08f, 0.09f, 0.11f)
-            padding.set(10f)
+    node.children.add(UIContainer(), {
+        val header = children.add(UIContainer(), {
+            colour(rgba(0.08f, 0.09f, 0.11f))
+            padding(Border(10f))
 
-            val title = addChild(UIButton("Projects")) {
-                colour.rgba(0f, 0f)
-                font.set(font.get().scaleTo(32f))
-            }
+            val title = children.add(UIButton("Projects"), {
+                colour(rgba(0f, 0f))
+                font(font.get().scaleTo(32f))
+            })
 
             layout(FillLayout())
-        }
+        })
 
-        val content = addChild(UIContainer()) {
-            colour.rgba(0.14f, 0.15f, 0.17f)
-            padding.set(0f, 0f, 50f, 0f)
+        val content = children.add(UIContainer(), {
+            colour(rgba(0.14f, 0.15f, 0.17f))
+            padding(Border(0f, 0f, 50f, 0f))
 
-            val plist = addChild(UIContainer()) {
-                colour.rgba(0f, 0f)
+            val plist = children.add(UIContainer(), {
+                colour(rgba(0f, 0f))
 
                 for (item in listOf("Project 1", "Project 2", "Project 3")) {
-                    addChild(UIButton(item)) {
-                        colour.rgba(0.3f, 0.6f, 0.9f)
-                        height.set(50f)
-                        font.set(font.get().scaleTo(28f))
+                    children.add(UIButton(item), {
+                        colour(rgba(0.3f, 0.6f, 0.9f))
+                        height(50f)
+                        font(font.get().scaleTo(28f))
 
                         onClick {
                             clearRootsLeft(scene, node)
                             loadProjectPage(scene, node, item)
                         }
-                    }
+                    })
                 }
 
                 layout(ListLayout()) {
-                    spacing.set(Spacing.fixed(24f) within Spacing.SPACE_AROUND)
+                    spacing(Spacing.fixed(24f) within Spacing.SPACE_AROUND)
                 }
-            }
+            })
 
-            val newButton = addChild(UIButton("NEW")) {
-                colour.rgba(0.9f, 0.35f, 0.3f)
-            }
+            val newButton = children.add(UIButton("NEW"), {
+                colour(rgba(0.9f, 0.35f, 0.3f))
+            })
 
             layout(FreeLayout()) {
                 hline("footer-start") {
@@ -94,7 +97,7 @@ fun loadProjectsList(scene: UIScene, node: UINode) {
                     rightPercentage = 50f
                 }
             }
-        }
+        })
 
         layout(FreeLayout()) {
             hline("divider") {
@@ -115,28 +118,28 @@ fun loadProjectsList(scene: UIScene, node: UINode) {
                 right = "right"
             }
         }
-    }
+    })
 }
 
 fun loadProjectPage(scene: UIScene, node: UINode, name: String) {
-    node.addChild(UIContainer()) {
-        val header = addChild(UIContainer()) {
-            colour.rgba(0.08f, 0.09f, 0.11f)
-            padding.set(10f)
+    node.children.add(UIContainer(), {
+        val header = children.add(UIContainer(), {
+            colour(rgba(0.08f, 0.09f, 0.11f))
+            padding(Border(10f))
 
-            val back = addChild(UIButton("BACK")) {
-                width.set(100f)
+            val back = children.add(UIButton("BACK"), {
+                width(100f)
 
                 onClick {
                     clearRootsRight(scene, node)
                     loadProjectsList(scene, node)
                 }
-            }
+            })
 
-            val title = addChild(UIButton(name)) {
-                colour.rgba(0f, 0f)
-                font.set(font.get().scaleTo(32f))
-            }
+            val title = children.add(UIButton(name), {
+                colour(rgba(0f, 0f))
+                font(font.get().scaleTo(32f))
+            })
 
             layout(FreeLayout()) {
                 elem(title) {
@@ -155,31 +158,31 @@ fun loadProjectPage(scene: UIScene, node: UINode, name: String) {
                     bottomOffset = -10f
                 }
             }
-        }
+        })
 
-        val content = addChild(UIContainer()) {
-            padding.set(16f)
-            colour.rgba(0.14f, 0.15f, 0.17f)
+        val content = children.add(UIContainer(), {
+            padding(Border(16f))
+            colour(rgba(0.14f, 0.15f, 0.17f))
 
-            val board = addChild(UICanvas()) {
+            val board = children.add(UICanvas(), {
 
-            }
+            })
 
-            val robots = addChild(UIContainer()) {
+            val robots = children.add(UIContainer(), {
 
-            }
+            })
 
-            val routines = addChild(UIContainer()) {
+            val routines = children.add(UIContainer(), {
 
-            }
+            })
 
-            val tasks = addChild(UIContainer()) {
+            val tasks = children.add(UIContainer(), {
 
-            }
+            })
 
-            val components = addChild(UIContainer()) {
+            val components = children.add(UIContainer(), {
 
-            }
+            })
 
             layout(FreeLayout()) {
                 hline("separator-start") {
@@ -247,7 +250,7 @@ fun loadProjectPage(scene: UIScene, node: UINode, name: String) {
                     right = "right"
                 }
             }
-        }
+        })
 
         layout(FreeLayout()) {
             hline("divider") {
@@ -268,16 +271,14 @@ fun loadProjectPage(scene: UIScene, node: UINode, name: String) {
                 right = "right"
             }
         }
-    }
+    })
 }
 
 fun main() = application("UI Test 2") {
     val context = DrawContext2D(viewport)
     val scene = scene(display, context)
-    val node = scene.setRoot(UIContainer()) {
-        layout(FreeLayout()) {
-
-        }
+    val node = scene.root(UIContainer()) {
+        layout(FreeLayout())
     }
 
     loadProjectsList(scene, node)

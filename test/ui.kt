@@ -1,12 +1,19 @@
 
-import ktaf.core.invoke
 import ktaf.core.*
 import ktaf.graphics.DrawContext2D
 import ktaf.graphics.circle
 import ktaf.graphics.rectangle
-import ktaf.ui.*
-import ktaf.ui.elements.*
+import ktaf.ui.Border
+import ktaf.ui.elements.UIButton
+import ktaf.ui.elements.UICanvas
+import ktaf.ui.elements.UIContainer
+import ktaf.ui.elements.onDraw
 import ktaf.ui.layout.*
+import ktaf.ui.list
+import ktaf.ui.node.fill
+import ktaf.ui.node.shrink
+import ktaf.ui.scene
+import ktaf.ui.scene.attachCallbacks
 import kotlin.math.min
 import kotlin.math.sin
 
@@ -15,16 +22,15 @@ fun main() = application("Hello world") {
     val scene = scene(display, context) {
         lateinit var r: UIContainer
 
-        r = setRoot(UIContainer()) {
+        r = root.set(UIContainer()) {
             colour(rgba(0f, 1f, 0.5f))
-
 
             val b1 = list {
                 colour(rgba(1f, 0f, 0f))
 
                 shrink()
 
-                addChild(UIButton("Hello")) {
+                children.add(UIButton("Hello")) {
                     colour(rgba(0.3f, 0.9f, 0.6f))
                     width["hover"](100f)
                     margin["hover"](Border(0f, 32f))
@@ -42,7 +48,7 @@ fun main() = application("Hello world") {
                     }
                 }
 
-                addChild(UIButton("Button")) {
+                children.add(UIButton("Button"), {
                     width(120f)
                     height(30f)
                     textColour(rgba(0f))
@@ -53,14 +59,14 @@ fun main() = application("Hello world") {
                             verticalSpacing(Spacing.SPACE_AFTER)
                         }
                     }
-                }
+                })
 
 //                layout(ListLayout()) {
 //                    spacing = Spacing.fixed(20f) within Spacing.SPACE_BEFORE
 //                }
             }
 
-            val b2 = addChild(UIButton("Woah")) {
+            val b2 = children.add(UIButton("Woah"), {
                 fill()
                 height(30f)
                 textColour(rgba(0f))
@@ -71,10 +77,10 @@ fun main() = application("Hello world") {
                         spacing(Spacing.SPACE_AFTER)
                     }
                 }
-            }
+            })
 
             val buttons = (3..17).map {
-                addChild(UIButton("B${it - 2}")) {
+                children.add(UIButton("B${it - 2}"), {
                     colour(rgba(it.toFloat() / 25))
                     margin(Border(10f))
                     width(100f)
@@ -84,10 +90,10 @@ fun main() = application("Hello world") {
                         println("grid button ${it - 2} was clicked at ${event.position} with button ${event.button} and modifiers ${event.modifiers}")
                         height((Math.random() * 100).toFloat() + 50f)
                     }
-                }
+                })
             }
 
-            addChild(UICanvas()) {
+            children.add(UICanvas(), {
                 var colour = rgba(1f, 0f, 1f)
 
                 width(100f)
@@ -111,7 +117,7 @@ fun main() = application("Hello world") {
                     width(Math.random().toFloat() * 100f + 50f)
                     height(Math.random().toFloat() * 100f + 50f)
                 }
-            }
+            })
 
             layout(FreeLayout()) {
                 alignment(vec2(0.5f))

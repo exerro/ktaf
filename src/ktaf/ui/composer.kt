@@ -5,6 +5,8 @@ import lwjglkt.GLFWDisplay
 import ktaf.ui.elements.UIContainer
 import ktaf.ui.layout.ListLayout
 import ktaf.ui.layout.UILayout
+import ktaf.ui.node.UINode
+import ktaf.ui.scene.UIScene
 
 fun scene(display: GLFWDisplay, context: DrawContext2D, init: UIScene.() -> Unit = {}): UIScene {
     val root = UIScene(display, context)
@@ -12,16 +14,10 @@ fun scene(display: GLFWDisplay, context: DrawContext2D, init: UIScene.() -> Unit
     return root
 }
 
-fun <N: UINode, L: UILayout> N.layout(layout: L, init: L.() -> Unit = {}): L {
-    init(layout)
-    this.layout.set(layout)
-    return layout
-}
-
 fun <N: UINode> N.list(init: UIContainer.() -> Unit): UIContainer {
-    val child = addChild(UIContainer()) {
+    val child = children.add(UIContainer(), {
         layout(ListLayout())
-    }
+    })
     init(child)
     return child
 }

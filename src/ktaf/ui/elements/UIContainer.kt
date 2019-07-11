@@ -2,6 +2,10 @@ package ktaf.ui.elements
 
 import ktaf.core.rgba
 import ktaf.ui.*
+import ktaf.ui.graphics.ColourBackground
+import ktaf.ui.node.UINode
+import ktaf.ui.node.addBackground
+import ktaf.ui.node.replaceBackground
 import lwjglkt.GLFWCursor
 
 class UIContainer: UINode() {

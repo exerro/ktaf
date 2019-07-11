@@ -1,18 +1,13 @@
-package ktaf.ui
+package ktaf.ui.graphics
 
-import ktaf.util.AABB
-import ktaf.core.*
+import ktaf.core.RGBA
+import ktaf.core.rgba
+import ktaf.core.vec2
+import ktaf.graphics.DrawContext2D
 import ktaf.graphics.Font
 import ktaf.graphics.widthOf
-import ktaf.graphics.*
-import ktaf.typeclass.plus
-import lwjglkt.GLTexture2
+import ktaf.graphics.write
 import ktaf.util.wrapText
-
-abstract class Foreground {
-    abstract fun draw(context: DrawContext2D, position: vec2, size: vec2)
-    open fun getHeight(width: Float): Float? = null
-}
 
 data class TextForeground(
         val text: String,
@@ -35,23 +30,4 @@ data class TextForeground(
     }
 
     // TODO: override fun getHeight(width: Float): Float? = height of wrapped text
-}
-
-data class ImageForeground(
-        val image: GLTexture2,
-        val tint: RGB = rgb(1f),
-        val opacity: Float = 1f
-): Background() {
-    override fun draw(context: DrawContext2D, position: vec2, size: vec2) {
-        context.push {
-            context.scissor = AABB(position, position + size)
-            context.colour = tint.rgba(opacity)
-
-            context.draw {
-                image(image, position, size / image.size)
-            }
-        }
-    }
-
-    // TODO: override fun getHeight(width: Float): Float? = height of scaled image
 }

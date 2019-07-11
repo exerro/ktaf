@@ -1,11 +1,10 @@
 package ktaf.ui.elements
 
 import ktaf.graphics.DrawContext2D
-import ktaf.core.plus
 import ktaf.graphics.push
 import ktaf.core.vec2
 import ktaf.typeclass.plus
-import ktaf.ui.UINode
+import ktaf.ui.node.UINode
 import ktaf.util.AABB
 
 class UICanvas : UINode() {

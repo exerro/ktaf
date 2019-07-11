@@ -1,11 +1,16 @@
-package ktaf.ui
+package ktaf.ui.node
 
 import ktaf.core.*
 import ktaf.graphics.DrawContext2D
 import ktaf.typeclass.minus
 import ktaf.typeclass.plus
+import ktaf.ui.*
+import ktaf.ui.graphics.Background
+import ktaf.ui.graphics.Foreground
 import ktaf.ui.layout.ListLayout
 import ktaf.ui.layout.UILayout
+import ktaf.ui.scene.UIScene
+import ktaf.ui.scene.animate
 import lwjglkt.GLFWCursor
 import kotlin.properties.Delegates
 
@@ -114,7 +119,7 @@ abstract class UINode {
 
         parent.connectComparator { old, new ->
             old?.children?.remove(this)
-            new?.children?.add(this)
+            if (new?.children?.contains(this) != true) new?.children?.add(this)
             Unit
         }
 

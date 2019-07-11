@@ -29,5 +29,3 @@ val Border.width
 
 val Border.height
         get() = top + bottom
-
-fun KTAFMutableValue<Border>.set(top: Float, right: Float = top, bottom: Float = top, left: Float = right) { set(Border(top, right, bottom, left)) }
