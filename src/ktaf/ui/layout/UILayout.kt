@@ -1,5 +1,5 @@
 package ktaf.ui.layout
-import ktaf.KTAFMutableValue
+import ktaf.core.KTAFMutableValue
 import ktaf.core.vec2
 import ktaf.ui.*
 

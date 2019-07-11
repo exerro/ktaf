@@ -1,4 +1,4 @@
-package ktaf
+package ktaf.core
 
 class KTAFValue<T>(
         private val value: T
@@ -148,3 +148,10 @@ class KTAFMutableList<T>(
     private var addedConnections = mutableListOf<(T) -> Any?>()
     private var removedConnections = mutableListOf<(T) -> Any?>()
 }
+
+fun <T> KTAFMutableValue<T>.joinTo(other: KTAFMutableValue<T>) {
+    connect(other::set)
+    other.connect(::set)
+}
+
+operator fun <T> KTAFMutableValue<T>.invoke(value: T) { set(value) }

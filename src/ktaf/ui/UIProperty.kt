@@ -1,6 +1,6 @@
 package ktaf.ui
 
-import ktaf.KTAFMutableValue
+import ktaf.core.KTAFMutableValue
 import ktaf.typeclass.Animateable
 import ktaf.util.Animation
 import ktaf.util.Easing
@@ -14,14 +14,7 @@ open class UIProperty<T>(value: T): KTAFMutableValue<T>(value) {
     private var activeState = DEFAULT_STATE
 
     override fun set(value: T) {
-        set(value, DEFAULT_STATE)
-    }
-
-    fun get(state: UINodeState): T = stateValues[state] ?: stateValues[DEFAULT_STATE]!!
-
-    fun set(value: T, state: UINodeState) {
-        stateValues[state] = value
-        if (activeState == state || state == DEFAULT_STATE && !stateValues.containsKey(activeState)) updateValue(value)
+        TODO()
     }
 
     fun setState(state: UINodeState) {
@@ -33,6 +26,15 @@ open class UIProperty<T>(value: T): KTAFMutableValue<T>(value) {
 
     protected open fun updateValue(value: T) {
         super.set(value)
+    }
+
+    operator fun invoke(value: T) {
+        this[DEFAULT_STATE](value)
+    }
+
+    operator fun get(state: UINodeState) = { value: T ->
+        stateValues[state] = value
+        if (activeState == state || state == DEFAULT_STATE && !stateValues.containsKey(activeState)) updateValue(value)
     }
 }
 

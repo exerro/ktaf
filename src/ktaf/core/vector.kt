@@ -1,6 +1,5 @@
 package ktaf.core
 
-import ktaf.KTAFMutableValue
 import ktaf.typeclass.*
 import kotlin.math.max
 import kotlin.math.min

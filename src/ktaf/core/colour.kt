@@ -1,7 +1,5 @@
 package ktaf.core
 
-import ktaf.KTAFMutableValue
-
 typealias RGB = vec3
 typealias RGBA = vec4
 

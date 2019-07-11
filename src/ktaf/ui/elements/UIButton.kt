@@ -24,7 +24,7 @@ class UIButton(text: String): UINode() {
         state.connect(this.text::setState)
         state.connect(textColour::setState)
         state.connect(font::setState)
-        colour.set(rgba(0.4f, 0.7f, 1f), "hover")
+        colour["hover"](rgba(0.4f, 0.7f, 1f))
 
         colour.connect { colour ->
             background = replaceBackground(background, background.copy(colour = colour))

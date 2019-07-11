@@ -1,7 +1,7 @@
 package ktaf.ui
 
-import ktaf.KTAFMutableList
-import ktaf.KTAFMutableValue
+import ktaf.core.KTAFMutableList
+import ktaf.core.KTAFMutableValue
 import ktaf.graphics.DrawContext2D
 import ktaf.core.vec2
 import ktaf.typeclass.minus
