@@ -275,7 +275,7 @@ fun loadProjectPage(scene: UIScene, node: UINode, name: String) {
 fun main() = application("UI Test 2") {
     val context = DrawContext2D(viewport)
     val scene = scene(display, context)
-    val node = scene.addRoot(UIContainer()) {
+    val node = scene.setRoot(UIContainer()) {
         layout(FreeLayout()) {
 
         }

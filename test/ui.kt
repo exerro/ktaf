@@ -14,8 +14,10 @@ fun main() = application("Hello world") {
     val context = DrawContext2D(viewport)
     val scene = scene(display, context) {
         lateinit var r: UIContainer
-        r = addRoot(UIContainer()) {
+
+        r = setRoot(UIContainer()) {
             colour(rgba(0f, 1f, 0.5f))
+
 
             val b1 = list {
                 colour(rgba(1f, 0f, 0f))
@@ -41,7 +43,7 @@ fun main() = application("Hello world") {
                 }
 
                 addChild(UIButton("Button")) {
-                    width(100f)
+                    width(120f)
                     height(30f)
                     textColour(rgba(0f))
 
@@ -105,22 +107,9 @@ fun main() = application("Hello world") {
                     colour = rgba(Math.random().toFloat(), Math.random().toFloat(), Math.random().toFloat())
                 }
 
-                onMousePress { event ->
-                    event.ifNotHandled {
-                        if (event.within(this)) {
-                            event.handledBy(this)
-                        }
-                    }
-                }
-
-                onMouseClick { event ->
-                    event.ifNotHandled {
-                        if (event.within(this)) {
-                            event.handledBy(this)
-                            width(Math.random().toFloat() * 100f + 50f)
-                            height(Math.random().toFloat() * 100f + 50f)
-                        }
-                    }
+                onMouseClick {
+                    width(Math.random().toFloat() * 100f + 50f)
+                    height(Math.random().toFloat() * 100f + 50f)
                 }
             }
 

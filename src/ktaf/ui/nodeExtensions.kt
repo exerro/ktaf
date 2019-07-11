@@ -17,9 +17,9 @@ fun UINode.absolutePosition(): vec2
 // Keyboard focus                                                                                                     //
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-fun UINode.requestFocus() { scene.get()?.focusOn(this) }
-fun UINode.unfocus() { if (isFocused()) scene.get()?.unfocus() }
-fun UINode.isFocused() = scene.get()?.focussedNode == this
+fun UINode.requestFocus() { scene.get()?.focussedNode?.set(this) }
+fun UINode.unfocus() { if (isFocused()) scene.get()?.focussedNode?.set(null) }
+fun UINode.isFocused() = scene.get()?.focussedNode?.get() == this
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Child control                                                                                                      //
@@ -86,6 +86,7 @@ fun <N: UINode> N.onKeyRelease(fn: N.(UIKeyReleaseEvent) -> Unit) { keyReleaseEv
 fun <N: UINode> N.onTextInput(fn: N.(UITextInputEvent) -> Unit) { textInputEventHandlers.add { fn(this, it) } }
 
 fun <N: UINode> N.onMouseEvent(fn: N.(UIMouseEvent) -> Unit) { mouseEventHandlers.add { fn(this, it) } }
+fun <N: UINode> N.onMouseButtonEvent(fn: N.(UIMouseButtonEvent) -> Unit) { mouseButtonEventHandlers.add { fn(this, it) } }
 fun <N: UINode> N.onMouseEnter(fn: N.(UIMouseEnterEvent) -> Unit) { mouseEnterEventHandlers.add { fn(this, it) } }
 fun <N: UINode> N.onMouseExit(fn: N.(UIMouseExitEvent) -> Unit) { mouseExitEventHandlers.add { fn(this, it) } }
 fun <N: UINode> N.onMousePress(fn: N.(UIMousePressEvent) -> Unit) { mousePressEventHandlers.add { fn(this, it) } }

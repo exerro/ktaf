@@ -1,8 +1,6 @@
 package ktaf.ui.elements
 
 import ktaf.core.rgba
-import ktaf.core.vec3
-import ktaf.typeclass.times
 import ktaf.ui.*
 import ktaf.util.Animation
 import lwjglkt.GLFWCursor
@@ -42,21 +40,9 @@ class UIButton(text: String): UINode() {
             foregroundText = replaceForeground(foregroundText, foregroundText.copy(font = font))
         }
 
-        onMouseEnter { if (!it.handled()) { it.handledBy(this); state.set("hover") } }
+        onMouseEnter { state.set("hover") }
         onMouseExit { state.clear() }
-
-        onMousePress { event -> event.ifNotHandled {
-            if (event.within(this)) {
-                event.handledBy(this)
-            }
-        } }
-
-        onMouseClick { event -> event.ifNotHandled {
-            if (event.within(this)) {
-                event.handledBy(this)
-                clickEventHandlers.forEach { it(event) }
-            }
-        } }
+        onMouseClick { event -> clickEventHandlers.forEach { it(event) } }
     }
 }
 

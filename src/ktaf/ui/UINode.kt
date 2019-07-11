@@ -1,9 +1,7 @@
 package ktaf.ui
 
-import ktaf.core.KTAFMutableList
-import ktaf.core.KTAFMutableValue
+import ktaf.core.*
 import ktaf.graphics.DrawContext2D
-import ktaf.core.vec2
 import ktaf.typeclass.minus
 import ktaf.typeclass.plus
 import ktaf.ui.layout.ListLayout
@@ -30,6 +28,7 @@ abstract class UINode {
     val computedY = KTAFMutableValue(0f)
     val computedWidth = KTAFMutableValue(0f)
     val computedHeight = KTAFMutableValue(0f)
+    val computedPosition = KTAFMutableValue(vec2(0f))
 
     open fun computeHeight(width: Float) = height.get()
 
@@ -42,7 +41,7 @@ abstract class UINode {
 
         children.forEach {
             it.draw(context,
-                    position + padding.get().tl + vec2(it.computedX.get(), it.computedY.get()),
+                    position + padding.get().tl + it.computedPosition.get(),
                     vec2(it.computedWidth.get(), it.computedHeight.get())
             )
         }
@@ -52,6 +51,13 @@ abstract class UINode {
         }
     }
 
+    open fun getMouseHandler(position: vec2): UINode?
+            =  children.reversed().firstNotNull { it.getMouseHandler(position - padding.get().tl - it.computedPosition.get()) }
+            ?: this.takeIf { position.x >= 0 && position.y >= 0 && position.x < computedWidth.get() && position.y < computedHeight.get() }
+
+    open fun getKeyboardHandler(key: GLFWKey, modifier: GLFWKeyModifier): UINode?
+            = children.reversed().firstNotNull { it.getKeyboardHandler(key, modifier) }
+
     open fun handleEvent(event: UIEvent) {
         when (event) {
             is UIKeyEvent -> handleKeyEvent(event)
@@ -59,11 +65,6 @@ abstract class UINode {
             is UITextInputEvent -> textInputEventHandlers.forEach { it(event) }
             is UIFocusEvent -> focusEventHandlers.forEach { it(event) }
             is UIUnFocusEvent -> unFocusEventHandlers.forEach { it(event) }
-        }
-
-        when (event) {
-            is UITextInputEvent, is UIFocusEvent, is UIUnFocusEvent -> children.forEach { it.handleEvent(event) }
-            else -> { /* do nothing */ }
         }
     }
 
@@ -74,25 +75,27 @@ abstract class UINode {
             is UIKeyPressEvent -> keyPressEventHandlers.forEach { it(event) }
             is UIKeyReleaseEvent -> keyReleaseEventHandlers.forEach { it(event) }
         }
+    }
 
-        children.forEach { it.handleEvent(event) }
+    open fun handleMouseButtonEvent(event: UIMouseButtonEvent) {
+        mouseButtonEventHandlers.forEach { it(event) }
+
+        when (event) {
+            is UIMousePressEvent -> mousePressEventHandlers.forEach { it(event) }
+            is UIMouseReleaseEvent -> mouseReleaseEventHandlers.forEach { it(event) }
+            is UIMouseClickEvent -> mouseClickEventHandlers.forEach { it(event) }
+        }
     }
 
     open fun handleMouseEvent(event: UIMouseEvent) {
         mouseEventHandlers.forEach { it(event) }
 
         when (event) {
+            is UIMouseButtonEvent -> handleMouseButtonEvent(event)
             is UIMouseEnterEvent -> mouseEnterEventHandlers.forEach { it(event) }
             is UIMouseExitEvent -> mouseExitEventHandlers.forEach { it(event) }
-            is UIMousePressEvent -> mousePressEventHandlers.forEach { it(event) }
-            is UIMouseReleaseEvent -> mouseReleaseEventHandlers.forEach { it(event) }
-            is UIMouseClickEvent -> mouseClickEventHandlers.forEach { it(event) }
             is UIMouseMoveEvent -> mouseMoveEventHandlers.forEach { it(event) }
             is UIMouseDragEvent -> mouseDragEventHandlers.forEach { it(event) }
-        }
-
-        children.reversed().forEach {
-            it.handleEvent(event.relativeTo(padding.get().tl + vec2(it.computedX.get(), it.computedY.get())))
         }
     }
 
@@ -105,6 +108,9 @@ abstract class UINode {
         scene.connect { scene ->
             children.forEach { it.scene.set(scene) }
         }
+
+        computedX.connect { computedPosition.set(vec2(it, computedY.get())) }
+        computedY.connect { computedPosition.set(vec2(computedX.get(), it)) }
 
         parent.connectComparator { old, new ->
             old?.children?.remove(this)
@@ -127,6 +133,7 @@ abstract class UINode {
     internal val focusEventHandlers: EventHandlerList<UIFocusEvent> = mutableListOf()
     internal val unFocusEventHandlers: EventHandlerList<UIUnFocusEvent> = mutableListOf()
     internal val mouseEventHandlers: EventHandlerList<UIMouseEvent> = mutableListOf()
+    internal val mouseButtonEventHandlers: EventHandlerList<UIMouseButtonEvent> = mutableListOf()
     internal val mouseEnterEventHandlers: EventHandlerList<UIMouseEnterEvent> = mutableListOf()
     internal val mouseExitEventHandlers: EventHandlerList<UIMouseExitEvent> = mutableListOf()
     internal val mousePressEventHandlers: EventHandlerList<UIMousePressEvent> = mutableListOf()
@@ -159,4 +166,9 @@ abstract class UINode {
     internal var computedHeightCachedSetter: Float by Delegates.observable(0f) { _, old, new ->
         if (old != new) { scene.get()?.animate(this, ::computedHeight, new) }
     }
+}
+
+private fun <T, R> List<T>.firstNotNull(fn: (T) -> R?): R? {
+    for (x in this) fn(x)?.let { return it }
+    return null
 }
