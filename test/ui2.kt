@@ -57,7 +57,7 @@ fun loadProjectsList(scene: UIScene, node: UINode) {
                         height(50f)
                         font(font.get().scaleTo(28f))
 
-                        onClick {
+                        onMouseClick {
                             clearRootsLeft(scene, node)
                             loadProjectPage(scene, node, item)
                         }

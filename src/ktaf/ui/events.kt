@@ -5,7 +5,7 @@ import ktaf.ui.node.UINode
 
 typealias EventHandler<T> = (T) -> Unit
 
-class EventHandlerList<T: UIEvent> {
+class EventHandlerList<T> {
     private val handlers: MutableList<EventHandler<T>> = mutableListOf()
 
     fun connect(handler: EventHandler<T>) { handlers.add(handler) }

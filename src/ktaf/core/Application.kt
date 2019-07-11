@@ -63,6 +63,12 @@ fun Application.onMouseMoved(handler: (Application).(Int, Int, Int, Int) -> Unit
         = onMouseMovedCallbacks.add { a, b, c, d -> handler(this, a, b, c, d) }
 fun Application.onMouseDragged(handler: (Application).(Int, Int, Int, Int, Int, Int, Set<GLFWMouseButton>) -> Unit)
         = onMouseDraggedCallbacks.add { a, b, c, d, e, f, g -> handler(this, a, b, c, d, e, f, g) }
+fun Application.onKeyPressed(handler: (Application).(GLFWKey, Set<GLFWKeyModifier>) -> Unit)
+        = onKeyPressedCallbacks.add { a, b -> handler(this, a, b) }
+fun Application.onKeyReleased(handler: (Application).(GLFWKey, Set<GLFWKeyModifier>) -> Unit)
+        = onKeyReleasedCallbacks.add { a, b -> handler(this, a, b) }
+fun Application.onTextInput(handler: (Application).(String) -> Unit)
+        = onTextInputCallbacks.add { a -> handler(this, a) }
 
 fun application(name: String, load: (Application).() -> Unit) {
     val width = 1080

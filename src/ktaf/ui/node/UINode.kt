@@ -60,8 +60,11 @@ abstract class UINode {
             =  children.reversed().firstNotNull { it.getMouseHandler(position - padding.get().tl - it.computedPosition.get()) }
             ?: this.takeIf { position.x >= 0 && position.y >= 0 && position.x < computedWidth.get() && position.y < computedHeight.get() }
 
-    open fun getKeyboardHandler(key: GLFWKey, modifier: GLFWKeyModifier): UINode?
-            = children.reversed().firstNotNull { it.getKeyboardHandler(key, modifier) }
+    open fun getKeyboardHandler(key: GLFWKey, modifiers: Set<GLFWKeyModifier>): UINode?
+            = children.reversed().firstNotNull { it.getKeyboardHandler(key, modifiers) }
+
+    open fun getInputHandler(): UINode?
+            = children.reversed().firstNotNull { it.getInputHandler() }
 
     open fun handleEvent(event: UIEvent) {
         when (event) {
@@ -88,7 +91,7 @@ abstract class UINode {
         when (event) {
             is UIMousePressEvent -> onMousePress.trigger(event)
             is UIMouseReleaseEvent -> onMouseRelease.trigger(event)
-            is UIMouseClickEvent -> onClick.trigger(event)
+            is UIMouseClickEvent -> onMouseClick.trigger(event)
         }
     }
 
@@ -143,7 +146,7 @@ abstract class UINode {
     internal val onMouseExit = EventHandlerList<UIMouseExitEvent>()
     internal val onMousePress = EventHandlerList<UIMousePressEvent>()
     internal val onMouseRelease = EventHandlerList<UIMouseReleaseEvent>()
-    internal val onClick = EventHandlerList<UIMouseClickEvent>()
+    internal val onMouseClick = EventHandlerList<UIMouseClickEvent>()
     internal val onMouseMove = EventHandlerList<UIMouseMoveEvent>()
     internal val onMouseDrag = EventHandlerList<UIMouseDragEvent>()
     internal val onKeyEvent = EventHandlerList<UIKeyEvent>()

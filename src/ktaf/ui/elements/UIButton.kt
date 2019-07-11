@@ -1,6 +1,6 @@
 package ktaf.ui.elements
 
-import ktaf.core.rgba
+import ktaf.core.*
 import ktaf.ui.*
 import ktaf.ui.graphics.ColourBackground
 import ktaf.ui.graphics.TextForeground
@@ -18,6 +18,11 @@ class UIButton(text: String): UINode() {
     var textColour = UIAnimatedProperty(foregroundText.colour, this, "textColour", duration = Animation.QUICK)
     var colour = UIAnimatedProperty(background.colour, this, "colour", duration = Animation.QUICK)
     var font = UIProperty(foregroundText.font)
+    val hotkeys = KTAFMutableList<Hotkey>()
+    val onClick = EventHandlerList<UIEvent>()
+
+    override fun getKeyboardHandler(key: GLFWKey, modifiers: Set<GLFWKeyModifier>): UINode?
+            = this.takeIf { hotkeys.any { it.matches(key, modifiers) } }
 
     init {
         state.connect(colour::setState)
@@ -41,6 +46,9 @@ class UIButton(text: String): UINode() {
         font.connect { font ->
             foregroundText = replaceForeground(foregroundText, foregroundText.copy(font = font))
         }
+
+        onKeyPress { onClick.trigger(it) }
+        onMouseClick { onClick.trigger(it) }
 
         onMouseEnter { state("hover") }
         onMouseExit { state.clear() }

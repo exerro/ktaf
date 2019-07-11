@@ -4,6 +4,7 @@ import ktaf.graphics.DrawContext2D
 import ktaf.graphics.circle
 import ktaf.graphics.rectangle
 import ktaf.ui.Border
+import ktaf.ui.Hotkey
 import ktaf.ui.elements.UIButton
 import ktaf.ui.elements.UICanvas
 import ktaf.ui.elements.UIContainer
@@ -14,6 +15,7 @@ import ktaf.ui.node.fill
 import ktaf.ui.node.shrink
 import ktaf.ui.scene
 import ktaf.ui.scene.attachCallbacks
+import org.lwjgl.glfw.GLFW
 import kotlin.math.min
 import kotlin.math.sin
 
@@ -38,6 +40,8 @@ fun main() = application("Hello world") {
                     font(font.get().scaleTo(font.get().height * 1.3f))
                     height(50f)
 
+                    hotkeys.add(Hotkey(GLFW.GLFW_KEY_G))
+
                     fill()
 
                     onClick {
@@ -52,6 +56,8 @@ fun main() = application("Hello world") {
                     width(120f)
                     height(30f)
                     textColour(rgba(0f))
+
+                    hotkeys.add(Hotkey(GLFW.GLFW_KEY_F))
 
                     onClick {
                         r.layout(FlowLayout()) {
@@ -71,6 +77,8 @@ fun main() = application("Hello world") {
                 height(30f)
                 textColour(rgba(0f))
 
+                hotkeys.add(Hotkey(GLFW.GLFW_KEY_L))
+
                 onClick {
                     r.layout(ListLayout()) {
                         alignment(0.8f)
@@ -86,7 +94,7 @@ fun main() = application("Hello world") {
                     width(100f)
                     height(50f)
 
-                    onClick { event ->
+                    onMouseClick { event ->
                         println("grid button ${it - 2} was clicked at ${event.position} with button ${event.button} and modifiers ${event.modifiers}")
                         height((Math.random() * 100).toFloat() + 50f)
                     }
@@ -113,7 +121,7 @@ fun main() = application("Hello world") {
                     colour = rgba(Math.random().toFloat(), Math.random().toFloat(), Math.random().toFloat())
                 }
 
-                onClick {
+                onMouseClick {
                     width(Math.random().toFloat() * 100f + 50f)
                     height(Math.random().toFloat() * 100f + 50f)
                 }
