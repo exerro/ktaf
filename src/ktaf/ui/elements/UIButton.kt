@@ -1,61 +1,45 @@
 package ktaf.ui.elements
 
 import ktaf.core.rgba
-import lwjglkt.GLFWCursor
 import ktaf.ui.*
+import ktaf.util.Animation
+import lwjglkt.GLFWCursor
 
 class UIButton(text: String): UINode() {
-    internal val clickEventHandlers: EventHandlerList<UIMouseClickEvent> = mutableListOf()
     private var background = addBackground(ColourBackground(rgba(0.3f, 0.6f, 0.9f)))
     private var foregroundText = addForeground(TextForeground(text))
 
     override val cursor: GLFWCursor? = GLFWCursor.POINTER
 
-    var colour by property(background.colour)
-    var text by property(foregroundText.text)
-    var textColour by property(foregroundText.colour)
-    var font by property(foregroundText.font)
+    var text = UIProperty(foregroundText.text)
+    var textColour = UIAnimatedProperty(foregroundText.colour, this, "textColour", duration = Animation.QUICK)
+    var colour = UIAnimatedProperty(background.colour, this, "colour", duration = Animation.QUICK)
+    var font = UIProperty(foregroundText.font)
 
     init {
-        p(::colour) {
-            attachChangeToCallback { colour ->
-                background = replaceBackground(background, background.copy(colour = colour))
-            }
+        state.connect(colour::setState)
+        state.connect(this.text::setState)
+        state.connect(textColour::setState)
+        state.connect(font::setState)
+        colour["hover"](rgba(0.4f, 0.7f, 1f))
+
+        colour.connect { colour ->
+            background = replaceBackground(background, background.copy(colour = colour))
         }
 
-        p(this::text) {
-            attachChangeToCallback { text ->
-                foregroundText = replaceForeground(foregroundText, foregroundText.copy(text = text))
-            }
+        this.text.connect { text ->
+            foregroundText = replaceForeground(foregroundText, foregroundText.copy(text = text))
         }
 
-        p(::textColour) {
-            attachChangeToCallback { colour ->
-                foregroundText = replaceForeground(foregroundText, foregroundText.copy(colour = colour))
-            }
+        textColour.connect { colour ->
+            foregroundText = replaceForeground(foregroundText, foregroundText.copy(colour = colour))
         }
 
-        p(::font) {
-            attachChangeToCallback { font ->
-                foregroundText = replaceForeground(foregroundText, foregroundText.copy(font = font))
-            }
+        font.connect { font ->
+            foregroundText = replaceForeground(foregroundText, foregroundText.copy(font = font))
         }
 
-        onMousePress { event -> event.ifNotHandled {
-            if (event.within(this)) {
-                event.handledBy(this)
-            }
-        } }
-
-        onMouseClick { event -> event.ifNotHandled {
-            if (event.within(this)) {
-                event.handledBy(this)
-                clickEventHandlers.forEach { it(event) }
-            }
-        } }
+        onMouseEnter { state.set("hover") }
+        onMouseExit { state.clear() }
     }
-}
-
-fun UIButton.onClick(fn: UIButton.(UIMouseClickEvent) -> Unit) {
-    clickEventHandlers.add { fn(this, it) }
 }

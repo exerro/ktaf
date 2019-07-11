@@ -1,84 +1,36 @@
 package ktaf.ui
 
-import ktaf.core.minus
+import ktaf.core.*
 import ktaf.graphics.DrawContext2D
-import ktaf.core.plus
-import ktaf.core.vec2
+import ktaf.typeclass.minus
+import ktaf.typeclass.plus
 import ktaf.ui.layout.ListLayout
 import ktaf.ui.layout.UILayout
-import ktaf.util.Animation
-import ktaf.util.AnimationProperties
-import ktaf.util.Easing
 import lwjglkt.GLFWCursor
 import kotlin.properties.Delegates
 
-abstract class UINode: UI_t {
+abstract class UINode {
     // structure
-    internal var sceneInternal: UIScene? = null
-    internal val childrenInternal = mutableListOf<UINode>()
-    val scene get() = sceneInternal
-    val children get() = childrenInternal.toList()
-    var parent by property(null as UINode?)
+    val children = KTAFMutableList<UINode>()
+    val scene = KTAFMutableValue<UIScene?>(null)
+    val parent = KTAFMutableValue<UINode?>(null)
 
     // configuration
-    internal val foregroundsInternal = mutableListOf<Foreground>()
-    internal val backgroundsInternal = mutableListOf<Background>()
-    internal open var fillAllocatedSize = true
-    internal open val cursor: GLFWCursor? = GLFWCursor.DEFAULT
-
-    var margin by property(Border(0f))
-    var padding by property(Border(0f))
-    var layout by property(ListLayout() as UILayout)
-    var width by property(null as Float?)
-    var height by property(null as Float?)
-
-    // callbacks
-    internal val focusEventHandlers: EventHandlerList<UIFocusEvent> = mutableListOf()
-    internal val unFocusEventHandlers: EventHandlerList<UIUnFocusEvent> = mutableListOf()
-    internal val mouseEventHandlers: EventHandlerList<UIMouseEvent> = mutableListOf()
-    internal val mouseEnterEventHandlers: EventHandlerList<UIMouseEnterEvent> = mutableListOf()
-    internal val mouseExitEventHandlers: EventHandlerList<UIMouseExitEvent> = mutableListOf()
-    internal val mousePressEventHandlers: EventHandlerList<UIMousePressEvent> = mutableListOf()
-    internal val mouseReleaseEventHandlers: EventHandlerList<UIMouseReleaseEvent> = mutableListOf()
-    internal val mouseClickEventHandlers: EventHandlerList<UIMouseClickEvent> = mutableListOf()
-    internal val mouseMoveEventHandlers: EventHandlerList<UIMouseMoveEvent> = mutableListOf()
-    internal val mouseDragEventHandlers: EventHandlerList<UIMouseDragEvent> = mutableListOf()
-    internal val keyEventHandlers: EventHandlerList<UIKeyEvent> = mutableListOf()
-    internal val keyPressEventHandlers: EventHandlerList<UIKeyPressEvent> = mutableListOf()
-    internal val keyReleaseEventHandlers: EventHandlerList<UIKeyReleaseEvent> = mutableListOf()
-    internal val textInputEventHandlers: EventHandlerList<UITextInputEvent> = mutableListOf()
+    val width = UIProperty<Float?>(null)
+    val height = UIProperty<Float?>(null)
+    val margin = UIProperty(Border(0f))
+    val padding = UIProperty(Border(0f))
+    val layout = KTAFMutableValue<UILayout>(ListLayout())
 
     // state
-    private val positionAnimationProperties = AnimationProperties(Animation.NORMAL, Easing.SMOOTH, Animation.Float)
-    internal var mouseInside = false
-    internal var computedXInternal: Float by Delegates.observable(0f) { _, old, new -> if (old != new) scene?.animate2(this, "computedXInternal", Animation(
-            computedXAnimated, new, positionAnimationProperties.duration, positionAnimationProperties.easing, positionAnimationProperties.eval
-    ) { computedXAnimated = it } ) }
-    internal var computedYInternal: Float by Delegates.observable(0f) { _, old, new -> if (old != new) scene?.animate2(this, "computedYInternal", Animation(
-            computedYAnimated, new, positionAnimationProperties.duration, positionAnimationProperties.easing, positionAnimationProperties.eval
-    ) { computedYAnimated = it } ) }
-    internal var computedWidthInternal: Float by Delegates.observable(0f) { _, old, new -> if (old != new) scene?.animate2(this, "computedWidthInternal", Animation(
-            computedWidthAnimated, new, positionAnimationProperties.duration, positionAnimationProperties.easing, positionAnimationProperties.eval
-    ) { computedWidthAnimated = it } ) }
-    internal var computedHeightInternal: Float by Delegates.observable(0f) { _, old, new -> if (old != new) scene?.animate2(this, "computedHeightInternal", Animation(
-            computedHeightAnimated, new, positionAnimationProperties.duration, positionAnimationProperties.easing, positionAnimationProperties.eval
-    ) { computedHeightAnimated = it } ) }
-    internal var computedXAnimated: Float = 0f
-    internal var computedYAnimated: Float = 0f
-    internal var computedWidthAnimated: Float = 0f
-    internal var computedHeightAnimated: Float = 0f
+    val state = KTAFMutableValue(DEFAULT_STATE)
+    val computedX = KTAFMutableValue(0f)
+    val computedY = KTAFMutableValue(0f)
+    val computedWidth = KTAFMutableValue(0f)
+    val computedHeight = KTAFMutableValue(0f)
+    val computedPosition = KTAFMutableValue(vec2(0f))
 
-    init {
-        p(::parent) {
-            attachChangeCallback { old, new ->
-                old?.childrenInternal?.remove(this@UINode)
-                new?.childrenInternal?.add(this@UINode)
-                this@UINode.sceneInternal = new?.sceneInternal
-            }
-        }
-    }
-
-    open fun computeHeight(width: Float) = height
+    open fun computeHeight(width: Float) = height.get()
 
     open fun update(dt: Float) {}
 
@@ -87,112 +39,136 @@ abstract class UINode: UI_t {
             it.draw(context, position, size)
         }
 
-        childrenInternal.forEach {
+        children.forEach {
             it.draw(context,
-                    position + padding.tl + vec2(it.computedXAnimated, it.computedYAnimated),
-                    vec2(it.computedWidthAnimated, it.computedHeightAnimated)
+                    position + padding.get().tl + it.computedPosition.get(),
+                    vec2(it.computedWidth.get(), it.computedHeight.get())
             )
         }
 
         foregroundsInternal.forEach {
-            it.draw(context, position + padding.tl, size - padding.size)
+            it.draw(context, position + padding.get().tl, size - padding.get().size)
         }
     }
+
+    open fun getMouseHandler(position: vec2): UINode?
+            =  children.reversed().firstNotNull { it.getMouseHandler(position - padding.get().tl - it.computedPosition.get()) }
+            ?: this.takeIf { position.x >= 0 && position.y >= 0 && position.x < computedWidth.get() && position.y < computedHeight.get() }
+
+    open fun getKeyboardHandler(key: GLFWKey, modifier: GLFWKeyModifier): UINode?
+            = children.reversed().firstNotNull { it.getKeyboardHandler(key, modifier) }
 
     open fun handleEvent(event: UIEvent) {
         when (event) {
             is UIKeyEvent -> handleKeyEvent(event)
             is UIMouseEvent -> handleMouseEvent(event)
-            is UITextInputEvent -> textInputEventHandlers.forEach { it(event) }
-            is UIFocusEvent -> focusEventHandlers.forEach { it(event) }
-            is UIUnFocusEvent -> unFocusEventHandlers.forEach { it(event) }
-        }
-
-        when (event) {
-            is UITextInputEvent, is UIFocusEvent, is UIUnFocusEvent -> childrenInternal.forEach { it.handleEvent(event) }
-            else -> { /* do nothing */ }
+            is UITextInputEvent -> onTextInput.trigger(event)
+            is UIFocusEvent -> onFocus.trigger(event)
+            is UIUnFocusEvent -> onUnFocus.trigger(event)
         }
     }
 
     open fun handleKeyEvent(event: UIKeyEvent) {
-        keyEventHandlers.forEach { it(event) }
+        onKeyEvent.trigger(event)
 
         when (event) {
-            is UIKeyPressEvent -> keyPressEventHandlers.forEach { it(event) }
-            is UIKeyReleaseEvent -> keyReleaseEventHandlers.forEach { it(event) }
+            is UIKeyPressEvent -> onKeyPress.trigger(event)
+            is UIKeyReleaseEvent -> onKeyRelease.trigger(event)
         }
+    }
 
-        childrenInternal.forEach { it.handleEvent(event) }
+    open fun handleMouseButtonEvent(event: UIMouseButtonEvent) {
+        onMouseButtonEvent.trigger(event)
+
+        when (event) {
+            is UIMousePressEvent -> onMousePress.trigger(event)
+            is UIMouseReleaseEvent -> onMouseRelease.trigger(event)
+            is UIMouseClickEvent -> onClick.trigger(event)
+        }
     }
 
     open fun handleMouseEvent(event: UIMouseEvent) {
-        mouseEventHandlers.forEach { it(event) }
+        onMouseEvent.trigger(event)
 
         when (event) {
-            is UIMouseEnterEvent -> mouseEnterEventHandlers.forEach { it(event) }
-            is UIMouseExitEvent -> mouseExitEventHandlers.forEach { it(event) }
-            is UIMousePressEvent -> mousePressEventHandlers.forEach { it(event) }
-            is UIMouseReleaseEvent -> mouseReleaseEventHandlers.forEach { it(event) }
-            is UIMouseClickEvent -> mouseClickEventHandlers.forEach { it(event) }
-            is UIMouseMoveEvent -> mouseMoveEventHandlers.forEach { it(event) }
-            is UIMouseDragEvent -> mouseDragEventHandlers.forEach { it(event) }
+            is UIMouseButtonEvent -> handleMouseButtonEvent(event)
+            is UIMouseEnterEvent -> onMouseEnter.trigger(event)
+            is UIMouseExitEvent -> onMouseExit.trigger(event)
+            is UIMouseMoveEvent -> onMouseMove.trigger(event)
+            is UIMouseDragEvent -> onMouseDrag.trigger(event)
+        }
+    }
+
+    init {
+        state.connect(width::setState)
+        state.connect(height::setState)
+        state.connect(margin::setState)
+        state.connect(padding::setState)
+
+        scene.connect { scene ->
+            children.forEach { it.scene.set(scene) }
         }
 
-        childrenInternal.reversed().forEach {
-            it.handleEvent(event.relativeTo(padding.tl + vec2(it.computedXAnimated, it.computedYAnimated)))
+        computedX.connect { computedPosition.set(vec2(it, computedY.get())) }
+        computedY.connect { computedPosition.set(vec2(computedX.get(), it)) }
+
+        parent.connectComparator { old, new ->
+            old?.children?.remove(this)
+            new?.children?.add(this)
+            Unit
         }
+
+        children.connectAdded { child ->
+            child.parent.set(this)
+            child.scene.set(scene.get())
+        }
+
+        children.connectRemoved { child ->
+            child.parent.set(null)
+            child.scene.set(null)
+        }
+    }
+
+    // callbacks
+    internal val onFocus = EventHandlerList<UIFocusEvent>()
+    internal val onUnFocus = EventHandlerList<UIUnFocusEvent>()
+    internal val onMouseEvent = EventHandlerList<UIMouseEvent>()
+    internal val onMouseButtonEvent = EventHandlerList<UIMouseButtonEvent>()
+    internal val onMouseEnter = EventHandlerList<UIMouseEnterEvent>()
+    internal val onMouseExit = EventHandlerList<UIMouseExitEvent>()
+    internal val onMousePress = EventHandlerList<UIMousePressEvent>()
+    internal val onMouseRelease = EventHandlerList<UIMouseReleaseEvent>()
+    internal val onClick = EventHandlerList<UIMouseClickEvent>()
+    internal val onMouseMove = EventHandlerList<UIMouseMoveEvent>()
+    internal val onMouseDrag = EventHandlerList<UIMouseDragEvent>()
+    internal val onKeyEvent = EventHandlerList<UIKeyEvent>()
+    internal val onKeyPress = EventHandlerList<UIKeyPressEvent>()
+    internal val onKeyRelease = EventHandlerList<UIKeyReleaseEvent>()
+    internal val onTextInput = EventHandlerList<UITextInputEvent>()
+
+    // configuration internals
+    internal val foregroundsInternal = mutableListOf<Foreground>()
+    internal val backgroundsInternal = mutableListOf<Background>()
+    internal open var fillAllocatedSize = true
+    internal open val cursor: GLFWCursor? = GLFWCursor.DEFAULT
+
+    // state
+    internal var mouseInside = true
+    internal var computedXCachedSetter: Float by Delegates.observable(0f) { _, old, new ->
+        if (old != new) { scene.get()?.animate(this, ::computedX, new) }
+    }
+    internal var computedYCachedSetter: Float by Delegates.observable(0f) { _, old, new ->
+        if (old != new) { scene.get()?.animate(this, ::computedY, new) }
+    }
+    internal var computedWidthCachedSetter: Float by Delegates.observable(0f) { _, old, new ->
+        if (old != new) { scene.get()?.animate(this, ::computedWidth, new) }
+    }
+    internal var computedHeightCachedSetter: Float by Delegates.observable(0f) { _, old, new ->
+        if (old != new) { scene.get()?.animate(this, ::computedHeight, new) }
     }
 }
 
-fun UINode.fill() { fillAllocatedSize = true }
-fun UINode.shrink() { fillAllocatedSize = false }
-
-fun UINode.absolutePosition(): vec2
-        = (parent?.absolutePosition() ?: vec2(0f)) + (parent?.padding?.tl ?: vec2(0f)) + vec2(computedXAnimated, computedYAnimated)
-
-fun UINode.requestFocus() { sceneInternal?.focusOn(this) }
-fun UINode.unfocus() { if (isFocused()) sceneInternal?.unfocus() }
-fun UINode.isFocused() = sceneInternal?.focussedNode == this
-
-fun <C: UINode> UINode.addChild(child: C, init: C.() -> Unit = {}): C {
-    child.parent = this
-    init(child)
-    return child
-}
-
-fun <C: UINode> UINode.removeChild(child: C): C {
-    if (child.parent == this) child.parent = null
-    return child
-}
-
-fun <B: Background> UINode.addBackground(background: B, init: B.() -> Unit = {}): B {
-    init(background)
-    backgroundsInternal.add(background)
-    return background
-}
-
-fun <B: Background> UINode.removeBackground(background: B): B {
-    if (backgroundsInternal.contains(background)) backgroundsInternal.remove(background)
-    return background
-}
-
-fun <B: Background> UINode.replaceBackground(old: Background, new: B): B {
-    removeBackground(old)
-    return addBackground(new)
-}
-
-fun <F: Foreground> UINode.addForeground(foreground: F, init: F.() -> Unit = {}): F {
-    init(foreground)
-    foregroundsInternal.add(foreground)
-    return foreground
-}
-
-fun <F: Foreground> UINode.removeForeground(foreground: F): F {
-    if (foregroundsInternal.contains(foreground)) foregroundsInternal.remove(foreground)
-    return foreground
-}
-
-fun <F: Foreground> UINode.replaceForeground(old: Foreground, new: F): F {
-    removeForeground(old)
-    return addForeground(new)
+private fun <T, R> List<T>.firstNotNull(fn: (T) -> R?): R? {
+    for (x in this) fn(x)?.let { return it }
+    return null
 }

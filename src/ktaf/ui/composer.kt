@@ -14,7 +14,7 @@ fun scene(display: GLFWDisplay, context: DrawContext2D, init: UIScene.() -> Unit
 
 fun <N: UINode, L: UILayout> N.layout(layout: L, init: L.() -> Unit = {}): L {
     init(layout)
-    this.layout = layout
+    this.layout.set(layout)
     return layout
 }
 

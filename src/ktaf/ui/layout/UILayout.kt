@@ -1,23 +1,23 @@
 package ktaf.ui.layout
+import ktaf.core.KTAFMutableValue
 import ktaf.core.vec2
 import ktaf.ui.*
-import ktaf.ui.UI_t
 
-sealed class UILayout: UI_t
+sealed class UILayout
 
 class FillLayout: UILayout() {
-    var alignment by property(vec2(0f))
+    var alignment = KTAFMutableValue(vec2(0f))
 }
 
 class GridLayout: UILayout() {
-    var alignment by property(vec2(0.5f))
-    var spacing by property(vec2(0f))
-    var columns by property(1)
-    var rows by property(1)
+    var alignment = KTAFMutableValue(vec2(0.5f))
+    var spacing = KTAFMutableValue(vec2(0f))
+    var columns = KTAFMutableValue(1)
+    var rows = KTAFMutableValue(1)
 }
 
 class FreeLayout: UILayout() {
-    var alignment by property(vec2(0f))
+    var alignment = KTAFMutableValue(vec2(0f))
     internal val vLines: LayoutLineMapping = mutableMapOf()
     internal val hLines: LayoutLineMapping = mutableMapOf()
     internal val nodeTops: LayoutNodeMapping = mutableMapOf()
@@ -34,14 +34,14 @@ class FreeLayout: UILayout() {
 }
 
 class ListLayout: UILayout() {
-    var alignment by property(0.5f)
-    var spacing by property(Spacing.SPACE_AFTER)
+    var alignment = KTAFMutableValue(0.5f)
+    var spacing = KTAFMutableValue(Spacing.SPACE_AFTER)
     // TODO: add spacing between elements
 }
 
 class FlowLayout: UILayout() {
-    var horizontalSpacing by property(Spacing.SPACE_AFTER)
-    var verticalSpacing by property(Spacing.SPACE_AFTER)
+    var horizontalSpacing = KTAFMutableValue(Spacing.SPACE_AFTER)
+    var verticalSpacing = KTAFMutableValue(Spacing.SPACE_AFTER)
     // TODO: add vertical alignment within row
     // TODO: add spacing between elements
 }

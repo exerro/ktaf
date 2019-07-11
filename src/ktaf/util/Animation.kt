@@ -1,6 +1,9 @@
 package ktaf.util
 
 import ktaf.core.*
+import ktaf.typeclass.minus
+import ktaf.typeclass.plus
+import ktaf.typeclass.times
 
 typealias EasingFunction = (Float, Float) -> Float
 typealias AnimationEvaluator<T> = (T, T, Float) -> T

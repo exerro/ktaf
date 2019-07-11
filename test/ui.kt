@@ -1,8 +1,6 @@
 
-import ktaf.core.application
-import ktaf.core.div
-import ktaf.core.rgba
-import ktaf.core.vec2
+import ktaf.core.invoke
+import ktaf.core.*
 import ktaf.graphics.DrawContext2D
 import ktaf.graphics.circle
 import ktaf.graphics.rectangle
@@ -16,39 +14,43 @@ fun main() = application("Hello world") {
     val context = DrawContext2D(viewport)
     val scene = scene(display, context) {
         lateinit var r: UIContainer
-        r = addRoot(UIContainer()) {
-            colour = rgba(0f, 1f, 0.5f)
+
+        r = setRoot(UIContainer()) {
+            colour(rgba(0f, 1f, 0.5f))
+
 
             val b1 = list {
-                colour = rgba(1f, 0f, 0f)
+                colour(rgba(1f, 0f, 0f))
 
                 shrink()
 
                 addChild(UIButton("Hello")) {
-                    colour = rgba(0f, 1f, 0f)
-                    textColour = rgba(1f, 0f, 1f)
-                    font = font.scaleTo(font.height * 1.3f)
-                    height = 50f
+                    colour(rgba(0.3f, 0.9f, 0.6f))
+                    width["hover"](100f)
+                    margin["hover"](Border(0f, 32f))
+                    textColour(rgba(1f, 0f, 1f))
+                    font(font.get().scaleTo(font.get().height * 1.3f))
+                    height(50f)
 
                     fill()
 
                     onClick {
                         r.layout(GridLayout()) {
-                            columns = 5
-                            rows = 5
+                            columns(5)
+                            rows(5)
                         }
                     }
                 }
 
                 addChild(UIButton("Button")) {
-                    width = 100f
-                    height = 30f
-                    textColour = rgba(0f)
+                    width(120f)
+                    height(30f)
+                    textColour(rgba(0f))
 
                     onClick {
                         r.layout(FlowLayout()) {
-                            horizontalSpacing = Spacing.SPACE_BETWEEN
-                            verticalSpacing = Spacing.SPACE_AFTER
+                            horizontalSpacing(Spacing.SPACE_BETWEEN)
+                            verticalSpacing(Spacing.SPACE_AFTER)
                         }
                     }
                 }
@@ -60,27 +62,27 @@ fun main() = application("Hello world") {
 
             val b2 = addChild(UIButton("Woah")) {
                 fill()
-                height = 30f
-                textColour = rgba(0f)
+                height(30f)
+                textColour(rgba(0f))
 
                 onClick {
                     r.layout(ListLayout()) {
-                        alignment = 0.8f
-                        spacing = Spacing.SPACE_AFTER
+                        alignment(0.8f)
+                        spacing(Spacing.SPACE_AFTER)
                     }
                 }
             }
 
             val buttons = (3..17).map {
                 addChild(UIButton("B${it - 2}")) {
-                    colour = rgba(it.toFloat() / 25)
-                    margin = Border(10f)
-                    width = 100f
-                    height = 50f
+                    colour(rgba(it.toFloat() / 25))
+                    margin(Border(10f))
+                    width(100f)
+                    height(50f)
 
                     onClick { event ->
                         println("grid button ${it - 2} was clicked at ${event.position} with button ${event.button} and modifiers ${event.modifiers}")
-                        this.height = (Math.random() * 100).toFloat() + 50f
+                        height((Math.random() * 100).toFloat() + 50f)
                     }
                 }
             }
@@ -88,8 +90,8 @@ fun main() = application("Hello world") {
             addChild(UICanvas()) {
                 var colour = rgba(1f, 0f, 1f)
 
-                width = 100f
-                height = 100f
+                width(100f)
+                height(100f)
 
                 onDraw { context, size ->
                     context.draw {
@@ -105,27 +107,14 @@ fun main() = application("Hello world") {
                     colour = rgba(Math.random().toFloat(), Math.random().toFloat(), Math.random().toFloat())
                 }
 
-                onMousePress { event ->
-                    event.ifNotHandled {
-                        if (event.within(this)) {
-                            event.handledBy(this)
-                        }
-                    }
-                }
-
-                onMouseClick { event ->
-                    event.ifNotHandled {
-                        if (event.within(this)) {
-                            event.handledBy(this)
-                            this.width = Math.random().toFloat() * 100f + 50f
-                            this.height = Math.random().toFloat() * 100f + 50f
-                        }
-                    }
+                onClick {
+                    width(Math.random().toFloat() * 100f + 50f)
+                    height(Math.random().toFloat() * 100f + 50f)
                 }
             }
 
             layout(FreeLayout()) {
-                alignment = vec2(0.5f)
+                alignment(vec2(0.5f))
 
                 hline("top") { percentage = 0f }
                 hline("middle") { percentage = 80f }
