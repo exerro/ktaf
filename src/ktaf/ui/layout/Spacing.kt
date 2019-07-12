@@ -32,9 +32,9 @@ data class Spacing2(val fixed: Float, val spacer: (Float, Int) -> Float, val off
 
         val SPACE_AROUND = align(0.5f)
         /** ...OO...OO...OO... */
-        val SPACE_EVENLY = Spacing2(0f, { s, n -> s / (n + 1) }, { s, n -> s / (n + 1) })
+        val SPACE_EVENLY = Spacing2(0f, { s, n -> s / (n + 1) }, { s, _ -> s / 2 })
         /** ..OO....OO....OO.. */
-        val SPACE_WRAP = Spacing2(0f, { s, n -> s / n }, { s, n -> s / (n * 2) })
+        val SPACE_WRAP = Spacing2(0f, { s, n -> s / n }, { s, _ -> s / 2 })
         /** OO......OO......OO */
         val SPACE_BETWEEN = Spacing2(0f, { s, n -> s / (n - 1) }, zero)
         /** OOOOOO............ */

@@ -2,16 +2,11 @@
 import ktaf.core.application
 import ktaf.core.vec2
 import ktaf.graphics.DrawContext2D
-import ktaf.ui.layout.Border
 import ktaf.ui.Hotkey
 import ktaf.ui.UIMouseClickEvent
 import ktaf.ui.elements.UIButton
 import ktaf.ui.elements.UIContainer
-import ktaf.ui.layout.FillLayout
-//import ktaf.ui.layout.FreeLayout
-//import ktaf.ui.layout.ListLayout
-import ktaf.ui.layout.Spacing2
-//import ktaf.ui.layout.elem
+import ktaf.ui.layout.*
 import ktaf.ui.scene.attachCallbacks
 import ktaf.ui.scene.scene
 import org.lwjgl.glfw.GLFW
@@ -21,13 +16,9 @@ fun main() = application("Hello world") {
     val scene = scene(display, context) {
         root.set(UIContainer()) {
             val content = children.add(UIContainer()) {
-                width(100f)
+                width(200f)
                 height(400f)
                 padding(Border(16f, 0f))
-
-                layout(FillLayout()) {
-                    alignment(vec2(0f))
-                }
             }
 
             val button = children.add(UIButton("Add button 6")) {
@@ -39,6 +30,7 @@ fun main() = application("Hello world") {
                 val container = this
 
                 children.add(UIButton("Button ${container.children.size}")) {
+                    width(80f)
                     height(30f)
                     hotkeys.add(Hotkey(GLFW.GLFW_KEY_0 + container.children.size))
 
@@ -54,13 +46,19 @@ fun main() = application("Hello world") {
             content.run {
                 (1 .. 5).map { content.addButton() }
 
-//                layout(ListLayout()) {
+                layout(FlowLayout()) {
+                    horizontalSpacing(Spacing2.SPACE_EVENLY)
+                    verticalSpacing(Spacing2.fixed(50f) then Spacing2.align(0.3f))
 //                    spacing(Spacing2.fixed(20f) then Spacing2.SPACE_BEFORE)
-//                }
-
-                layout(FillLayout()) {
-                    alignment(vec2(0.5f))
+//                    spacing(vec2(20f, 10f))
+//                    columns(2)
+//                    rows(6)
                 }
+
+//                layout(GridLayout()) {
+//                    columns(2)
+//                    rows(6)
+//                }
             }
 
             button.run {
@@ -69,11 +67,7 @@ fun main() = application("Hello world") {
                 onClick { content.addButton() }
             }
 
-            layout(FillLayout()) {
-                alignment(vec2(0.5f))
-            }
-
-//            layout(FreeLayout()) {
+            layout(FreeLayout()) {
 //                elem(content) {
 //                    topOffset = 100f
 //                    leftOffset = 100f
@@ -83,7 +77,7 @@ fun main() = application("Hello world") {
 //                    topOffset = 100f
 //                    leftOffset = 300f
 //                }
-//            }
+            }
         }
     }
 
