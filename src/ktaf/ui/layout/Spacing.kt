@@ -26,6 +26,40 @@ data class Spacing(val init: SpacingFunction, val iter: SpacingFunction) {
     }
 }
 
+data class Spacing2(val fixed: Float, val spacer: (Float, Int) -> Float, val offset: (Float, Int) -> Float) {
+    companion object {
+        private val zero: (Float, Int) -> Float = { _, _ -> 0f }
+
+        val SPACE_AROUND = align(0.5f)
+        /** ...OO...OO...OO... */
+        val SPACE_EVENLY = Spacing2(0f, { s, n -> s / (n + 1) }, { s, n -> s / (n + 1) })
+        /** ..OO....OO....OO.. */
+        val SPACE_WRAP = Spacing2(0f, { s, n -> s / n }, { s, n -> s / (n * 2) })
+        /** OO......OO......OO */
+        val SPACE_BETWEEN = Spacing2(0f, { s, n -> s / (n - 1) }, zero)
+        /** OOOOOO............ */
+        val SPACE_AFTER = Spacing2(0f, zero, zero)
+        /** ............OOOOOO */
+        val SPACE_BEFORE = Spacing2(0f, zero, { s, _ -> s })
+        /** OO.OO.OO...... */
+        fun fixed(spacing: Float) = Spacing2(spacing, zero, zero)
+        /** ..<~OOOOOO~>.. */
+        fun align(alignment: Float) = Spacing2(0f, zero, { s, _ -> s * alignment })
+    }
+
+    infix fun then(other: Spacing2): Spacing2 {
+        return Spacing2(fixed + other.fixed, { s, n -> spacer(s, n) + other.spacer(s, n) }, { s, n -> offset(s, n) + other.offset(s, n) })
+    }
+}
+
+internal fun Spacing2.fixed() = fixed
+
+internal fun Spacing2.evaluate(space: Float, n: Int): Pair<Float, Float> {
+    val spacing = fixed + spacer(space - (n - 1) * fixed, n)
+    val offset = offset(space - (n - 1) * spacing, n)
+    return Pair(offset, spacing)
+}
+
 infix fun Spacing.within(other: Spacing) = Spacing(
         { n, s, c -> other.init(n, s, c + (n - 1) + this.iter(n, s, c) + 2 * this.init(n, s, c)) },
         this.iter

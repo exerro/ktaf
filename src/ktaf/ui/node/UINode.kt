@@ -7,8 +7,7 @@ import ktaf.typeclass.plus
 import ktaf.ui.*
 import ktaf.ui.graphics.Background
 import ktaf.ui.graphics.Foreground
-import ktaf.ui.layout.ListLayout
-import ktaf.ui.layout.UILayout
+import ktaf.ui.layout.*
 import ktaf.ui.scene.UIScene
 import ktaf.ui.scene.animate
 import lwjglkt.GLFWCursor
@@ -17,6 +16,7 @@ import kotlin.properties.Delegates
 abstract class UINode {
     // structure
     val children = KTAFMutableList<UINode>()
+    var ordering = KTAFMutableValue(Ordering())
     val scene = KTAFMutableValue<UIScene?>(null)
     val parent = KTAFMutableValue<UINode?>(null)
 
@@ -25,7 +25,7 @@ abstract class UINode {
     val height = UIProperty<Float?>(null)
     val margin = UIProperty(Border(0f))
     val padding = UIProperty(Border(0f))
-    val layout = KTAFMutableValue<UILayout>(ListLayout())
+    val layout = KTAFMutableValue<UILayout>(FillLayout())
 
     // state
     val state = KTAFMutableValue(DEFAULT_STATE)
@@ -157,21 +157,21 @@ abstract class UINode {
     // configuration internals
     internal val foregroundsInternal = mutableListOf<Foreground>()
     internal val backgroundsInternal = mutableListOf<Background>()
-    internal open var fillAllocatedSize = true
+    internal open var fillSize = true // whether the node should fill allocated size when positioning
     internal open val cursor: GLFWCursor? = GLFWCursor.DEFAULT
 
     // state
     internal var mouseInside = true
-    internal var computedXCachedSetter: Float by Delegates.observable(0f) { _, old, new ->
+    internal var computedXInternal: Float by Delegates.observable(0f) { _, old, new ->
         if (old != new) { scene.get()?.animate(this, ::computedX, new) }
     }
-    internal var computedYCachedSetter: Float by Delegates.observable(0f) { _, old, new ->
+    internal var computedYInternal: Float by Delegates.observable(0f) { _, old, new ->
         if (old != new) { scene.get()?.animate(this, ::computedY, new) }
     }
-    internal var computedWidthCachedSetter: Float by Delegates.observable(0f) { _, old, new ->
+    internal var computedWidthInternal: Float by Delegates.observable(0f) { _, old, new ->
         if (old != new) { scene.get()?.animate(this, ::computedWidth, new) }
     }
-    internal var computedHeightCachedSetter: Float by Delegates.observable(0f) { _, old, new ->
+    internal var computedHeightInternal: Float by Delegates.observable(0f) { _, old, new ->
         if (old != new) { scene.get()?.animate(this, ::computedHeight, new) }
     }
 }

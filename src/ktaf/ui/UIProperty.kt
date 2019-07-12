@@ -33,7 +33,7 @@ open class UIProperty<T>(value: T): KTAFMutableValue<T>(value) {
 
     override fun <TT : T> set(value: TT, init: TT.() -> Unit): TT {
         init(value)
-        this[DEFAULT_STATE](value)
+        stateValues.keys.map { this[it](value) }
         return value
     }
 }

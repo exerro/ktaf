@@ -1,6 +1,14 @@
 package ktaf.ui.scene
 
 import ktaf.core.*
+import ktaf.graphics.DrawContext2D
+import lwjglkt.GLFWDisplay
+
+fun scene(display: GLFWDisplay, context: DrawContext2D, init: UIScene.() -> Unit = {}): UIScene {
+    val root = UIScene(display, context)
+    init(root)
+    return root
+}
 
 fun UIScene.attachCallbacks(application: Application) {
     application.update(updater)

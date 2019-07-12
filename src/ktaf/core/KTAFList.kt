@@ -47,6 +47,16 @@ class KTAFMutableList<T>(
         removedConnections.remove(fn)
     }
 
+    fun connectChanged(fn: (T) -> Any?) {
+        addedConnections.add(fn)
+        removedConnections.add(fn)
+    }
+
+    fun disconnectChanged(fn: (T) -> Any?) {
+        addedConnections.remove(fn)
+        removedConnections.remove(fn)
+    }
+
     override val size: Int get() = value.size
     override fun contains(element: T): Boolean = value.contains(element)
     override fun containsAll(elements: Collection<T>): Boolean = value.containsAll(elements)

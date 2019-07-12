@@ -59,7 +59,7 @@ fun DrawContext2DRenderer.circle(position: vec2, radius: Float) {
                         mat3_scale(radius).mat4())
     }
     else {
-        TODO("outline ktaf.graphics.circle rendering not yet implemented")
+        TODO("outline circle rendering not yet implemented")
     }
 }
 

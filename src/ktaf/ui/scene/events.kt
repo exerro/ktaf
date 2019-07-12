@@ -3,8 +3,7 @@ package ktaf.ui.scene
 import ktaf.core.*
 import ktaf.typeclass.minus
 import ktaf.ui.*
-import ktaf.ui.layout.computeWidthInternal
-import ktaf.ui.layout.positionChildrenInternal
+import ktaf.ui.layout.*
 import ktaf.ui.node.absolutePosition
 import lwjglkt.GLFWCursor
 import lwjglkt.setCursor
@@ -16,11 +15,16 @@ fun UIScene.update(dt: Float) {
     animations.map { (node, m) -> node to m.filterValues { !it.finished() } }
 
     root.get()?.let {
-        it.computeWidthInternal(context.viewport.width().toFloat())
-        it.positionChildrenInternal(context.viewport.height().toFloat())
+        it.layout.get().beginPositioning(it)
+        it.layout.get().computeWidthFor(it, context.viewport.width().toFloat())
+        it.layout.get().computeHeightFor(it, context.viewport.height().toFloat())
+        it.layout.get().computePositionForChildren(it)
+        it.layout.get().finishPositioning(it)
+
         it.update(dt)
-        it.computedXCachedSetter = 0f
-        it.computedYCachedSetter = 0f
+
+        it.computedXInternal = 0f
+        it.computedYInternal = 0f
     }
 }
 

@@ -1,136 +1,80 @@
 package ktaf.ui.layout
-import ktaf.core.KTAFMutableValue
+
+import ktaf.core.times
 import ktaf.core.vec2
-import ktaf.ui.*
+import ktaf.typeclass.minus
+import ktaf.typeclass.plus
 import ktaf.ui.node.UINode
+import ktaf.ui.node.orderedChildren
 
-sealed class UILayout
+abstract class UILayout {
+    protected lateinit var children: List<UINode>
+    /** Sets the width of children and returns the content width of those children */
+    abstract fun computeChildrenWidth(widthAllocatedForChildren: Float): Lazy<Float>
+    /** Sets the height of children and returns the content height of those children */
+    abstract fun computeChildrenHeight(heightAllocatedForChildren: Float?): Lazy<Float>
+    /** Positions the children */
+    abstract fun position(width: Float, height: Float)
+    /** Called prior to positioning */
+    open fun begin(children: List<UINode>) { this.children = children }
+    /** Called after positioning */
+    open fun finish() {}
 
-class FillLayout: UILayout() {
-    var alignment = KTAFMutableValue(vec2(0f))
+    companion object
 }
 
-class GridLayout: UILayout() {
-    var alignment = KTAFMutableValue(vec2(0.5f))
-    var spacing = KTAFMutableValue(vec2(0f))
-    var columns = KTAFMutableValue(1)
-    var rows = KTAFMutableValue(1)
+fun UILayout.Companion.align(node: UINode, offset: vec2, area: vec2, alignment: vec2) {
+    val (x, y) = (area - node.margin.get().size - vec2(node.computedWidthInternal, node.computedHeightInternal)) * alignment + offset
+    node.computedXInternal = x
+    node.computedYInternal = y
 }
 
-class FreeLayout: UILayout() {
-    var alignment = KTAFMutableValue(vec2(0f))
-    internal val vLines: LayoutLineMapping = mutableMapOf()
-    internal val hLines: LayoutLineMapping = mutableMapOf()
-    internal val nodeTops: LayoutNodeMapping = mutableMapOf()
-    internal val nodeBottoms: LayoutNodeMapping = mutableMapOf()
-    internal val nodeLefts: LayoutNodeMapping = mutableMapOf()
-    internal val nodeRights: LayoutNodeMapping = mutableMapOf()
-
-    init {
-        hline("top") { percentage = 0f }
-        hline("bottom") { percentage = 100f }
-        vline("left") { percentage = 0f }
-        vline("right") { percentage = 100f }
-    }
+/** Begins positioning of a node */
+fun UILayout.beginPositioning(node: UINode) {
+    begin(node.orderedChildren())
+    node.children.map { it.layout.get().beginPositioning(it) }
 }
 
-class ListLayout: UILayout() {
-    var alignment = KTAFMutableValue(0.5f)
-    var spacing = KTAFMutableValue(Spacing.SPACE_AFTER)
-    // TODO: add spacing between elements
+/** Completes positioning of a node */
+fun UILayout.finishPositioning(node: UINode) {
+    finish()
+    node.children.map { it.layout.get().finishPositioning(it) }
 }
 
-class FlowLayout: UILayout() {
-    var horizontalSpacing = KTAFMutableValue(Spacing.SPACE_AFTER)
-    var verticalSpacing = KTAFMutableValue(Spacing.SPACE_AFTER)
-    // TODO: add vertical alignment within row
-    // TODO: add spacing between elements
+/**
+ * Sets the width of a node based on the width of its children and the node's positioning protocols
+ * @param node the node to compute the width for
+ * @param widthAllocated the width allocated for the node
+ */
+fun UILayout.computeWidthFor(node: UINode, widthAllocated: Float) {
+    // the width allocated for children
+    val widthAllocatedInternal = (node.width.get() ?: widthAllocated - node.margin.get().width) - node.padding.get().width
+    // the getter for the width of the content based on the node's children
+    val contentWidth by computeChildrenWidth(widthAllocatedInternal)
+    // update the node's width
+    node.computedWidthInternal = node.width.get()
+            ?: if (node.fillSize) widthAllocated - node.margin.get().width else contentWidth + node.padding.get().width
 }
 
-typealias LayoutLine = String
-internal typealias LayoutLineValue = RelativeSize
-internal typealias LayoutLineMapping = MutableMap<LayoutLine, LayoutLineValue>
-internal typealias LayoutNodeMapping = MutableMap<UINode, LayoutLine>
-
-class LineEditor internal constructor(private val lines: LayoutLineMapping, private val line: String) {
-    var offset
-        get() = lines.computeIfAbsent(line) { fixed(0f) } .fixed
-        set(value) { lines[line] = RelativeSize(value, lines[line]?.ratio ?: 0f) }
-
-    var percentage
-        get() = lines.computeIfAbsent(line) { fixed(0f) } .ratio
-        set(value) { lines[line] = RelativeSize(lines[line]?.fixed ?: 0f, value / 100f) }
+/**
+ * Sets the height of a node based on the height of its children and the node's positioning protocols
+ * @param node the node to compute the height for
+ * @param heightAllocated the height allocated for the node, or null if no height was allocated
+ */
+fun UILayout.computeHeightFor(node: UINode, heightAllocated: Float?) {
+    // the height computed based off the node's width
+    val computedHeight = node.computeHeight(node.computedWidthInternal)
+    // the height allocated for the children (ignoring subtracting the node's padding)
+    val heightAllocatedInternalPlusPadding = (computedHeight ?: heightAllocated ?.let { it - node.margin.get().height })
+    // the getter for the height of the content based on the node's children
+    val contentHeight by computeChildrenHeight(heightAllocatedInternalPlusPadding ?.let { it - node.padding.get().height })
+    node.computedHeightInternal = computedHeight
+            ?: heightAllocated.takeIf { node.fillSize } ?.let { it - node.margin.get().height } ?: contentHeight + node.padding.get().height
 }
 
-class NodeEditor internal constructor(private val node: UINode, private val layout: FreeLayout) {
-    var top
-        get() = layout.nodeTops[node]
-        set(value) { value ?.let { layout.nodeTops[node] = value } }
-
-    var bottom
-        get() = layout.nodeBottoms[node]
-        set(value) { value ?.let { layout.nodeBottoms[node] = value } }
-
-    var left
-        get() = layout.nodeLefts[node]
-        set(value) { value ?.let { layout.nodeLefts[node] = value } }
-
-    var right
-        get() = layout.nodeRights[node]
-        set(value) { value ?.let { layout.nodeRights[node] = value } }
-
-    var topOffset
-        get() = layout.hLines[layout.nodeTops[node]] ?.fixed ?: 0f
-        set(value) { top = genLine(layout.hLines, RelativeSize(value, topPercentage))
-        }
-
-    var bottomOffset
-        get() = layout.hLines[layout.nodeBottoms[node]] ?.fixed ?: 0f
-        set(value) { bottom = genLine(layout.hLines, RelativeSize(value, bottomPercentage))
-        }
-
-    var leftOffset
-        get() = layout.vLines[layout.nodeLefts[node]] ?.fixed ?: 0f
-        set(value) { left = genLine(layout.vLines, RelativeSize(value, leftPercentage))
-        }
-
-    var rightOffset
-        get() = layout.vLines[layout.nodeRights[node]] ?.fixed ?: 0f
-        set(value) { right = genLine(layout.vLines, RelativeSize(value, rightPercentage))
-        }
-
-    var topPercentage
-        get() = layout.hLines[layout.nodeTops[node]] ?.fixed ?: 0f
-        set(value) { top = genLine(layout.hLines, RelativeSize(topOffset, value / 100f))
-        }
-
-    var bottomPercentage
-        get() = layout.hLines[layout.nodeBottoms[node]] ?.ratio ?: 0f
-        set(value) { bottom = genLine(layout.hLines, RelativeSize(bottomOffset, value / 100f))
-        }
-
-    var leftPercentage
-        get() = layout.vLines[layout.nodeLefts[node]] ?.ratio ?: 0f
-        set(value) { left = genLine(layout.vLines, RelativeSize(leftOffset, value / 100f))
-        }
-
-    var rightPercentage
-        get() = layout.vLines[layout.nodeRights[node]] ?.ratio ?: 0f
-        set(value) { right = genLine(layout.vLines, RelativeSize(rightOffset, value / 100f))
-        }
-}
-
-fun FreeLayout.hline(line: String, fn: LineEditor.() -> Unit) = fn(LineEditor(hLines, line))
-fun FreeLayout.vline(line: String, fn: LineEditor.() -> Unit) = fn(LineEditor(vLines, line))
-fun FreeLayout.hline(line: String, value: RelativeSize) { hLines[line] = value }
-fun FreeLayout.vline(line: String, value: RelativeSize) { vLines[line] = value }
-fun FreeLayout.line(line: String, fn: LineEditor.() -> Unit) { fn(LineEditor(hLines, line)); fn(LineEditor(vLines, line)) }
-fun FreeLayout.line(line: String, value: RelativeSize) { hLines[line] = value; vLines[line] = value }
-
-fun FreeLayout.elem(node: UINode, fn: NodeEditor.() -> Unit) = fn(NodeEditor(node, this))
-
-private fun genLine(lines: LayoutLineMapping, value: LayoutLineValue): String {
-    val i = generateSequence(0) { it + 1 } .first { !lines.contains("__bounds$it") }
-    lines["__bounds$i"] = value
-    return "__bounds$i"
+fun UILayout.computePositionForChildren(node: UINode) {
+    position(
+            node.computedWidthInternal - node.padding.get().width,
+            node.computedHeightInternal - node.padding.get().height
+    )
 }

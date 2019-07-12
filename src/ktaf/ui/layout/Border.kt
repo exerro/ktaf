@@ -1,6 +1,5 @@
-package ktaf.ui
+package ktaf.ui.layout
 
-import ktaf.core.KTAFMutableValue
 import ktaf.core.vec2
 import ktaf.typeclass.Add
 import ktaf.typeclass.Animateable
