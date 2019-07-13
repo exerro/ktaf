@@ -49,7 +49,7 @@ class FlowLayout: UILayout() {
         val contentHeight = rows.map { row -> UILayout.maximumChildHeight(row) } .sum()
         val (yOffset, ySpacing) = verticalSpacing.get().evaluate(height - contentHeight, rows.size)
 
-        children.forEach { it.layout.get().computePositionForChildren(it) }
+        UILayout.positionChildrenChildren(children)
 
         rows.fold(yOffset) { y, row ->
             val rowWidth = UILayout.sumChildrenWidth(row)

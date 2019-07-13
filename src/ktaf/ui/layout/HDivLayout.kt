@@ -26,7 +26,7 @@ class HDivLayout: UILayout() {
         val w = (width - (children.size - 1) * spacing.get()) / children.size
         val h = height
 
-        children.forEach { it.layout.get().computePositionForChildren(it) }
+        UILayout.positionChildrenChildren(children)
 
         UILayout.positionChildren(children, 0) { index, child ->
             align(child, vec2(index * (w + spacing.get()), 0f), vec2(w, h), alignment.get())

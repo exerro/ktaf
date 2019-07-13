@@ -21,8 +21,8 @@ class FillLayout: UILayout() {
     }
 
     override fun position(width: Float, height: Float) {
+        UILayout.positionChildrenChildren(children)
         // position each child in the area with an alignment
         children.forEach { align(it, vec2(0f), vec2(width, height), alignment.get()) }
-        children.forEach { it.layout.get().computePositionForChildren(it) }
     }
 }

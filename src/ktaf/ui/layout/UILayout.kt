@@ -5,8 +5,6 @@ import ktaf.core.vec2
 import ktaf.typeclass.minus
 import ktaf.typeclass.plus
 import ktaf.ui.node.UINode
-import ktaf.ui.node.computeHeight
-import ktaf.ui.node.computeWidth
 import ktaf.ui.node.orderedChildren
 import kotlin.math.max
 
@@ -38,48 +36,6 @@ fun UILayout.finishPositioning(node: UINode) {
     node.children.map { it.layout.get().finishPositioning(it) }
 }
 
-/**
- * Sets the width of a node based on the width of its children and the node's positioning protocols
- * @param node the node to compute the width for
- * @param widthAllocated the width allocated for the node
- */
-fun UILayout.computeWidthFor(node: UINode, widthAllocated: Float) {
-    // the width allocated for children
-    val widthAllocatedInternal = (node.width.get() ?: widthAllocated - node.margin.get().width) - node.padding.get().width
-    // the getter for the width of the content based on the node's children
-    val contentWidth by computeChildrenWidth(widthAllocatedInternal)
-    // update the node's width
-    node.computedWidthInternal = node.width.get()
-            ?: if (node.fillSize) widthAllocated else larger(node.computeWidth(), contentWidth + node.padding.get().width)
-}
-
-/**
- * Sets the height of a node based on the height of its children and the node's positioning protocols
- * @param node the node to compute the height for
- * @param heightAllocated the height allocated for the node, or null if no height was allocated
- */
-fun UILayout.computeHeightFor(node: UINode, heightAllocated: Float?) {
-    // the height allocated for the children (ignoring subtracting the node's padding)
-    val heightAllocatedInternalPlusPadding = (node.height.get() ?: heightAllocated ?.let { it - node.margin.get().height })
-    // the getter for the height of the content based on the node's children
-    val contentHeight by computeChildrenHeight(
-            node.computedWidthInternal - node.padding.get().width,
-            heightAllocatedInternalPlusPadding ?.let { it - node.padding.get().height }
-    )
-    node.computedHeightInternal = node.height.get()
-            ?: heightAllocated.takeIf { node.fillSize } ?: larger(node.computeHeight(node.computedWidthInternal), contentHeight + node.padding.get().height)
-}
-
-/**
- *
- */
-fun UILayout.computePositionForChildren(node: UINode) {
-    position(
-            node.computedWidthInternal - node.padding.get().width,
-            node.computedHeightInternal - node.padding.get().height
-    )
-}
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Utility functions                                                                                                  //
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -103,19 +59,19 @@ fun UILayout.Companion.align(node: UINode, offset: vec2, area: vec2, alignment: 
 }
 
 fun UILayout.Companion.fillChildrenWidths(children: List<UINode>, widthAllocatedForChildren: Float) {
-    children.forEach { it.layout.get().computeWidthFor(it, widthAllocatedForChildren - it.margin.get().width) }
+    children.forEach { it.computeWidth(widthAllocatedForChildren - it.margin.get().width) }
 }
 
 fun UILayout.Companion.fillChildrenHeights(children: List<UINode>, heightAllocatedForChildren: Float?) {
-    children.forEach { it.layout.get().computeHeightFor(it, heightAllocatedForChildren ?.let { h -> h - it.margin.get().height }) }
+    children.forEach { it.computeHeight(heightAllocatedForChildren ?.let { h -> h - it.margin.get().height }) }
 }
 
 fun UILayout.Companion.setChildrenWidths(children: List<UINode>, widthAllocatedForChildren: Float) {
-    children.forEach { it.layout.get().computeWidthFor(it, widthAllocatedForChildren - it.margin.get().width) }
+    children.forEach { it.computeWidth(widthAllocatedForChildren - it.margin.get().width) }
 }
 
 fun UILayout.Companion.setChildrenHeights(children: List<UINode>, heightAllocatedForChildren: Float?) {
-    children.forEach { it.layout.get().computeHeightFor(it, heightAllocatedForChildren?.let { h -> h - it.margin.get().width }) }
+    children.forEach { it.computeHeight(heightAllocatedForChildren?.let { h -> h - it.margin.get().width }) }
 }
 
 fun UILayout.Companion.maximumChildWidth(children: List<UINode>)
@@ -133,4 +89,5 @@ fun UILayout.Companion.sumChildrenHeight(children: List<UINode>)
 fun <T> UILayout.Companion.positionChildren(children: List<UINode>, start: T, fn: (T, UINode) -> T)
         = children.fold(start, fn)
 
-private fun larger(a: Float?, b: Float) = a ?.let { max(a, b) } ?: b
+fun UILayout.Companion.positionChildrenChildren(children: List<UINode>)
+        = children.forEach { it.computePositionForChildren() }

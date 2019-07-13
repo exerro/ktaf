@@ -41,7 +41,7 @@ class GridLayout(rows: Int = 2, columns: Int = 2): UILayout() {
         val w = (width - (columns.get() - 1) * spacing.get().x) / columns.get()
         val h = (height - (rows.get() - 1) * spacing.get().y) / rows.get()
 
-        children.forEach { it.layout.get().computePositionForChildren(it) }
+        UILayout.positionChildrenChildren(children)
 
         UILayout.positionChildren(children, 0) { index, child ->
             val row = index / columns.get()

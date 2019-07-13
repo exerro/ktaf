@@ -25,7 +25,7 @@ class ListLayout : UILayout() {
         val contentHeight = UILayout.sumChildrenHeight(children)
         val (offset, spacing) = spacing.get().evaluate(height - contentHeight, children.size)
 
-        children.forEach { it.layout.get().computePositionForChildren(it) }
+        UILayout.positionChildrenChildren(children)
 
         UILayout.positionChildren(children, offset) { y, child ->
             UILayout.alignw(child, vec2(0f, y), width, alignment.get())

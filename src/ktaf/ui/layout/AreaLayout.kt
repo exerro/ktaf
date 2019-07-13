@@ -15,21 +15,21 @@ class AreaLayout: UILayout() {
     // TODO: this process needs better documenting
     override fun computeChildrenWidth(widthAllocatedForContent: Float): Lazy<Float> {
         val widths = area.widths("", 0f, widthAllocatedForContent)
-        children.map { elements[it] ?.let { label -> widths[label] } ?.let { w -> it.layout.get().computeWidthFor(it, w) } }
+        children.map { elements[it] ?.let { label -> widths[label] } ?.let { w -> it.computeWidth(w) } }
         return lazy { widthAllocatedForContent }
     }
 
     // TODO: this process needs better documenting
     override fun computeChildrenHeight(width: Float, heightAllocatedForContent: Float?): Lazy<Float> {
         val heights = area.heights("", 0f, heightAllocatedForContent ?: 0f)
-        children.map { elements[it] ?.let { label -> heights[label] } ?.let { h -> it.layout.get().computeHeightFor(it, h) } }
+        children.map { elements[it] ?.let { label -> heights[label] } ?.let { h -> it.computeHeight(h) } }
         return lazy { heightAllocatedForContent ?: 0f }
     }
 
     // TODO: this process needs better documenting
     override fun position(width: Float, height: Float) {
         val positions = area.build("", vec2(0f, 0f), vec2(width, height))
-        children.forEach { it.layout.get().computePositionForChildren(it) }
+        children.forEach { it.computePositionForChildren() }
         children.map { elements[it] ?.let { label -> positions[label] } ?.let { (pos, size) ->
             UILayout.align(it, pos, size, alignment.get())
         } }

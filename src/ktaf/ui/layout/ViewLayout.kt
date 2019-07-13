@@ -35,13 +35,13 @@ class ViewLayout: UILayout() {
     }
 
     override fun position(width: Float, height: Float) {
+        UILayout.positionChildrenChildren(children)
         // position each child in the area with an alignment and offset based on the current location
         children.forEach {
             val dx = (locations[it] ?.let { (x, _) -> x } ?: 0) - locationX.get()
             val dy = (locations[it] ?.let { (_, y) -> y } ?: 0) - locationY.get()
             align(it, vec2(width * dx, height * dy), vec2(width, height), alignment.get())
         }
-        children.forEach { it.layout.get().computePositionForChildren(it) }
     }
 
     private val locations = mutableMapOf<UINode, Pair<Int, Int>>()

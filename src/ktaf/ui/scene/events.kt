@@ -15,9 +15,9 @@ fun UIScene.update(dt: Float) {
 
     root.get()?.let {
         it.layout.get().beginPositioning(it)
-        it.layout.get().computeWidthFor(it, context.viewport.width().toFloat())
-        it.layout.get().computeHeightFor(it, context.viewport.height().toFloat())
-        it.layout.get().computePositionForChildren(it)
+        it.computeWidth(context.viewport.width().toFloat())
+        it.computeHeight(context.viewport.height().toFloat())
+        it.computePositionForChildren()
         it.layout.get().finishPositioning(it)
 
         it.update(dt)

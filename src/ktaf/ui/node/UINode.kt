@@ -11,9 +11,10 @@ import ktaf.ui.layout.*
 import ktaf.ui.scene.UIScene
 import ktaf.util.animate
 import lwjglkt.GLFWCursor
+import kotlin.math.max
 import kotlin.properties.Delegates
 
-abstract class UINode {
+open class UINode {
     // structure
     val children = KTAFList<UINode>()
     var ordering = KTAFValue(Ordering())
@@ -91,6 +92,53 @@ abstract class UINode {
             = children.reversed().firstNotNull { it.getInputHandler() } ?: this.takeIf { handlesInput() }
 
     open fun cursor(): GLFWCursor? = GLFWCursor.DEFAULT
+
+    /**
+     * Sets the width of a node based on the width of its children and the node's positioning protocols
+     * @param node the node to compute the width for
+     * @param widthAllocated the width allocated for the node
+     */
+    open fun computeWidth(widthAllocated: Float) {
+        val node = this
+        // the width allocated for children
+        val widthAllocatedInternal = (node.width.get() ?: widthAllocated - node.margin.get().width) - node.padding.get().width
+        // the getter for the width of the content based on the node's children
+        val contentWidth by layout.get().computeChildrenWidth(widthAllocatedInternal)
+        // update the node's width
+        node.computedWidthInternal = node.width.get()
+                ?: if (node.fillSize) widthAllocated else larger(node.computeWidth(), contentWidth + node.padding.get().width)
+    }
+
+    /**
+     * Sets the height of a node based on the height of its children and the node's positioning protocols
+     * @param node the node to compute the height for
+     * @param heightAllocated the height allocated for the node, or null if no height was allocated
+     */
+    open fun computeHeight(heightAllocated: Float?) {
+        val node = this
+        // the height allocated for the children (ignoring subtracting the node's padding)
+        val heightAllocatedInternalPlusPadding = (node.height.get() ?: heightAllocated ?.let { it - node.margin.get().height })
+        // the getter for the height of the content based on the node's children
+        val contentHeight by layout.get().computeChildrenHeight(
+                node.computedWidthInternal - node.padding.get().width,
+                heightAllocatedInternalPlusPadding ?.let { it - node.padding.get().height }
+        )
+        node.computedHeightInternal = node.height.get()
+                ?: heightAllocated.takeIf { node.fillSize } ?: larger(node.computeHeight(node.computedWidthInternal), contentHeight + node.padding.get().height)
+    }
+
+    /**
+     * TODO
+     */
+    open fun computePositionForChildren() {
+        val node = this
+
+        layout.get().position(
+                node.computedWidthInternal - node.padding.get().width,
+                node.computedHeightInternal - node.padding.get().height
+        )
+    }
+
 
     protected fun <T> propertyState(property: UIProperty<T>) {
         state.connect { property.setState(state.current()) }
@@ -179,7 +227,10 @@ fun UINode.handleEvent(event: UIEvent) {
     }
 }
 
+// TODO: move to utils
 fun <T, R> List<T>.firstNotNull(fn: (T) -> R?): R? {
     for (x in this) fn(x)?.let { return it }
     return null
 }
+
+private fun larger(a: Float?, b: Float) = a ?.let { max(a, b) } ?: b
