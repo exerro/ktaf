@@ -56,29 +56,33 @@ fun main() = application("UI Graphics") {
                 layout(FlowLayout())
             }
 
-            val addButton = children.add(UIButton("ADD BUTTON")) {
-                hotkeys.add(Hotkey(GLFW.GLFW_KEY_A))
-                onClick { buttons.addButton() }
-            }
+            val actionButtons = children.add(UIContainer()) {
+                val addButton = children.add(UIButton("ADD BUTTON")) {
+                    hotkeys.add(Hotkey(GLFW.GLFW_KEY_A))
+                    onClick { buttons.addButton() }
+                }
 
-            val toggleExpand = children.add(UIButton("TOGGLE EXPAND")) {
-                hotkeys.add(Hotkey(GLFW.GLFW_KEY_E))
-                onClick {
-                    sizeGiven = !sizeGiven
-                    buttons.children.forEach {
-                        if (sizeGiven) it.fill() else it.shrink()
+                val toggleExpand = children.add(UIButton("TOGGLE EXPAND")) {
+                    hotkeys.add(Hotkey(GLFW.GLFW_KEY_E))
+                    onClick {
+                        sizeGiven = !sizeGiven
+                        buttons.children.forEach {
+                            if (sizeGiven) it.fill() else it.shrink()
+                        }
                     }
                 }
-            }
 
-            val marginButton = children.add(UIButton("TOGGLE MARGIN")) {
-                hotkeys.add(Hotkey(GLFW.GLFW_KEY_M))
-                onClick {
-                    margins = !margins
-                    buttons.children.forEach {
-                        it.margin(Border(if (margins) 32f else 0f))
+                val marginButton = children.add(UIButton("TOGGLE MARGIN")) {
+                    hotkeys.add(Hotkey(GLFW.GLFW_KEY_M))
+                    onClick {
+                        margins = !margins
+                        buttons.children.forEach {
+                            it.margin(Border(if (margins) 32f else 0f))
+                        }
                     }
                 }
+
+                layout(HDivLayout())
             }
 
             val switches = children.add(UIContainer()) {
@@ -300,9 +304,7 @@ fun main() = application("UI Graphics") {
                     }
 
                     elem(buttons, "buttons")
-                    elem(addButton, "add-button")
-                    elem(toggleExpand, "toggle-button")
-                    elem(marginButton, "margin-button")
+                    elem(actionButtons, "button-row")
                     elem(switches, "switches")
                 }
             }
