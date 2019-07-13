@@ -2,7 +2,7 @@ import ktaf.core.application
 import ktaf.graphics.DrawContext2D
 import ktaf.ui.Hotkey
 import ktaf.ui.elements.UIButton
-import ktaf.ui.elements.UIContainer
+import ktaf.ui.node.UIContainer
 import ktaf.ui.elements.UIView
 import ktaf.ui.layout.AreaLayout
 import ktaf.ui.layout.HDivLayout
@@ -52,7 +52,7 @@ fun main() = application("UI Graphics") {
     scene.attachCallbacks(this)
 }
 
-inline fun <reified T: UILayout> setLayout(element: UINode, create: () -> T, fn: (T) -> Unit) {
+inline fun <reified T: UILayout> setLayout(element: UIContainer, create: () -> T, fn: (T) -> Unit) {
     when (val layout = element.layout.get()) {
         is T -> { fn(layout) }
         else -> { fn(element.layout(create())); fn(element.layout.get() as T) }

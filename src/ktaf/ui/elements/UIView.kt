@@ -7,9 +7,10 @@ import ktaf.core.vec2
 import ktaf.typeclass.minus
 import ktaf.ui.layout.ViewLayout
 import ktaf.ui.layout.tl
+import ktaf.ui.node.UIContainer
 import ktaf.ui.node.UINode
 
-class UIView: UINode() {
+class UIView: UIContainer() {
     val viewLayout = KTAFValue(ViewLayout())
     val active = KTAFValue(null as UINode?)
 

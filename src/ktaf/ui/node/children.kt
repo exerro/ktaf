@@ -14,7 +14,7 @@ fun UINode.drawChildren(children: List<UINode>, context: DrawContext2D, position
     }
 }
 
-fun UINode.orderedChildren(): List<UINode>
+fun UIContainer.orderedChildren(): List<UINode>
         = ordering.get().apply(children)
 
 fun UINode.previousChild()

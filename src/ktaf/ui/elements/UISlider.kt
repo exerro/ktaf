@@ -4,7 +4,6 @@ import ktaf.core.*
 import ktaf.graphics.DrawContext2D
 import ktaf.typeclass.minus
 import ktaf.ui.graphics.ColourBackground
-import ktaf.ui.layout.FillLayout
 import ktaf.ui.layout.height
 import ktaf.ui.layout.tl
 import ktaf.ui.layout.width
@@ -37,7 +36,17 @@ class UISlider: UINode() {
         drawChildren(listOf(slider), context, position)
     }
 
-    private val slider = children.add(SliderObject()) {}
+    override fun computeWidth(widthAllocated: Float) {
+        super.computeWidth(widthAllocated)
+        slider.computeWidth(widthAllocated)
+    }
+
+    override fun computeHeight(heightAllocated: Float?) {
+        super.computeHeight(heightAllocated)
+        slider.computeHeight(heightAllocated)
+    }
+
+    private val slider = SliderObject()
     private var background = addBackground(ColourBackground())
     private var sliderBackground = slider.addBackground(ColourBackground())
 
@@ -51,8 +60,10 @@ class UISlider: UINode() {
         sliderColour.connect { sliderBackground = slider.replaceBackground(sliderBackground, sliderBackground.copy(colour = it)) }
         backgroundColour.connect { background = replaceBackground(background, background.copy(colour = it)) }
 
-        x.connect { x(divisions(it, xSteps.get() ?.let { it - 1 })) }
-        y.connect { y(divisions(it, ySteps.get() ?.let { it - 1 })) }
+        scene.joinTo(slider.scene)
+
+        x.connect { x(divisions(it, xSteps.get() ?.let { s -> s - 1 })) }
+        y.connect { y(divisions(it, ySteps.get() ?.let { s -> s - 1 })) }
         x.connect { value(vec2(x.get(), y.get())) }
         y.connect { value(vec2(x.get(), y.get())) }
         value.connect { x(it.x); y(it.y) }

@@ -7,26 +7,24 @@ import ktaf.typeclass.plus
 import ktaf.ui.*
 import ktaf.ui.graphics.Background
 import ktaf.ui.graphics.Foreground
-import ktaf.ui.layout.*
+import ktaf.ui.layout.Border
+import ktaf.ui.layout.size
+import ktaf.ui.layout.tl
 import ktaf.ui.scene.UIScene
 import ktaf.util.animate
 import lwjglkt.GLFWCursor
-import kotlin.math.max
 import kotlin.properties.Delegates
 
 open class UINode {
     // structure
-    val children = KTAFList<UINode>()
-    var ordering = KTAFValue(Ordering())
     val scene = KTAFValue<UIScene?>(null)
-    val parent = KTAFValue<UINode?>(null)
+    val parent = KTAFValue<UIContainer?>(null)
 
     // configuration
     val width = UIProperty<Float?>(null)
     val height = UIProperty<Float?>(null)
     val margin = UIProperty(Border(0f))
     val padding = UIProperty(Border(0f))
-    val layout = KTAFValue<UILayout>(FillLayout())
     val hotkeys = KTAFList<Hotkey>()
 
     // state
@@ -62,8 +60,6 @@ open class UINode {
             it.draw(context, position, size)
         }
 
-        drawChildren(children, context, position)
-
         foregroundsInternal.forEach {
             it.draw(context, position + padding.get().tl, size - padding.get().size)
         }
@@ -78,61 +74,34 @@ open class UINode {
             = false
 
     open fun getMouseHandler(position: vec2): UINode?
-            =  children.reversed().firstNotNull { it.getMouseHandler(position - padding.get().tl - it.computedPosition.get()) }
-            ?: this.takeIf { position.x >= 0 && position.y >= 0 && position.x < computedWidth.get() && position.y < computedHeight.get() }
+            =  this.takeIf { position.x >= 0 && position.y >= 0 && position.x < computedWidth.get() && position.y < computedHeight.get() }
 
     open fun getKeyboardHandler(key: GLFWKey, modifiers: Set<GLFWKeyModifier>): UINode?
-            = children.reversed().firstNotNull { it.getKeyboardHandler(key, modifiers) } ?: this.takeIf { handlesKey(key, modifiers) }
+            = null
 
     open fun getInputHandler(): UINode?
-            = children.reversed().firstNotNull { it.getInputHandler() } ?: this.takeIf { handlesInput() }
+            = null
 
     open fun cursor(): GLFWCursor? = GLFWCursor.DEFAULT
 
     /**
-     * Sets the width of a node based on the width of its children and the node's positioning protocols
-     * @param node the node to compute the width for
+     * Sets the width of the node based on its set width and the computed width of its contents
      * @param widthAllocated the width allocated for the node
      */
-    open fun computeInternalWidth(widthAllocated: Float) {
-        val node = this
-        // the width allocated for children
-        val widthAllocatedInternal = (node.width.get() ?: widthAllocated - node.margin.get().width) - node.padding.get().width
-        // the getter for the width of the content based on the node's children
-        val contentWidth by layout.get().computeChildrenWidth(widthAllocatedInternal)
-        // update the node's width
-        node.computedWidthInternal = node.width.get()
-                ?: if (node.fillSize) widthAllocated else larger(node.computeInternalWidth(), contentWidth + node.padding.get().width)
+    open fun computeWidth(widthAllocated: Float) {
+        // TODO: comment
+        computedWidthInternal = width.get()
+                ?: widthAllocated.takeIf { fillSize } ?: computeInternalWidth() ?: 0f
     }
 
     /**
-     * Sets the height of a node based on the height of its children and the node's positioning protocols
-     * @param node the node to compute the height for
+     * Sets the height of the node based on its set height and the computed height of its contents
      * @param heightAllocated the height allocated for the node, or null if no height was allocated
      */
     open fun computeHeight(heightAllocated: Float?) {
-        val node = this
-        // the height allocated for the children (ignoring subtracting the node's padding)
-        val heightAllocatedInternalPlusPadding = (node.height.get() ?: heightAllocated ?.let { it - node.margin.get().height })
-        // the getter for the height of the content based on the node's children
-        val contentHeight by layout.get().computeChildrenHeight(
-                node.computedWidthInternal - node.padding.get().width,
-                heightAllocatedInternalPlusPadding ?.let { it - node.padding.get().height }
-        )
-        node.computedHeightInternal = node.height.get()
-                ?: heightAllocated.takeIf { node.fillSize } ?: larger(node.computeInternalHeight(node.computedWidthInternal), contentHeight + node.padding.get().height)
-    }
-
-    /**
-     * TODO
-     */
-    open fun computePositionForChildren() {
-        val node = this
-
-        layout.get().position(
-                node.computedWidthInternal - node.padding.get().width,
-                node.computedHeightInternal - node.padding.get().height
-        )
+        // TODO: comment
+        computedHeightInternal = height.get()
+                ?: heightAllocated.takeIf { fillSize } ?: computeInternalHeight(computedWidthInternal) ?: 0f
     }
 
 
@@ -146,7 +115,6 @@ open class UINode {
         propertyState(margin)
         propertyState(padding)
 
-        scene.connect { scene -> children.forEach { it.scene.set(scene) } }
         focussed.connect { if (it) scene.get()?.focussedNode?.set(this) }
         computedX.connect { computedPosition.set(vec2(it, computedY.get())) }
         computedY.connect { computedPosition.set(vec2(computedX.get(), it)) }
@@ -154,17 +122,6 @@ open class UINode {
         parent.connectComparator { old, new ->
             old?.children?.remove(this)
             if (new?.children?.contains(this) != true) new?.children?.add(this)
-            Unit
-        }
-
-        children.connectAdded { child ->
-            child.parent.set(this)
-            child.scene.set(scene.get())
-        }
-
-        children.connectRemoved { child ->
-            child.parent.set(null)
-            child.scene.set(null)
         }
 
         onMouseEnter { state.push(HOVER) }
@@ -177,18 +134,18 @@ open class UINode {
     internal open var fillSize = true // whether the node should fill allocated size when positioning
 
     // state
-    internal var computedXInternal: Float by Delegates.observable(0f) { _, old, new ->
-        if (old != new) { scene.get()?.animations?.animate(this, ::computedX, new) }
-    }
-    internal var computedYInternal: Float by Delegates.observable(0f) { _, old, new ->
-        if (old != new) { scene.get()?.animations?.animate(this, ::computedY, new) }
-    }
-    internal var computedWidthInternal: Float by Delegates.observable(0f) { _, old, new ->
-        if (old != new) { scene.get()?.animations?.animate(this, ::computedWidth, new) }
-    }
-    internal var computedHeightInternal: Float by Delegates.observable(0f) { _, old, new ->
-        if (old != new) { scene.get()?.animations?.animate(this, ::computedHeight, new) }
-    }
+    internal var computedXInternal: Float by Delegates.observable(0f) { _, old, new -> if (old != new) {
+        scene.get()?.animations?.animate(this, ::computedX, new) ?: run { computedX(new) }
+    } }
+    internal var computedYInternal: Float by Delegates.observable(0f) { _, old, new -> if (old != new) {
+        scene.get()?.animations?.animate(this, ::computedY, new) ?: run { computedY(new) }
+    } }
+    internal var computedWidthInternal: Float by Delegates.observable(0f) { _, old, new -> if (old != new) {
+        scene.get()?.animations?.animate(this, ::computedWidth, new) ?: run { computedWidth(new) }
+    } }
+    internal var computedHeightInternal: Float by Delegates.observable(0f) { _, old, new -> if (old != new) {
+        scene.get()?.animations?.animate(this, ::computedHeight, new) ?: run { computedHeight(new) }
+    } }
 
     companion object {
         const val HOVER = "hover"
@@ -226,5 +183,3 @@ fun <T, R> List<T>.firstNotNull(fn: (T) -> R?): R? {
     for (x in this) fn(x)?.let { return it }
     return null
 }
-
-private fun larger(a: Float?, b: Float) = a ?.let { max(a, b) } ?: b

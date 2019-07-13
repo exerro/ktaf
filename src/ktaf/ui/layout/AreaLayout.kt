@@ -15,7 +15,7 @@ class AreaLayout: UILayout() {
     // TODO: this process needs better documenting
     override fun computeChildrenWidth(widthAllocatedForContent: Float): Lazy<Float> {
         val widths = area.widths("", 0f, widthAllocatedForContent)
-        children.map { elements[it] ?.let { label -> widths[label] } ?.let { w -> it.computeInternalWidth(w) } }
+        children.map { elements[it] ?.let { label -> widths[label] } ?.let { w -> it.computeWidth(w) } }
         return lazy { widthAllocatedForContent }
     }
 
@@ -29,7 +29,7 @@ class AreaLayout: UILayout() {
     // TODO: this process needs better documenting
     override fun position(width: Float, height: Float) {
         val positions = area.build("", vec2(0f, 0f), vec2(width, height))
-        children.forEach { it.computePositionForChildren() }
+        UILayout.positionChildrenChildren(children)
         children.map { elements[it] ?.let { label -> positions[label] } ?.let { (pos, size) ->
             UILayout.align(it, pos, size, alignment.get())
         } }

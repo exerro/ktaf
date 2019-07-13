@@ -4,13 +4,14 @@ import ktaf.core.*
 import ktaf.graphics.DrawContext2D
 import ktaf.ui.UIFocusEvent
 import ktaf.ui.UIUnFocusEvent
+import ktaf.ui.node.UIContainer
 import ktaf.ui.node.UINode
 import ktaf.ui.node.handleEvent
 import ktaf.util.Animations
 import lwjglkt.GLFWDisplay
 
 class UIScene(val display: GLFWDisplay, val context: DrawContext2D) {
-    val root = KTAFValue<UINode?>(null)
+    val root = KTAFValue<UIContainer?>(null)
     val focussedNode = KTAFValue<UINode?>(null)
     val animations = Animations()
 

@@ -4,7 +4,7 @@ import ktaf.graphics.DrawContext2D
 import ktaf.ui.Hotkey
 import ktaf.ui.UIMouseClickEvent
 import ktaf.ui.elements.UIButton
-import ktaf.ui.elements.UIContainer
+import ktaf.ui.node.UIContainer
 import ktaf.ui.layout.*
 import ktaf.ui.scene.attachCallbacks
 import ktaf.ui.scene.scene

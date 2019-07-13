@@ -4,7 +4,9 @@ import ktaf.core.times
 import ktaf.core.vec2
 import ktaf.typeclass.minus
 import ktaf.typeclass.plus
+import ktaf.ui.node.UIContainer
 import ktaf.ui.node.UINode
+import ktaf.ui.node.computeInternalWidth
 import ktaf.ui.node.orderedChildren
 import kotlin.math.max
 
@@ -25,15 +27,15 @@ abstract class UILayout {
 }
 
 /** Begins positioning of a node */
-fun UILayout.beginPositioning(node: UINode) {
+fun UILayout.beginPositioning(node: UIContainer) {
     begin(node.orderedChildren())
-    node.children.map { it.layout.get().beginPositioning(it) }
+    node.children.map { when (it) { is UIContainer -> it.layout.get().beginPositioning(it) } }
 }
 
 /** Completes positioning of a node */
-fun UILayout.finishPositioning(node: UINode) {
+fun UILayout.finishPositioning(node: UIContainer) {
     finish()
-    node.children.map { it.layout.get().finishPositioning(it) }
+    node.children.map { when (it) { is UIContainer -> it.layout.get().finishPositioning(it) } }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -59,7 +61,7 @@ fun UILayout.Companion.align(node: UINode, offset: vec2, area: vec2, alignment: 
 }
 
 fun UILayout.Companion.fillChildrenWidths(children: List<UINode>, widthAllocatedForChildren: Float) {
-    children.forEach { it.computeInternalWidth(widthAllocatedForChildren - it.margin.get().width) }
+    children.forEach { it.computeWidth(widthAllocatedForChildren - it.margin.get().width) }
 }
 
 fun UILayout.Companion.fillChildrenHeights(children: List<UINode>, heightAllocatedForChildren: Float?) {
@@ -67,7 +69,7 @@ fun UILayout.Companion.fillChildrenHeights(children: List<UINode>, heightAllocat
 }
 
 fun UILayout.Companion.setChildrenWidths(children: List<UINode>, widthAllocatedForChildren: Float) {
-    children.forEach { it.computeInternalWidth(widthAllocatedForChildren - it.margin.get().width) }
+    children.forEach { it.computeWidth(widthAllocatedForChildren - it.margin.get().width) }
 }
 
 fun UILayout.Companion.setChildrenHeights(children: List<UINode>, heightAllocatedForChildren: Float?) {
@@ -90,4 +92,4 @@ fun <T> UILayout.Companion.positionChildren(children: List<UINode>, start: T, fn
         = children.fold(start, fn)
 
 fun UILayout.Companion.positionChildrenChildren(children: List<UINode>)
-        = children.forEach { it.computePositionForChildren() }
+        = children.forEach { when (it) { is UIContainer -> it.computePositionForChildren() } }
