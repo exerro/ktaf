@@ -15,8 +15,8 @@ class FlowLayout: UILayout() {
     }
 
     // compute the width for each child where allocated width fills the area
-    override fun computeChildrenWidths(widthAllocatedForContent: Float) {
-        UILayout.fillChildrenWidths(children, widthAllocatedForContent)
+    override fun computeChildrenWidths(widthAllocatedForContent: Float?) {
+        UILayout.setChildrenWidths(children, null)
     }
 
     override fun computeChildrenHeights(width: Float, heightAllocatedForContent: Float?) {

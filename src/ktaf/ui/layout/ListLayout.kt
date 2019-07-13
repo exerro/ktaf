@@ -8,7 +8,7 @@ class ListLayout : UILayout() {
     val spacing = KTAFValue(Spacing.SPACE_AFTER)
 
     // compute the width for each child where allocated width fills the area
-    override fun computeChildrenWidths(widthAllocatedForContent: Float) {
+    override fun computeChildrenWidths(widthAllocatedForContent: Float?) {
         UILayout.fillChildrenWidths(children, widthAllocatedForContent)
     }
 

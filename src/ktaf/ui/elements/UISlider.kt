@@ -39,7 +39,7 @@ class UISlider: UINode() {
         drawChildren(listOf(slider), context, position)
     }
 
-    override fun computeWidth(widthAllocated: Float) {
+    override fun computeWidth(widthAllocated: Float?) {
         super.computeWidth(widthAllocated)
         slider.computeWidth(widthAllocated)
     }

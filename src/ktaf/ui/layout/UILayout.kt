@@ -12,7 +12,7 @@ import kotlin.math.max
 abstract class UILayout {
     protected lateinit var children: List<UINode>
     /** Computes the width of children */
-    abstract fun computeChildrenWidths(widthAllocatedForContent: Float)
+    abstract fun computeChildrenWidths(widthAllocatedForContent: Float?)
     /** Computes the height of children */
     abstract fun computeChildrenHeights(width: Float, heightAllocatedForContent: Float?)
     /** Returns the content width of children */
@@ -63,20 +63,20 @@ fun UILayout.Companion.align(node: UINode, offset: vec2, area: vec2, alignment: 
     node.computedYInternal = node.margin.get().top + y
 }
 
-fun UILayout.Companion.fillChildrenWidths(children: List<UINode>, widthAllocatedForChildren: Float) {
-    children.forEach { it.computeWidth(widthAllocatedForChildren - it.margin.get().width) }
+fun UILayout.Companion.fillChildrenWidths(children: List<UINode>, widthAllocatedForChildren: Float?) {
+    children.forEach { it.computeWidth(widthAllocatedForChildren ?.let { w -> w - it.margin.get().width }) }
 }
 
 fun UILayout.Companion.fillChildrenHeights(children: List<UINode>, heightAllocatedForChildren: Float?) {
     children.forEach { it.computeHeight(heightAllocatedForChildren ?.let { h -> h - it.margin.get().height }) }
 }
 
-fun UILayout.Companion.setChildrenWidths(children: List<UINode>, widthAllocatedForChildren: Float) {
-    children.forEach { it.computeWidth(widthAllocatedForChildren - it.margin.get().width) }
+fun UILayout.Companion.setChildrenWidths(children: List<UINode>, widthAllocatedForChildren: Float?) {
+    children.forEach { it.computeWidth(widthAllocatedForChildren ?.let { w -> w - it.margin.get().width }) }
 }
 
 fun UILayout.Companion.setChildrenHeights(children: List<UINode>, heightAllocatedForChildren: Float?) {
-    children.forEach { it.computeHeight(heightAllocatedForChildren?.let { h -> h - it.margin.get().width }) }
+    children.forEach { it.computeHeight(heightAllocatedForChildren ?.let { h -> h - it.margin.get().width }) }
 }
 
 fun UILayout.Companion.maximumChildWidth(children: List<UINode>)

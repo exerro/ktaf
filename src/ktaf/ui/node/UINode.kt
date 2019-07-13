@@ -19,11 +19,12 @@ abstract class UINode {
     val height = UIProperty<Float?>(null)
     val margin = UIProperty(Border(0f))
     val padding = UIProperty(Border(0f))
-    val hotkeys = KTAFList<Hotkey>()
+    val hotkeys = KTAFList<Hotkey>() // TODO: comment
+    val fill = KTAFValue(true) // TODO: comment
 
     // state
-    val state = KTAFValue(listOf<UINodeState>())
-    val focussed = KTAFValue(false)
+    val state = KTAFValue(listOf<UINodeState>()) // TODO: comment
+    val focussed = KTAFValue(false) // TODO: comment
     val computedX = KTAFValue(0f)
     val computedY = KTAFValue(0f)
     val computedWidth = KTAFValue(0f)
@@ -47,11 +48,46 @@ abstract class UINode {
     val onKeyRelease = EventHandlerList<UIKeyReleaseEvent>()
     val onTextInput = EventHandlerList<UITextInputEvent>()
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    /** Update the node */
     open fun update(dt: Float) {}
 
+    /** Draw the node */
     abstract fun draw(context: DrawContext2D, position: vec2, size: vec2)
+
+    /** Return the cursor to show when hovering over this node */
+    open fun cursor(): GLFWCursor? = GLFWCursor.DEFAULT
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * Sets the width of the node based on its set width and the computed width of its contents
+     * @param widthAllocated the width allocated for the node
+     */
+    open fun computeWidth(widthAllocated: Float?) {
+        // TODO: comment
+        computedWidthInternal = width.get()
+                ?: widthAllocated.takeIf { fill.get() } ?: computeContentWidth(widthAllocated)
+    }
+
+    /**
+     * Sets the height of the node based on its set height and the computed height of its contents
+     * @param heightAllocated the height allocated for the node, or null if no height was allocated
+     */
+    open fun computeHeight(heightAllocated: Float?) {
+        // TODO: comment
+        computedHeightInternal = height.get()
+                ?: heightAllocated.takeIf { fill.get() } ?: computeContentHeight(computedWidthInternal, heightAllocated)
+    }
+
+    /** Return the width of the content of this node */
     abstract fun computeContentWidth(width: Float?): Float
+
+    /** Return the height of the content of this node */
     abstract fun computeContentHeight(width: Float, height: Float?): Float
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     /** Return true if this node can handle the key event */
     open fun handlesKey(key: GLFWKey, modifiers: Set<GLFWKeyModifier>): Boolean
@@ -70,32 +106,7 @@ abstract class UINode {
     open fun getInputHandler(): UINode?
             = null
 
-    open fun cursor(): GLFWCursor? = GLFWCursor.DEFAULT
-
-    /**
-     * Sets the width of the node based on its set width and the computed width of its contents
-     * @param widthAllocated the width allocated for the node
-     */
-    open fun computeWidth(widthAllocated: Float) {
-        // TODO: comment
-        computedWidthInternal = width.get()
-                ?: widthAllocated.takeIf { fillSize } ?: computeContentWidth(widthAllocated)
-    }
-
-    /**
-     * Sets the height of the node based on its set height and the computed height of its contents
-     * @param heightAllocated the height allocated for the node, or null if no height was allocated
-     */
-    open fun computeHeight(heightAllocated: Float?) {
-        // TODO: comment
-        computedHeightInternal = height.get()
-                ?: heightAllocated.takeIf { fillSize } ?: computeContentHeight(computedWidthInternal, heightAllocated)
-    }
-
-
-    protected fun <T> propertyState(property: UIProperty<T>) {
-        state.connect { property.setState(state.current()) }
-    }
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     init {
         propertyState(width)
@@ -116,10 +127,12 @@ abstract class UINode {
         onMouseExit { state.remove(HOVER) }
     }
 
-    // configuration internals
-    internal open var fillSize = true // whether the node should fill allocated size when positioning
+    /** Register a property as a state-dependent property, making state changes to update this property */
+    protected fun <T> propertyState(property: UIProperty<T>) {
+        state.connect { property.setState(state.current()) }
+    }
 
-    // state
+    // computed position helpers
     internal var computedXInternal: Float by Delegates.observable(0f) { _, old, new -> if (old != new) {
         scene.get()?.animations?.animate(this, ::computedX, new) ?: run { computedX(new) }
     } }

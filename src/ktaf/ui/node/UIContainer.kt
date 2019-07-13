@@ -42,20 +42,12 @@ open class UIContainer: UINode() {
     override fun getInputHandler(): UINode?
             = children.reversed().firstNotNull { it.getInputHandler() } ?: this.takeIf { handlesInput() } ?: super.getInputHandler()
 
-    // return the width of the children plus padding, based on the layout's rules
-    override fun computeContentWidth(width: Float?)
-            = layout.get().computeChildrenWidth() + padding.get().width
-
-    // return the height of the children plus padding, based on the layout's rules
-    override fun computeContentHeight(width: Float, height: Float?)
-            = layout.get().computeChildrenHeight() + padding.get().height
-
     // compute the width of children prior to calling the super method
-    override fun computeWidth(widthAllocated: Float) {
+    override fun computeWidth(widthAllocated: Float?) {
         // the width allocated for children
-        val widthAllocatedInner = (width.get() ?: widthAllocated - margin.get().width) - padding.get().width
+        val widthAllocatedInnerPlusPadding = (width.get() ?: widthAllocated ?.let { it - margin.get().width })
         // compute the width of each child
-        layout.get().computeChildrenWidths(widthAllocatedInner)
+        layout.get().computeChildrenWidths(widthAllocatedInnerPlusPadding ?.let { it - padding.get().width })
         // update the node's width
         super.computeWidth(widthAllocated)
     }
@@ -72,6 +64,14 @@ open class UIContainer: UINode() {
         // update the node's height
         super.computeHeight(heightAllocated)
     }
+
+    // return the width of the children plus padding, based on the layout's rules
+    override fun computeContentWidth(width: Float?)
+            = layout.get().computeChildrenWidth() + padding.get().width
+
+    // return the height of the children plus padding, based on the layout's rules
+    override fun computeContentHeight(width: Float, height: Float?)
+            = layout.get().computeChildrenHeight() + padding.get().height
 
     init {
         children.connectAdded { child ->

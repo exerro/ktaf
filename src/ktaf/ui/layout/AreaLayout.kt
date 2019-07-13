@@ -13,8 +13,8 @@ class AreaLayout: UILayout() {
     fun elem(node: UINode, area: String) { elements[node] = area }
 
     // TODO: this process needs better documenting
-    override fun computeChildrenWidths(widthAllocatedForContent: Float) {
-        val widths = area.widths("", 0f, widthAllocatedForContent)
+    override fun computeChildrenWidths(widthAllocatedForContent: Float?) {
+        val widths = area.widths("", 0f, widthAllocatedForContent ?: 0f)
         children.map { elements[it] ?.let { label -> widths[label] } ?.let { w -> it.computeWidth(w) } }
     }
 

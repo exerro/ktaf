@@ -11,13 +11,13 @@ class GridLayout(rows: Int = 2, columns: Int = 2): UILayout() {
     val rows = KTAFValue(rows)
 
     // compute the width for each child where allocated width fills the area divided into `columns` columns
-    override fun computeChildrenWidths(widthAllocatedForContent: Float) {
-        UILayout.setChildrenWidths(children, (widthAllocatedForContent - (columns.get() - 1) * spacing.get().x) / columns.get())
+    override fun computeChildrenWidths(widthAllocatedForContent: Float?) {
+        UILayout.setChildrenWidths(children, widthAllocatedForContent ?.let { w -> (w - (columns.get() - 1) * spacing.get().x) / columns.get() })
     }
 
     // compute the height for each child where allocated height fills the area divided into `rows` rows
     override fun computeChildrenHeights(width: Float, heightAllocatedForContent: Float?) {
-        UILayout.setChildrenHeights(children, heightAllocatedForContent?.let { h -> (h - (rows.get() - 1) * spacing.get().y) / rows.get() })
+        UILayout.setChildrenHeights(children, heightAllocatedForContent ?.let { h -> (h - (rows.get() - 1) * spacing.get().y) / rows.get() })
     }
 
     // return the sum of the largest widths of each column plus spacing

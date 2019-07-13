@@ -8,8 +8,8 @@ class HDivLayout: UILayout() {
     val spacing = KTAFValue(0f) // TODO: use proper spacing
 
     // compute the width for each child where allocated width fills the area divided evenly amongst children
-    override fun computeChildrenWidths(widthAllocatedForContent: Float) {
-        UILayout.setChildrenWidths(children, (widthAllocatedForContent - (children.size - 1) * spacing.get()) / children.size)
+    override fun computeChildrenWidths(widthAllocatedForContent: Float?) {
+        UILayout.setChildrenWidths(children, widthAllocatedForContent ?.let { w -> (w - (children.size - 1) * spacing.get()) / children.size })
     }
 
     // compute the height for each child where allocated height fills the area

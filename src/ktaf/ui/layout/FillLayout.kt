@@ -7,7 +7,7 @@ class FillLayout: UILayout() {
     val alignment = KTAFValue(vec2(0f))
 
     // compute the width for each child where allocated width fills the area
-    override fun computeChildrenWidths(widthAllocatedForContent: Float) {
+    override fun computeChildrenWidths(widthAllocatedForContent: Float?) {
         UILayout.fillChildrenWidths(children, widthAllocatedForContent)
     }
 
