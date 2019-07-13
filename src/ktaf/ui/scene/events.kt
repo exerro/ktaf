@@ -88,13 +88,19 @@ fun UIScene.mouseDragged(position: vec2) {
 }
 
 fun UIScene.keyPressed(key: GLFWKey, modifiers: Set<GLFWKeyModifier>) {
-    (root.get() ?.getKeyboardHandler(key, modifiers) ?: focussedNode.get()) ?.handleEvent(UIKeyPressEvent(key, modifiers))
+    keyboardTarget(key, modifiers) ?.handleEvent(UIKeyPressEvent(key, modifiers))
 }
 
 fun UIScene.keyReleased(key: GLFWKey, modifiers: Set<GLFWKeyModifier>) {
-    (root.get() ?.getKeyboardHandler(key, modifiers) ?: focussedNode.get()) ?.handleEvent(UIKeyReleaseEvent(key, modifiers))
+    keyboardTarget(key, modifiers) ?.handleEvent(UIKeyReleaseEvent(key, modifiers))
 }
 
 fun UIScene.textInput(text: String) {
-    (root.get() ?.getInputHandler() ?: focussedNode.get()) ?.handleEvent(UITextInputEvent(text))
+    inputTarget() ?.handleEvent(UITextInputEvent(text))
 }
+
+private fun UIScene.keyboardTarget(key: GLFWKey, modifiers: Set<GLFWKeyModifier>)
+        = focussedNode.get() ?.takeIf { it.getKeyboardHandler(key, modifiers) == it } ?: root.get() ?.getKeyboardHandler(key, modifiers)
+
+private fun UIScene.inputTarget()
+        = focussedNode.get() ?.takeIf { it.getInputHandler() == it } ?: root.get() ?.getInputHandler()
