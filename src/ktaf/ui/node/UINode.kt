@@ -9,32 +9,32 @@ import ktaf.ui.graphics.Background
 import ktaf.ui.graphics.Foreground
 import ktaf.ui.layout.*
 import ktaf.ui.scene.UIScene
-import ktaf.ui.scene.animate
+import ktaf.util.animate
 import lwjglkt.GLFWCursor
 import kotlin.properties.Delegates
 
 abstract class UINode {
     // structure
-    val children = KTAFMutableList<UINode>()
-    var ordering = KTAFMutableValue(Ordering())
-    val scene = KTAFMutableValue<UIScene?>(null)
-    val parent = KTAFMutableValue<UINode?>(null)
+    val children = KTAFList<UINode>()
+    var ordering = KTAFValue(Ordering())
+    val scene = KTAFValue<UIScene?>(null)
+    val parent = KTAFValue<UINode?>(null)
 
     // configuration
     val width = UIProperty<Float?>(null)
     val height = UIProperty<Float?>(null)
     val margin = UIProperty(Border(0f))
     val padding = UIProperty(Border(0f))
-    val layout = KTAFMutableValue<UILayout>(FillLayout())
-    val hotkeys = KTAFMutableList<Hotkey>()
+    val layout = KTAFValue<UILayout>(FillLayout())
+    val hotkeys = KTAFList<Hotkey>()
 
     // state
-    val state = KTAFMutableValue(listOf<UINodeState>())
-    val computedX = KTAFMutableValue(0f)
-    val computedY = KTAFMutableValue(0f)
-    val computedWidth = KTAFMutableValue(0f)
-    val computedHeight = KTAFMutableValue(0f)
-    val computedPosition = KTAFMutableValue(vec2(0f))
+    val state = KTAFValue(listOf<UINodeState>())
+    val computedX = KTAFValue(0f)
+    val computedY = KTAFValue(0f)
+    val computedWidth = KTAFValue(0f)
+    val computedHeight = KTAFValue(0f)
+    val computedPosition = KTAFValue(vec2(0f))
 
     // callbacks
     val onFocus = EventHandlerList<UIFocusEvent>()
@@ -161,16 +161,16 @@ abstract class UINode {
     // state
     internal var mouseInside = true
     internal var computedXInternal: Float by Delegates.observable(0f) { _, old, new ->
-        if (old != new) { scene.get()?.animate(this, ::computedX, new) }
+        if (old != new) { scene.get()?.animations?.animate(this, ::computedX, new) }
     }
     internal var computedYInternal: Float by Delegates.observable(0f) { _, old, new ->
-        if (old != new) { scene.get()?.animate(this, ::computedY, new) }
+        if (old != new) { scene.get()?.animations?.animate(this, ::computedY, new) }
     }
     internal var computedWidthInternal: Float by Delegates.observable(0f) { _, old, new ->
-        if (old != new) { scene.get()?.animate(this, ::computedWidth, new) }
+        if (old != new) { scene.get()?.animations?.animate(this, ::computedWidth, new) }
     }
     internal var computedHeightInternal: Float by Delegates.observable(0f) { _, old, new ->
-        if (old != new) { scene.get()?.animate(this, ::computedHeight, new) }
+        if (old != new) { scene.get()?.animations?.animate(this, ::computedHeight, new) }
     }
 }
 

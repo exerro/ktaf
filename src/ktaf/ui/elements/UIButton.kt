@@ -1,7 +1,6 @@
 package ktaf.ui.elements
 
 import ktaf.core.*
-import ktaf.graphics.Font
 import ktaf.ui.*
 import ktaf.ui.graphics.ColourBackground
 import ktaf.ui.graphics.TextForeground

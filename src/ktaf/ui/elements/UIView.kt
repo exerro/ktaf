@@ -2,7 +2,7 @@ package ktaf.ui.elements
 
 import ktaf.core.GLFWKey
 import ktaf.core.GLFWKeyModifier
-import ktaf.core.KTAFMutableValue
+import ktaf.core.KTAFValue
 import ktaf.core.vec2
 import ktaf.typeclass.minus
 import ktaf.ui.layout.ViewLayout
@@ -10,8 +10,8 @@ import ktaf.ui.layout.tl
 import ktaf.ui.node.UINode
 
 class UIView: UINode() {
-    val viewLayout = KTAFMutableValue(ViewLayout())
-    val active = KTAFMutableValue(null as UINode?)
+    val viewLayout = KTAFValue(ViewLayout())
+    val active = KTAFValue(null as UINode?)
 
     fun show(node: UINode) {
         active(node)

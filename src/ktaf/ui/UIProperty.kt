@@ -1,19 +1,19 @@
 package ktaf.ui
 
-import ktaf.core.KTAFMutableValue
+import ktaf.core.KTAFValue
 import ktaf.typeclass.Animateable
 import ktaf.ui.node.UINode
-import ktaf.ui.scene.animate
 import ktaf.util.Animation
 import ktaf.util.Easing
 import ktaf.util.EasingFunction
+import ktaf.util.animate
 
 typealias UINodeState = String
 const val DEFAULT_STATE: UINodeState = "default"
 
 open class UIProperty<T>(value: T,
         private val setter: UIProperty<T>.(T) -> Unit = { v -> stateValues.keys.map { this[it](v) } }
-): KTAFMutableValue<T>(value) {
+): KTAFValue<T>(value) {
     internal val stateValues: MutableMap<UINodeState, T> = mutableMapOf(DEFAULT_STATE to value)
     private var activeState = DEFAULT_STATE
 
@@ -41,11 +41,11 @@ open class UIProperty<T>(value: T,
 }
 
 class UIAnimatedProperty<T: Animateable<T>, out N: UINode>(value: T,
-        private val node: N,
-        private val property: String,
-        var duration: Float = Animation.NORMAL,
-        var easing: EasingFunction = Easing.SMOOTH,
-        setter: UIProperty<T>.(T) -> Unit = { v -> stateValues.keys.map { this[it](v) } }
+                                                           private val node: N,
+                                                           private val property: String,
+                                                           var duration: Float = Animation.NORMAL,
+                                                           var easing: EasingFunction = Easing.SMOOTH,
+                                                           setter: UIProperty<T>.(T) -> Unit = { v -> stateValues.keys.map { this[it](v) } }
 ): UIProperty<T>(value, setter) {
     override fun updateValue(value: T) {
         val scene = node.scene.get()
@@ -54,7 +54,7 @@ class UIAnimatedProperty<T: Animateable<T>, out N: UINode>(value: T,
             super.updateValue(value)
         }
         else {
-            scene.animate(node, property, this, value, duration, easing)
+            scene.animations.animate(node, property, this, value, duration, easing)
         }
     }
 }

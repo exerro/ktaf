@@ -1,10 +1,10 @@
 package ktaf.ui.layout
 
-import ktaf.core.KTAFMutableValue
+import ktaf.core.KTAFValue
 import ktaf.core.vec2
 
 class FillLayout: UILayout() {
-    val alignment = KTAFMutableValue(vec2(0f))
+    val alignment = KTAFValue(vec2(0f))
 
     override fun computeChildrenWidth(widthAllocatedForContent: Float): Lazy<Float> {
         // compute the width for each child where allocated width fills the area

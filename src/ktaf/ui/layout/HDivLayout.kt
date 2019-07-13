@@ -1,11 +1,11 @@
 package ktaf.ui.layout
 
-import ktaf.core.KTAFMutableValue
+import ktaf.core.KTAFValue
 import ktaf.core.vec2
 
 class HDivLayout: UILayout() {
-    val alignment = KTAFMutableValue(vec2(0.5f))
-    val spacing = KTAFMutableValue(0f) // TODO: use proper spacing
+    val alignment = KTAFValue(vec2(0.5f))
+    val spacing = KTAFValue(0f) // TODO: use proper spacing
 
     override fun computeChildrenWidth(widthAllocatedForContent: Float): Lazy<Float> {
         // compute the width for each child where allocated width fills the area divided evenly amongst children

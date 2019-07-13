@@ -1,11 +1,11 @@
 package ktaf.ui.layout
 
-import ktaf.core.KTAFMutableValue
+import ktaf.core.KTAFValue
 import ktaf.core.vec2
 
 class ListLayout : UILayout() {
-    val alignment = KTAFMutableValue(0.5f)
-    val spacing = KTAFMutableValue(Spacing.SPACE_AFTER)
+    val alignment = KTAFValue(0.5f)
+    val spacing = KTAFValue(Spacing.SPACE_AFTER)
 
     override fun computeChildrenWidth(widthAllocatedForContent: Float): Lazy<Float> {
         // compute the width for each child where allocated width fills the area

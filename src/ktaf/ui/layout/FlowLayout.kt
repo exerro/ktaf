@@ -1,13 +1,13 @@
 package ktaf.ui.layout
 
-import ktaf.core.KTAFMutableValue
+import ktaf.core.KTAFValue
 import ktaf.core.vec2
 import ktaf.ui.node.UINode
 
 class FlowLayout: UILayout() {
-    val horizontalSpacing = KTAFMutableValue(Spacing.SPACE_AFTER)
-    val verticalSpacing = KTAFMutableValue(Spacing.SPACE_AFTER)
-    val verticalAlignment = KTAFMutableValue(0.5f)
+    val horizontalSpacing = KTAFValue(Spacing.SPACE_AFTER)
+    val verticalSpacing = KTAFValue(Spacing.SPACE_AFTER)
+    val verticalAlignment = KTAFValue(0.5f)
 
     override fun begin(children: List<UINode>) {
         super.begin(children)

@@ -1,12 +1,6 @@
 package ktaf.core
 
-class KTAFValue<T>(
-        private val value: T
-) {
-    fun get(): T = value
-}
-
-open class KTAFMutableValue<T>(
+open class KTAFValue<T>(
         private var value: T
 ) {
     fun get(): T = value
@@ -19,20 +13,24 @@ open class KTAFMutableValue<T>(
         }
     }
 
-    fun connect(fn: (T) -> Unit) {
+    fun connect(fn: (T) -> Unit): (T) -> Unit {
         connections.add(fn)
+        return fn
     }
 
-    fun connectComparator(fn: (T, T) -> Unit) {
+    fun connectComparator(fn: (T, T) -> Unit): (T, T) -> Unit {
         connections2.add(fn)
+        return fn
     }
 
-    fun disconnect(fn: (T) -> Unit) {
+    fun disconnect(fn: (T) -> Unit): (T) -> Unit {
         connections.remove(fn)
+        return fn
     }
 
-    fun disconnectComparator(fn: (T, T) -> Unit) {
+    fun disconnectComparator(fn: (T, T) -> Unit): (T, T) -> Unit {
         connections2.remove(fn)
+        return fn
     }
 
     operator fun <TT: T> invoke(value: TT, init: TT.() -> Unit = {}): TT = set(value, init)
@@ -43,7 +41,7 @@ open class KTAFMutableValue<T>(
     private var connections2 = mutableListOf<(T, T) -> Any?>()
 }
 
-fun <T> KTAFMutableValue<T>.joinTo(other: KTAFMutableValue<T>) {
+fun <T> KTAFValue<T>.joinTo(other: KTAFValue<T>) {
     connect(other::setValue)
     other.connect(::setValue)
 }

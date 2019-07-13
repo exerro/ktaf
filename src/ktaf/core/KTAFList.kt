@@ -1,22 +1,6 @@
 package ktaf.core
 
 class KTAFList<T>(
-        private val value: List<T> = listOf()
-): List<T> {
-    override val size: Int get() = value.size
-    override fun contains(element: T): Boolean = value.contains(element)
-    override fun containsAll(elements: Collection<T>): Boolean = value.containsAll(elements)
-    override fun get(index: Int): T = value[index]
-    override fun indexOf(element: T): Int = value.indexOf(element)
-    override fun isEmpty(): Boolean = value.isEmpty()
-    override fun iterator(): Iterator<T> = value.iterator()
-    override fun lastIndexOf(element: T): Int = value.lastIndexOf(element)
-    override fun listIterator(): ListIterator<T> = value.listIterator()
-    override fun listIterator(index: Int): ListIterator<T> = value.listIterator(index)
-    override fun subList(fromIndex: Int, toIndex: Int): KTAFList<T> = KTAFList(value.subList(fromIndex, toIndex))
-}
-
-class KTAFMutableList<T>(
         private val value: MutableList<T> = mutableListOf()
 ): MutableList<T> {
     fun <TT: T> add(element: TT, init: TT.() -> Unit): TT {
@@ -74,7 +58,7 @@ class KTAFMutableList<T>(
     override fun listIterator(): MutableListIterator<T> = value.listIterator()
     override fun listIterator(index: Int): MutableListIterator<T> = value.listIterator(index)
     override fun removeAll(elements: Collection<T>): Boolean = elements.map { remove(it) } .any { it }
-    override fun subList(fromIndex: Int, toIndex: Int): KTAFMutableList<T> = KTAFMutableList(value.subList(fromIndex, toIndex))
+    override fun subList(fromIndex: Int, toIndex: Int): KTAFList<T> = KTAFList(value.subList(fromIndex, toIndex))
 
     override fun add(element: T): Boolean {
         value.add(element)

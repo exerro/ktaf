@@ -25,7 +25,7 @@ fun positionDemo(): UINode {
                 colour(rgba(1f, 0.1f))
 
                 children.add(UIButton("")) {
-                    val index = KTAFMutableValue(0)
+                    val index = KTAFValue(0)
 
                     width(96f)
                     height(32f)

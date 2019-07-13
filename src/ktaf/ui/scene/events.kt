@@ -5,14 +5,12 @@ import ktaf.typeclass.minus
 import ktaf.ui.*
 import ktaf.ui.layout.*
 import ktaf.ui.node.absolutePosition
+import ktaf.util.update
 import lwjglkt.GLFWCursor
 import lwjglkt.setCursor
 
 fun UIScene.update(dt: Float) {
-    for ((_, m) in animations) for ((_, animation) in m)
-        animation.update(dt)
-
-    animations.map { (node, m) -> node to m.filterValues { !it.finished() } }
+    animations.update(dt)
 
     root.get()?.let {
         it.layout.get().beginPositioning(it)

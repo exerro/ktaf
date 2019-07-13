@@ -5,12 +5,13 @@ import ktaf.graphics.DrawContext2D
 import ktaf.ui.UIFocusEvent
 import ktaf.ui.UIUnFocusEvent
 import ktaf.ui.node.UINode
-import ktaf.util.Animation
+import ktaf.util.Animations
 import lwjglkt.GLFWDisplay
 
 class UIScene(val display: GLFWDisplay, val context: DrawContext2D) {
-    val root = KTAFMutableValue<UINode?>(null)
-    val focussedNode = KTAFMutableValue<UINode?>(null)
+    val root = KTAFValue<UINode?>(null)
+    val focussedNode = KTAFValue<UINode?>(null)
+    val animations = Animations()
 
     init {
         focussedNode.connectComparator { old, new ->
@@ -28,7 +29,6 @@ class UIScene(val display: GLFWDisplay, val context: DrawContext2D) {
     internal var firstRelativeMouseLocation = vec2(0f)
     internal var lastRelativeMouseLocation = vec2(0f)
     internal var mouseModifiers = setOf<GLFWMouseModifier>()
-    internal val animations: MutableMap<Any, MutableMap<String, Animation<*>>> = mutableMapOf()
 
     internal val updater by lazy { { _: Application, dt: Float -> update(dt) } }
     internal val drawer by lazy { { _: Application -> draw() } }

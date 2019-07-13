@@ -1,14 +1,13 @@
 package ktaf.ui.layout
 
-import ktaf.core.KTAFMutableValue
+import ktaf.core.KTAFValue
 import ktaf.core.vec2
-import ktaf.typeclass.minus
 import ktaf.typeclass.plus
 import ktaf.ui.node.UINode
 
 // TODO: this needs better documenting
 class AreaLayout: UILayout() {
-    val alignment = KTAFMutableValue(vec2(0.5f))
+    val alignment = KTAFValue(vec2(0.5f))
 
     fun areas(fn: Area.() -> Any?) { fn(area) }
     fun elem(node: UINode, area: String) { elements[node] = area }
@@ -47,14 +46,14 @@ class AreaLayout: UILayout() {
 
 // TODO: this needs better documenting
 class Area {
-    val topPercentage = KTAFMutableValue(0f)
-    val topPixels = KTAFMutableValue(0f)
-    val rightPercentage = KTAFMutableValue(100f)
-    val rightPixels = KTAFMutableValue(0f)
-    val bottomPercentage = KTAFMutableValue(100f)
-    val bottomPixels = KTAFMutableValue(0f)
-    val leftPercentage = KTAFMutableValue(0f)
-    val leftPixels = KTAFMutableValue(0f)
+    val topPercentage = KTAFValue(0f)
+    val topPixels = KTAFValue(0f)
+    val rightPercentage = KTAFValue(100f)
+    val rightPixels = KTAFValue(0f)
+    val bottomPercentage = KTAFValue(100f)
+    val bottomPixels = KTAFValue(0f)
+    val leftPercentage = KTAFValue(0f)
+    val leftPixels = KTAFValue(0f)
 
     fun top(value: Value) {
         topPercentage(value.percentage)

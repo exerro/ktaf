@@ -1,13 +1,13 @@
 package ktaf.ui.layout
 
-import ktaf.core.KTAFMutableValue
+import ktaf.core.KTAFValue
 import ktaf.core.vec2
 import ktaf.ui.node.UINode
 
 class ViewLayout: UILayout() {
-    val alignment = KTAFMutableValue(vec2(0f))
-    val locationX = KTAFMutableValue(0)
-    val locationY = KTAFMutableValue(0)
+    val alignment = KTAFValue(vec2(0f))
+    val locationX = KTAFValue(0)
+    val locationY = KTAFValue(0)
 
     fun location(node: UINode, x: Int, y: Int) {
         locations[node] = Pair(x, y)
