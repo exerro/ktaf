@@ -10,25 +10,20 @@ import ktaf.ui.typeclass.Clickable
 import ktaf.util.Animation
 import lwjglkt.GLFWCursor
 
-class UIButton(text: String): UINode(), Clickable {
+class UILabel(text: String, target: Clickable? = null): UINode() {
     private var background = addBackground(ColourBackground())
-    private var foregroundText = addForeground(TextForeground(text))
+    private var foregroundText = addForeground(TextForeground(text, alignment = vec2(0f, 0.5f), colour = rgba(0f)))
 
-    val onClick = EventHandlerList<UIEvent>()
+    val target = KTAFValue(target)
     var text = UIProperty(foregroundText.text)
     var textColour = UIAnimatedProperty(foregroundText.colour, this, "textColour", duration = Animation.QUICK)
     var font = UIProperty(foregroundText.font)
     var colour = UIAnimatedProperty(background.colour, this, "colour", duration = Animation.QUICK) {
         this[DEFAULT_STATE](it)
         this[HOVER](it.lighten())
-        this[PRESSED](it.darken())
     }
 
-    override fun cursor(): GLFWCursor? = GLFWCursor.POINTER
-
-    override fun click(event: UIEvent) {
-        onClick.trigger(event)
-    }
+    override fun cursor(): GLFWCursor? = GLFWCursor.POINTER.takeIf { target.get() != null }
 
     init {
         propertyState(colour)
@@ -41,19 +36,10 @@ class UIButton(text: String): UINode(), Clickable {
         textColour.connect { colour -> foregroundText = replaceForeground(foregroundText, foregroundText.copy(colour = colour)) }
         font.connect { font -> foregroundText = replaceForeground(foregroundText, foregroundText.copy(font = font)) }
 
-        onKeyPress { onClick.trigger(it) }
-        onMouseClick { onClick.trigger(it) }
-        onMousePress { state.push(PRESSED) }
-        onMouseRelease { state.remove(PRESSED) }
+        onKeyPress { this.target.get()?.click(it) }
+        onMouseClick { this.target.get()?.click(it) }
 
-        onMouseEnter { state.push(HOVER) }
-        onMouseExit { state.remove(HOVER) }
-
-        colour(Colour.blue)
+        colour(rgba(1f, 0f))
         padding(Border(8f, 16f))
-    }
-
-    companion object {
-        const val PRESSED = "pressed"
     }
 }

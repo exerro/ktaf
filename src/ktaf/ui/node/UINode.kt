@@ -90,6 +90,8 @@ abstract class UINode {
     open fun getInputHandler(): UINode?
             = children.reversed().firstNotNull { it.getInputHandler() } ?: this.takeIf { handlesInput() }
 
+    open fun cursor(): GLFWCursor? = GLFWCursor.DEFAULT
+
     protected fun <T> propertyState(property: UIProperty<T>) {
         state.connect { property.setState(state.current()) }
     }
@@ -122,13 +124,15 @@ abstract class UINode {
             child.parent.set(null)
             child.scene.set(null)
         }
+
+        onMouseEnter { state.push(HOVER) }
+        onMouseExit { state.remove(HOVER) }
     }
 
     // configuration internals
     internal val foregroundsInternal = mutableListOf<Foreground>()
     internal val backgroundsInternal = mutableListOf<Background>()
     internal open var fillSize = true // whether the node should fill allocated size when positioning
-    internal open val cursor: GLFWCursor? = GLFWCursor.DEFAULT
 
     // state
     internal var computedXInternal: Float by Delegates.observable(0f) { _, old, new ->
@@ -142,6 +146,10 @@ abstract class UINode {
     }
     internal var computedHeightInternal: Float by Delegates.observable(0f) { _, old, new ->
         if (old != new) { scene.get()?.animations?.animate(this, ::computedHeight, new) }
+    }
+
+    companion object {
+        const val HOVER = "hover"
     }
 }
 

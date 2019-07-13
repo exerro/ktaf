@@ -28,7 +28,7 @@ fun UIScene.update(dt: Float) {
 }
 
 fun UIScene.draw() {
-    display.setCursor(focussedNodeHover?.cursor ?: GLFWCursor.DEFAULT)
+    display.setCursor(focussedNodeHover?.cursor() ?: GLFWCursor.DEFAULT)
 
     root.get()?.let {
         it.draw(context, it.margin.get().tl,

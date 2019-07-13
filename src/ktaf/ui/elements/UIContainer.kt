@@ -1,8 +1,7 @@
 package ktaf.ui.elements
 
-import ktaf.core.RGBA
 import ktaf.core.rgba
-import ktaf.ui.*
+import ktaf.ui.UIAnimatedProperty
 import ktaf.ui.graphics.ColourBackground
 import ktaf.ui.node.UINode
 import ktaf.ui.node.addBackground
@@ -12,7 +11,7 @@ import lwjglkt.GLFWCursor
 class UIContainer: UINode() {
     private var background = addBackground(ColourBackground(rgba(1f, 0.02f)))
 
-    override val cursor: GLFWCursor? = null
+    override fun cursor(): GLFWCursor? = null
 
     var colour = UIAnimatedProperty(background.colour, this, "colour")
 

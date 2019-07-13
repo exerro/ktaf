@@ -42,7 +42,7 @@ class FNTFont internal constructor(
     override fun getCharOffset(char: Char): vec2 = charOffsets[char] ?: vec2(0f)
     override fun getCharAdvance(char: Char): Float = charAdvances[char] ?: 0f
     override fun getKerning(char1: Char, char2: Char): Float = charKernings[char1]?.get(char2) ?: 0f
-    override fun getVAO(char: Char): GLVAO = charVAOs[char]!!
+    override fun getVAO(char: Char): GLVAO = charVAOs[char] ?: error("No VAO for char '$char'")
     override fun getVAOVertexCount(char: Char) = 6
     override fun getTexture(char: Char): GLTexture2? = charTextures[char]
 

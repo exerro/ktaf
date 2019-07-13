@@ -17,3 +17,9 @@ fun RGBA.rgb() = rgb(x, y, z)
 
 fun RGBA.darken() = this * 0.9f
 fun RGBA.lighten() = this / 0.9f
+
+object Colour {
+    val blue = rgba(0.27f, 0.54f, 0.81f)
+    val orange = rgba(0.90f, 0.40f, 0.20f)
+    val purple = rgba(0.40f, 0.20f, 0.60f)
+}
