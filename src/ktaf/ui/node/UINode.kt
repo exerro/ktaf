@@ -31,6 +31,7 @@ open class UINode {
 
     // state
     val state = KTAFValue(listOf<UINodeState>())
+    val focussed = KTAFValue(false)
     val computedX = KTAFValue(0f)
     val computedY = KTAFValue(0f)
     val computedWidth = KTAFValue(0f)
@@ -145,10 +146,8 @@ open class UINode {
         propertyState(margin)
         propertyState(padding)
 
-        scene.connect { scene ->
-            children.forEach { it.scene.set(scene) }
-        }
-
+        scene.connect { scene -> children.forEach { it.scene.set(scene) } }
+        focussed.connect { if (it) scene.get()?.focussedNode?.set(this) }
         computedX.connect { computedPosition.set(vec2(it, computedY.get())) }
         computedY.connect { computedPosition.set(vec2(computedX.get(), it)) }
 

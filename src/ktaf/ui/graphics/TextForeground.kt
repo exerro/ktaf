@@ -14,10 +14,11 @@ data class TextForeground(
         val text: String,
         val colour: RGBA = rgba(1f),
         val alignment: vec2 = vec2(0.5f),
-        val font: Font = Font.DEFAULT_FONT.scaleTo(16f)
+        val font: Font = Font.DEFAULT_FONT.scaleTo(16f),
+        val wrap: Boolean = true
 ): Foreground() {
     override fun draw(context: DrawContext2D, position: vec2, size: vec2) {
-        val lines = wrapText(text, font, size.x)
+        val lines = if (wrap) wrapText(text, font, size.x) else listOf(text.replace("\n", " "))
         var y = position.y + (size.y - lines.size * font.height) * alignment.y
 
         context.colour = colour
@@ -31,12 +32,11 @@ data class TextForeground(
     }
 
     override fun computeWidth(): Float? {
-        return text.split("\n").map { font.widthOf(it) + 1 } .fold(0f, ::max)
+        return if (wrap) text.split("\n").map { font.widthOf(it) + 1 } .fold(0f, ::max)
+             else font.widthOf(text.replace("\n", " "))
     }
 
     override fun computeHeight(width: Float): Float? {
-        return wrapText(text, font, width).size * font.height
+        return if (wrap) wrapText(text, font, width).size * font.height else font.height
     }
-
-    // TODO: override fun getHeight(width: Float): Float? = height of wrapped text
 }

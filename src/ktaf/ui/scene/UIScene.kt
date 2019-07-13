@@ -18,6 +18,8 @@ class UIScene(val display: GLFWDisplay, val context: DrawContext2D) {
         focussedNode.connectComparator { old, new ->
             old?.handleEvent(UIUnFocusEvent(new))
             new?.handleEvent(UIFocusEvent(old))
+            old?.focussed?.set(false)
+            new?.focussed?.set(true)
         }
 
         root.connectComparator { old, new ->

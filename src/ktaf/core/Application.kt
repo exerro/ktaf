@@ -99,7 +99,7 @@ private fun setup(title: String, width: Int, height: Int): Application {
     }
 
     GLFW.glfwSetCharCallback(display.windowID) { _, codepoint ->
-        app.onTextInputCallbacks.map { it(Character.toChars(codepoint).toString()) }
+        app.onTextInputCallbacks.map { it(String(Character.toChars(codepoint))) }
     }
 
     GLFW.glfwSetCursorPosCallback(display.windowID) { _, xr, yr ->
