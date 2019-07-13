@@ -35,14 +35,15 @@ fun main() = application("UI Graphics") {
                         colour(rgba(0.9f, 0.4f, 0.2f))
 
                         onClick { outer.parent(null) }
-                        onMouseEnter.connect { outer.colour(rgba(1f, 0.15f)) }
-                        onMouseExit.connect { outer.colour(rgba(1f, 0.1f)) }
 
                         container.children.connectChanged { index(container.children.indexOf(outer) + 1) }
                         index.connect { text("Button $it") }
                         index.connect { colour(if (it % 2 == 0) rgba(0.9f, 0.4f, 0.2f) else rgba(0.4f, 0.2f, 0.6f)) }
                         index(container.children.indexOf(outer) + 1)
                     }
+
+                    onMouseEnter.connect { colour(rgba(1f, if (it.target) 0.2f else 0.15f)) }
+                    onMouseExit.connect { colour(rgba(1f, 0.1f)) }
 
                     layout(FillLayout()) {
                         alignment(vec2(0.5f))

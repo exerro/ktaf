@@ -73,9 +73,14 @@ fun UIScene.mouseMoved(position: vec2, last: vec2) {
         ))
 
         if (previousFocussedNode != currentFocussedNode) {
+            val inside = generateSequence(currentFocussedNode?.parent?.get()) { it.parent.get() }
+            val oldParents = generateSequence(previousFocussedNode?.parent?.get()) { it.parent.get() }
+
             focussedNodeHover = currentFocussedNode
-            previousFocussedNode?.handleEvent(UIMouseExitEvent(position - previousFocussedNode.absolutePosition()))
-            currentFocussedNode?.handleEvent(UIMouseEnterEvent(position - currentFocussedNode.absolutePosition()))
+            previousFocussedNode?.handleEvent(UIMouseExitEvent(true, position - previousFocussedNode.absolutePosition()))
+            (oldParents - inside - previousFocussedNode).forEach { it?.handleEvent(UIMouseExitEvent(false, position - it.absolutePosition())) }
+            currentFocussedNode?.handleEvent(UIMouseEnterEvent(true, position - currentFocussedNode.absolutePosition()))
+            (inside - oldParents - currentFocussedNode).forEach { it?.handleEvent(UIMouseEnterEvent(false, position - it.absolutePosition())) }
         }
     }
 }
