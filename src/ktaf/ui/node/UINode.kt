@@ -26,6 +26,7 @@ abstract class UINode {
     val margin = UIProperty(Border(0f))
     val padding = UIProperty(Border(0f))
     val layout = KTAFMutableValue<UILayout>(FillLayout())
+    val hotkeys = KTAFMutableList<Hotkey>()
 
     // state
     val state = KTAFMutableValue(DEFAULT_STATE)
@@ -77,11 +78,17 @@ abstract class UINode {
             =  children.reversed().firstNotNull { it.getMouseHandler(position - padding.get().tl - it.computedPosition.get()) }
             ?: this.takeIf { position.x >= 0 && position.y >= 0 && position.x < computedWidth.get() && position.y < computedHeight.get() }
 
+    open fun handlesKey(key: GLFWKey, modifiers: Set<GLFWKeyModifier>): Boolean
+            = hotkeys.any { it.matches(key, modifiers) }
+
     open fun getKeyboardHandler(key: GLFWKey, modifiers: Set<GLFWKeyModifier>): UINode?
-            = children.reversed().firstNotNull { it.getKeyboardHandler(key, modifiers) }
+            = children.reversed().firstNotNull { it.getKeyboardHandler(key, modifiers) } ?: this.takeIf { handlesKey(key, modifiers) }
+
+    open fun handlesInput(): Boolean
+            = false
 
     open fun getInputHandler(): UINode?
-            = children.reversed().firstNotNull { it.getInputHandler() }
+            = children.reversed().firstNotNull { it.getInputHandler() } ?: this.takeIf { handlesInput() }
 
     open fun handleEvent(event: UIEvent) {
         when (event) {

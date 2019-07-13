@@ -18,11 +18,7 @@ class UIButton(text: String): UINode() {
     var textColour = UIAnimatedProperty(foregroundText.colour, this, "textColour", duration = Animation.QUICK)
     var colour = UIAnimatedProperty(background.colour, this, "colour", duration = Animation.QUICK)
     var font = UIProperty(foregroundText.font)
-    val hotkeys = KTAFMutableList<Hotkey>()
     val onClick = EventHandlerList<UIEvent>()
-
-    override fun getKeyboardHandler(key: GLFWKey, modifiers: Set<GLFWKeyModifier>): UINode?
-            = this.takeIf { hotkeys.any { it.matches(key, modifiers) } }
 
     init {
         state.connect(colour::setState)
@@ -35,8 +31,8 @@ class UIButton(text: String): UINode() {
             background = replaceBackground(background, background.copy(colour = colour))
         }
 
-        this.text.connect { text ->
-            foregroundText = replaceForeground(foregroundText, foregroundText.copy(text = text))
+        this.text.connect { t ->
+            foregroundText = replaceForeground(foregroundText, foregroundText.copy(text = t))
         }
 
         textColour.connect { colour ->
