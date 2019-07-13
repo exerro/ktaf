@@ -1,6 +1,7 @@
 package ktaf.ui.elements
 
 import ktaf.core.*
+import ktaf.graphics.Font
 import ktaf.ui.*
 import ktaf.ui.graphics.ColourBackground
 import ktaf.ui.graphics.TextForeground
@@ -9,23 +10,26 @@ import ktaf.util.Animation
 import lwjglkt.GLFWCursor
 
 class UIButton(text: String): UINode() {
-    private var background = addBackground(ColourBackground(rgba(0.3f, 0.6f, 0.9f)))
+    private var background = addBackground(ColourBackground())
     private var foregroundText = addForeground(TextForeground(text))
 
     override val cursor: GLFWCursor? = GLFWCursor.POINTER
 
     var text = UIProperty(foregroundText.text)
     var textColour = UIAnimatedProperty(foregroundText.colour, this, "textColour", duration = Animation.QUICK)
-    var colour = UIAnimatedProperty(background.colour, this, "colour", duration = Animation.QUICK)
+    var colour = UIAnimatedProperty(background.colour, this, "colour", duration = Animation.QUICK) {
+        this[DEFAULT_STATE](it)
+        this[HOVER](it.lighten())
+        this[PRESSED](it.darken())
+    }
     var font = UIProperty(foregroundText.font)
     val onClick = EventHandlerList<UIEvent>()
 
     init {
-        state.connect(colour::setState)
-        state.connect(this.text::setState)
-        state.connect(textColour::setState)
-        state.connect(font::setState)
-        colour["hover"](rgba(0.4f, 0.7f, 1f))
+        propertyState(colour)
+        propertyState(this.text)
+        propertyState(textColour)
+        propertyState(font)
 
         colour.connect { colour ->
             background = replaceBackground(background, background.copy(colour = colour))
@@ -45,8 +49,17 @@ class UIButton(text: String): UINode() {
 
         onKeyPress { onClick.trigger(it) }
         onMouseClick { onClick.trigger(it) }
+        onMousePress { state.push(PRESSED) }
+        onMouseRelease { state.remove(PRESSED) }
 
-        onMouseEnter { state("hover") }
-        onMouseExit { state.clear() }
+        onMouseEnter { state.push(HOVER) }
+        onMouseExit { state.remove(HOVER) }
+
+        colour(rgba(0.27f, 0.54f, 0.81f))
+    }
+
+    companion object {
+        const val PRESSED = "pressed"
+        const val HOVER = "hover"
     }
 }

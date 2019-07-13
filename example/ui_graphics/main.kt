@@ -27,19 +27,21 @@ fun main() = application("UI Graphics") {
 
                     colour(rgba(1f, 0.1f))
 
-                    children.add(UIButton("Button ${children.size}")) {
+                    children.add(UIButton("")) {
+                        val index = KTAFMutableValue(0)
+
                         width(96f)
                         height(32f)
                         colour(rgba(0.9f, 0.4f, 0.2f))
-                        colour["hover"](rgba(0.8f, 0.3f, 0.1f))
 
                         onClick { outer.parent(null) }
                         onMouseEnter.connect { outer.colour(rgba(1f, 0.15f)) }
                         onMouseExit.connect { outer.colour(rgba(1f, 0.1f)) }
 
-                        container.children.connectChanged {
-                            text("Button ${container.children.indexOf(outer) + 1}")
-                        }
+                        container.children.connectChanged { index(container.children.indexOf(outer) + 1) }
+                        index.connect { text("Button $it") }
+                        index.connect { colour(if (it % 2 == 0) rgba(0.9f, 0.4f, 0.2f) else rgba(0.4f, 0.2f, 0.6f)) }
+                        index(container.children.indexOf(outer) + 1)
                     }
 
                     layout(FillLayout()) {
@@ -59,7 +61,7 @@ fun main() = application("UI Graphics") {
             }
 
             val toggleExpand = children.add(UIButton("TOGGLE EXPAND")) {
-                hotkeys.add(Hotkey(GLFW.GLFW_KEY_T))
+                hotkeys.add(Hotkey(GLFW.GLFW_KEY_E))
                 onClick {
                     sizeGiven = !sizeGiven
                     buttons.children.forEach {
@@ -90,12 +92,14 @@ fun main() = application("UI Graphics") {
                 children.add(UIButton("FILL LAYOUT")) {
                     colour(rgba(0.9f, 0.3f, 0.6f))
                     height(32f)
+                    hotkeys.add(Hotkey(GLFW.GLFW_KEY_F))
                     onClick { buttons.layout(FillLayout()) }
                 }
 
                 children.add(UIButton("LIST LAYOUT")) {
                     colour(rgba(0.9f, 0.3f, 0.6f))
                     height(32f)
+                    hotkeys.add(Hotkey(GLFW.GLFW_KEY_L))
                     onClick { buttons.layout(ListLayout()) }
                 }
 
@@ -156,6 +160,7 @@ fun main() = application("UI Graphics") {
                 children.add(UIButton("FLOW LAYOUT")) {
                     colour(rgba(0.9f, 0.3f, 0.6f))
                     height(32f)
+                    hotkeys.add(Hotkey(GLFW.GLFW_KEY_F, GLFWKeyModifier.CTRL))
                     onClick { buttons.layout(FlowLayout()) }
                 }
 
@@ -234,6 +239,7 @@ fun main() = application("UI Graphics") {
                 children.add(UIButton("GRID LAYOUT")) {
                     colour(rgba(0.9f, 0.3f, 0.6f))
                     height(32f)
+                    hotkeys.add(Hotkey(GLFW.GLFW_KEY_G))
                     onClick { buttons.layout(GridLayout()) }
                 }
 

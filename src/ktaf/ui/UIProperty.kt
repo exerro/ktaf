@@ -11,14 +11,16 @@ import ktaf.util.EasingFunction
 typealias UINodeState = String
 const val DEFAULT_STATE: UINodeState = "default"
 
-open class UIProperty<T>(value: T): KTAFMutableValue<T>(value) {
-    private val stateValues: MutableMap<UINodeState, T> = mutableMapOf(DEFAULT_STATE to value)
+open class UIProperty<T>(value: T,
+        private val setter: UIProperty<T>.(T) -> Unit = { v -> stateValues.keys.map { this[it](v) } }
+): KTAFMutableValue<T>(value) {
+    internal val stateValues: MutableMap<UINodeState, T> = mutableMapOf(DEFAULT_STATE to value)
     private var activeState = DEFAULT_STATE
 
     fun setState(state: UINodeState) {
         if (activeState != state) {
             activeState = state
-            stateValues[state]?.let(::updateValue)
+            (stateValues[state] ?: stateValues[DEFAULT_STATE]) ?. let(::updateValue)
         }
     }
 
@@ -33,17 +35,18 @@ open class UIProperty<T>(value: T): KTAFMutableValue<T>(value) {
 
     override fun <TT : T> set(value: TT, init: TT.() -> Unit): TT {
         init(value)
-        stateValues.keys.map { this[it](value) }
+        setter(value)
         return value
     }
 }
 
-class UIAnimatedProperty<T: Animateable<T>, N: UINode>(value: T,
-                                                       private val node: N,
-                                                       private val property: String,
-                                                       var duration: Float = Animation.NORMAL,
-                                                       var easing: EasingFunction = Easing.SMOOTH
-): UIProperty<T>(value) {
+class UIAnimatedProperty<T: Animateable<T>, out N: UINode>(value: T,
+        private val node: N,
+        private val property: String,
+        var duration: Float = Animation.NORMAL,
+        var easing: EasingFunction = Easing.SMOOTH,
+        setter: UIProperty<T>.(T) -> Unit = { v -> stateValues.keys.map { this[it](v) } }
+): UIProperty<T>(value, setter) {
     override fun updateValue(value: T) {
         val scene = node.scene.get()
 
@@ -55,5 +58,3 @@ class UIAnimatedProperty<T: Animateable<T>, N: UINode>(value: T,
         }
     }
 }
-
-fun KTAFMutableValue<UINodeState>.clear() = set(DEFAULT_STATE)

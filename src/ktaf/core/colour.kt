@@ -14,3 +14,6 @@ fun rgba(c: String): RGBA = rgba(c.drop(1).toInt(16))
 
 fun RGB.rgba(a: Float = 1f) = rgba(x, y, z, a)
 fun RGBA.rgb() = rgb(x, y, z)
+
+fun RGBA.darken() = this * 0.9f
+fun RGBA.lighten() = this / 0.9f

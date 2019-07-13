@@ -29,7 +29,7 @@ abstract class UINode {
     val hotkeys = KTAFMutableList<Hotkey>()
 
     // state
-    val state = KTAFMutableValue(DEFAULT_STATE)
+    val state = KTAFMutableValue(listOf<UINodeState>())
     val computedX = KTAFMutableValue(0f)
     val computedY = KTAFMutableValue(0f)
     val computedWidth = KTAFMutableValue(0f)
@@ -131,11 +131,15 @@ abstract class UINode {
         }
     }
 
+    protected fun <T> propertyState(property: UIProperty<T>) {
+        state.connect { property.setState(state.current()) }
+    }
+
     init {
-        state.connect(width::setState)
-        state.connect(height::setState)
-        state.connect(margin::setState)
-        state.connect(padding::setState)
+        propertyState(width)
+        propertyState(height)
+        propertyState(margin)
+        propertyState(padding)
 
         scene.connect { scene ->
             children.forEach { it.scene.set(scene) }

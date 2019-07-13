@@ -1,5 +1,6 @@
 package ktaf.ui.elements
 
+import ktaf.core.RGBA
 import ktaf.core.rgba
 import ktaf.ui.*
 import ktaf.ui.graphics.ColourBackground
@@ -16,7 +17,7 @@ class UIContainer: UINode() {
     var colour = UIAnimatedProperty(background.colour, this, "colour")
 
     init {
-        state.connect(colour::setState)
+        propertyState(colour)
 
         colour.connect { colour ->
             background = replaceBackground(background, background.copy(colour = colour))
