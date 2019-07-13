@@ -1,6 +1,5 @@
 
 import ktaf.core.application
-import ktaf.core.vec2
 import ktaf.graphics.DrawContext2D
 import ktaf.ui.Hotkey
 import ktaf.ui.UIMouseClickEvent
@@ -45,9 +44,9 @@ fun main() = application("Hello world") {
                 (1 .. 5).map { content.addButton() }
 
                 layout(FlowLayout()) {
-                    horizontalSpacing(Spacing2.SPACE_EVENLY)
-                    verticalSpacing(Spacing2.fixed(50f) then Spacing2.align(0.3f))
-//                    spacing(Spacing2.fixed(20f) then Spacing2.SPACE_BEFORE)
+                    horizontalSpacing(Spacing.SPACE_EVENLY)
+                    verticalSpacing(Spacing.fixed(50f) then Spacing.align(0.3f))
+//                    spacing(Spacing.fixed(20f) then Spacing.SPACE_BEFORE)
 //                    spacing(vec2(20f, 10f))
 //                    columns(2)
 //                    rows(6)

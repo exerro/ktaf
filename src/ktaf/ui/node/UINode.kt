@@ -35,6 +35,23 @@ abstract class UINode {
     val computedHeight = KTAFMutableValue(0f)
     val computedPosition = KTAFMutableValue(vec2(0f))
 
+    // callbacks
+    val onFocus = EventHandlerList<UIFocusEvent>()
+    val onUnFocus = EventHandlerList<UIUnFocusEvent>()
+    val onMouseEvent = EventHandlerList<UIMouseEvent>()
+    val onMouseButtonEvent = EventHandlerList<UIMouseButtonEvent>()
+    val onMouseEnter = EventHandlerList<UIMouseEnterEvent>()
+    val onMouseExit = EventHandlerList<UIMouseExitEvent>()
+    val onMousePress = EventHandlerList<UIMousePressEvent>()
+    val onMouseRelease = EventHandlerList<UIMouseReleaseEvent>()
+    val onMouseClick = EventHandlerList<UIMouseClickEvent>()
+    val onMouseMove = EventHandlerList<UIMouseMoveEvent>()
+    val onMouseDrag = EventHandlerList<UIMouseDragEvent>()
+    val onKeyEvent = EventHandlerList<UIKeyEvent>()
+    val onKeyPress = EventHandlerList<UIKeyPressEvent>()
+    val onKeyRelease = EventHandlerList<UIKeyReleaseEvent>()
+    val onTextInput = EventHandlerList<UITextInputEvent>()
+
     open fun computeHeight(width: Float) = height.get()
 
     open fun update(dt: Float) {}
@@ -136,23 +153,6 @@ abstract class UINode {
             child.scene.set(null)
         }
     }
-
-    // callbacks
-    internal val onFocus = EventHandlerList<UIFocusEvent>()
-    internal val onUnFocus = EventHandlerList<UIUnFocusEvent>()
-    internal val onMouseEvent = EventHandlerList<UIMouseEvent>()
-    internal val onMouseButtonEvent = EventHandlerList<UIMouseButtonEvent>()
-    internal val onMouseEnter = EventHandlerList<UIMouseEnterEvent>()
-    internal val onMouseExit = EventHandlerList<UIMouseExitEvent>()
-    internal val onMousePress = EventHandlerList<UIMousePressEvent>()
-    internal val onMouseRelease = EventHandlerList<UIMouseReleaseEvent>()
-    internal val onMouseClick = EventHandlerList<UIMouseClickEvent>()
-    internal val onMouseMove = EventHandlerList<UIMouseMoveEvent>()
-    internal val onMouseDrag = EventHandlerList<UIMouseDragEvent>()
-    internal val onKeyEvent = EventHandlerList<UIKeyEvent>()
-    internal val onKeyPress = EventHandlerList<UIKeyPressEvent>()
-    internal val onKeyRelease = EventHandlerList<UIKeyReleaseEvent>()
-    internal val onTextInput = EventHandlerList<UITextInputEvent>()
 
     // configuration internals
     internal val foregroundsInternal = mutableListOf<Foreground>()

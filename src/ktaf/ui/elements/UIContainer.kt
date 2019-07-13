@@ -9,7 +9,7 @@ import ktaf.ui.node.replaceBackground
 import lwjglkt.GLFWCursor
 
 class UIContainer: UINode() {
-    private var background = addBackground(ColourBackground(rgba(1f, 0.1f)))
+    private var background = addBackground(ColourBackground(rgba(1f, 0.02f)))
 
     override val cursor: GLFWCursor? = null
 

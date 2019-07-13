@@ -48,7 +48,7 @@ fun UILayout.computeWidthFor(node: UINode, widthAllocated: Float) {
     val contentWidth by computeChildrenWidth(widthAllocatedInternal)
     // update the node's width
     node.computedWidthInternal = node.width.get()
-            ?: if (node.fillSize) widthAllocated - node.margin.get().width else contentWidth + node.padding.get().width
+            ?: if (node.fillSize) widthAllocated else contentWidth + node.padding.get().width
 }
 
 /**
@@ -67,7 +67,7 @@ fun UILayout.computeHeightFor(node: UINode, heightAllocated: Float?) {
             heightAllocatedInternalPlusPadding ?.let { it - node.padding.get().height }
     )
     node.computedHeightInternal = computedHeight
-            ?: heightAllocated.takeIf { node.fillSize } ?.let { it - node.margin.get().height } ?: contentHeight + node.padding.get().height
+            ?: heightAllocated.takeIf { node.fillSize } ?: contentHeight + node.padding.get().height
 }
 
 /**

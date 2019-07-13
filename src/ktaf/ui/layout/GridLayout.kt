@@ -4,11 +4,11 @@ import ktaf.core.KTAFMutableValue
 import ktaf.core.vec2
 import kotlin.math.max
 
-class GridLayout: UILayout() {
+class GridLayout(rows: Int = 2, columns: Int = 2): UILayout() {
     val alignment = KTAFMutableValue(vec2(0.5f))
     val spacing = KTAFMutableValue(vec2(0f)) // TODO: use proper spacing
-    val columns = KTAFMutableValue(1)
-    val rows = KTAFMutableValue(1)
+    val columns = KTAFMutableValue(columns)
+    val rows = KTAFMutableValue(rows)
 
     override fun computeChildrenWidth(widthAllocatedForContent: Float): Lazy<Float> {
         // compute the width for each child where allocated width fills the area divided into `columns` columns

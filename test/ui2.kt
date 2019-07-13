@@ -66,7 +66,7 @@ import ktaf.ui.scene.scene
 //                }
 //
 //                layout(ListLayout()) {
-//                    spacing(Spacing2.fixed(24f) then Spacing2.SPACE_AROUND)
+//                    spacing(Spacing.fixed(24f) then Spacing.SPACE_AROUND)
 //                }
 //            })
 //

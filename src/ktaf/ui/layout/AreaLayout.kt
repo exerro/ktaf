@@ -49,9 +49,9 @@ class AreaLayout: UILayout() {
 class Area {
     val topPercentage = KTAFMutableValue(0f)
     val topPixels = KTAFMutableValue(0f)
-    val rightPercentage = KTAFMutableValue(0f)
+    val rightPercentage = KTAFMutableValue(100f)
     val rightPixels = KTAFMutableValue(0f)
-    val bottomPercentage = KTAFMutableValue(0f)
+    val bottomPercentage = KTAFMutableValue(100f)
     val bottomPixels = KTAFMutableValue(0f)
     val leftPercentage = KTAFMutableValue(0f)
     val leftPixels = KTAFMutableValue(0f)
@@ -103,21 +103,21 @@ class Area {
 
     fun split(label: String, vararg values: Value) {
         val lefts = listOf(Value(0f, 0f)) + values
-        val rights = values.toList() + listOf(Value(0f, 0f))
+        val rights = values.toList() + listOf(Value(0f, 100f))
 
         lefts.zip(rights).mapIndexed { i, (left, right) -> area("$label[$i]") { left(left); right(right) } }
     }
 
     fun vsplit(label: String, vararg values: Value) {
         val tops = listOf(Value(0f, 0f)) + values
-        val bottoms = values.toList() + listOf(Value(0f, 0f))
+        val bottoms = values.toList() + listOf(Value(0f, 100f))
 
         tops.zip(bottoms).mapIndexed { i, (top, bottom) -> area("$label[$i]") { top(top); bottom(bottom) } }
     }
 
     fun split(vararg values: Value, fn: Labeller.() -> Any?) {
         val lefts = listOf(Value(0f, 0f)) + values
-        val rights = values.toList() + listOf(Value(0f, 0f))
+        val rights = values.toList() + listOf(Value(0f, 100f))
         val baseIndex = subAreas.size
 
         lefts.zip(rights).map { (left, right) -> area { left(left); right(right) } }
@@ -126,7 +126,7 @@ class Area {
 
     fun vsplit(vararg values: Value, fn: Labeller.() -> Any?) {
         val tops = listOf(Value(0f, 0f)) + values
-        val bottoms = values.toList() + listOf(Value(0f, 0f))
+        val bottoms = values.toList() + listOf(Value(0f, 100f))
         val baseIndex = subAreas.size
 
         tops.zip(bottoms).map { (top, bottom) -> area { top(top); bottom(bottom) } }
@@ -138,8 +138,8 @@ class Area {
         val right = rightPixels.get() + rightPercentage.get() / 100 * width
 
         return (subAreas.mapIndexed { i, area ->
-            area.widths(labels[i]!!, x + left, width - left - right).toList()
-        } .flatten() + (label to width - right)) .toMap()
+            area.widths(labels[i]!!, x + left, right - left).toList()
+        } .flatten() + (label to right - left)) .toMap()
     }
 
     fun heights(label: String, y: Float, height: Float): Map<String, Float> {
@@ -147,8 +147,8 @@ class Area {
         val bottom = bottomPixels.get() + bottomPercentage.get() / 100 * height
 
         return (subAreas.mapIndexed { i, area ->
-            area.heights(labels[i]!!, y + top, height - top - bottom).toList()
-        } .flatten() + (label to height - bottom)) .toMap()
+            area.heights(labels[i]!!, y + top, bottom - top).toList()
+        } .flatten() + (label to bottom - top)) .toMap()
     }
 
     fun build(label: String, position: vec2, size: vec2): Map<String, Pair<vec2, vec2>> {
@@ -158,8 +158,8 @@ class Area {
         val right = rightPixels.get() + rightPercentage.get() / 100 * size.x
 
         return (subAreas.mapIndexed { i, area ->
-            area.build(labels[i]!!, position + vec2(left, top), size - vec2(left + right, top + bottom)).toList()
-        } .flatten() + (label to Pair(position + vec2(left, top), size - vec2(left + right, top + bottom)))) .toMap()
+            area.build(labels[i]!!, position + vec2(left, top), vec2(right - left, bottom - top)).toList()
+        } .flatten() + (label to Pair(position + vec2(left, top), vec2(right - left, bottom - top)))) .toMap()
     }
 
     private val subAreas: MutableList<Area> = mutableListOf()
@@ -169,6 +169,7 @@ class Area {
 
 data class Value internal constructor(val pixels: Float, val percentage: Float) {
     operator fun plus(other: Value) = Value(pixels + other.pixels, percentage + other.percentage)
+    operator fun minus(other: Value) = Value(pixels - other.pixels, percentage - other.percentage)
 }
 
 class Labeller internal constructor(private var baseIndex: Int, private val labels: MutableMap<Int, String>, private val labelLookup: MutableMap<String, Int>) {

@@ -5,8 +5,8 @@ import ktaf.core.vec2
 import ktaf.ui.node.UINode
 
 class FlowLayout: UILayout() {
-    val horizontalSpacing = KTAFMutableValue(Spacing2.SPACE_AFTER)
-    val verticalSpacing = KTAFMutableValue(Spacing2.SPACE_AFTER)
+    val horizontalSpacing = KTAFMutableValue(Spacing.SPACE_AFTER)
+    val verticalSpacing = KTAFMutableValue(Spacing.SPACE_AFTER)
     val verticalAlignment = KTAFMutableValue(0.5f)
 
     override fun begin(children: List<UINode>) {
@@ -37,7 +37,7 @@ class FlowLayout: UILayout() {
             }
             else {
                 rows.last().add(child)
-                x + w
+                x + w + horizontalSpacing.get().fixed
             }
         }
 
