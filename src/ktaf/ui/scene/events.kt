@@ -15,7 +15,7 @@ fun UIScene.update(dt: Float) {
 
     root.get()?.let {
         it.layout.get().beginPositioning(it)
-        it.computeWidth(context.viewport.width().toFloat())
+        it.computeInternalWidth(context.viewport.width().toFloat())
         it.computeHeight(context.viewport.height().toFloat())
         it.computePositionForChildren()
         it.layout.get().finishPositioning(it)
@@ -86,7 +86,7 @@ fun UIScene.mouseMoved(position: vec2, last: vec2) {
 
 fun UIScene.mouseDragged(position: vec2) {
     focussedNode.get() ?.let { node ->
-        node.handleEvent(UIMouseDragEvent(position, lastRelativeMouseLocation, firstRelativeMouseLocation, mouseModifiers))
+        node.handleEvent(UIMouseDragEvent(position - node.absolutePosition(), lastRelativeMouseLocation, firstRelativeMouseLocation, mouseModifiers))
         lastRelativeMouseLocation = position - node.absolutePosition()
     }
 }

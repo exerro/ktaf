@@ -59,7 +59,7 @@ fun UILayout.Companion.align(node: UINode, offset: vec2, area: vec2, alignment: 
 }
 
 fun UILayout.Companion.fillChildrenWidths(children: List<UINode>, widthAllocatedForChildren: Float) {
-    children.forEach { it.computeWidth(widthAllocatedForChildren - it.margin.get().width) }
+    children.forEach { it.computeInternalWidth(widthAllocatedForChildren - it.margin.get().width) }
 }
 
 fun UILayout.Companion.fillChildrenHeights(children: List<UINode>, heightAllocatedForChildren: Float?) {
@@ -67,7 +67,7 @@ fun UILayout.Companion.fillChildrenHeights(children: List<UINode>, heightAllocat
 }
 
 fun UILayout.Companion.setChildrenWidths(children: List<UINode>, widthAllocatedForChildren: Float) {
-    children.forEach { it.computeWidth(widthAllocatedForChildren - it.margin.get().width) }
+    children.forEach { it.computeInternalWidth(widthAllocatedForChildren - it.margin.get().width) }
 }
 
 fun UILayout.Companion.setChildrenHeights(children: List<UINode>, heightAllocatedForChildren: Float?) {

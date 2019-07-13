@@ -15,7 +15,7 @@ class AreaLayout: UILayout() {
     // TODO: this process needs better documenting
     override fun computeChildrenWidth(widthAllocatedForContent: Float): Lazy<Float> {
         val widths = area.widths("", 0f, widthAllocatedForContent)
-        children.map { elements[it] ?.let { label -> widths[label] } ?.let { w -> it.computeWidth(w) } }
+        children.map { elements[it] ?.let { label -> widths[label] } ?.let { w -> it.computeInternalWidth(w) } }
         return lazy { widthAllocatedForContent }
     }
 

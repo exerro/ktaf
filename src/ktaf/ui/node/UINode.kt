@@ -61,12 +61,7 @@ open class UINode {
             it.draw(context, position, size)
         }
 
-        children.forEach {
-            it.draw(context,
-                    position + padding.get().tl + it.computedPosition.get(),
-                    vec2(it.computedWidth.get(), it.computedHeight.get())
-            )
-        }
+        drawChildren(children, context, position)
 
         foregroundsInternal.forEach {
             it.draw(context, position + padding.get().tl, size - padding.get().size)
@@ -98,7 +93,7 @@ open class UINode {
      * @param node the node to compute the width for
      * @param widthAllocated the width allocated for the node
      */
-    open fun computeWidth(widthAllocated: Float) {
+    open fun computeInternalWidth(widthAllocated: Float) {
         val node = this
         // the width allocated for children
         val widthAllocatedInternal = (node.width.get() ?: widthAllocated - node.margin.get().width) - node.padding.get().width
@@ -106,7 +101,7 @@ open class UINode {
         val contentWidth by layout.get().computeChildrenWidth(widthAllocatedInternal)
         // update the node's width
         node.computedWidthInternal = node.width.get()
-                ?: if (node.fillSize) widthAllocated else larger(node.computeWidth(), contentWidth + node.padding.get().width)
+                ?: if (node.fillSize) widthAllocated else larger(node.computeInternalWidth(), contentWidth + node.padding.get().width)
     }
 
     /**
@@ -124,7 +119,7 @@ open class UINode {
                 heightAllocatedInternalPlusPadding ?.let { it - node.padding.get().height }
         )
         node.computedHeightInternal = node.height.get()
-                ?: heightAllocated.takeIf { node.fillSize } ?: larger(node.computeHeight(node.computedWidthInternal), contentHeight + node.padding.get().height)
+                ?: heightAllocated.takeIf { node.fillSize } ?: larger(node.computeInternalHeight(node.computedWidthInternal), contentHeight + node.padding.get().height)
     }
 
     /**

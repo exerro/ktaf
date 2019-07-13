@@ -7,9 +7,11 @@ open class KTAFValue<T>(
     fun setValue(value: T) {
         val oldValue = this.value
         if (this.value != value) {
+            setting = false
             this.value = value
-            connections.forEach { it(value) }
-            connections2.forEach { it(oldValue, value) }
+            for (it in connections) { if (setting) break; it(value) }
+            for (it in connections2) { if (setting) break; it(oldValue, value) }
+            setting = true
         }
     }
 
@@ -34,11 +36,16 @@ open class KTAFValue<T>(
     }
 
     operator fun <TT: T> invoke(value: TT, init: TT.() -> Unit = {}): TT = set(value, init)
-    open fun <TT: T> set(value: TT, init: TT.() -> Unit): TT { init(value); setValue(value); return value }
-    fun set(value: T): T = set(value, {})
+    open fun <TT: T> set(value: TT, init: TT.() -> Unit = {}): TT { init(value); setValue(value); return value }
+    fun <TT: T> setter(value: TT) { set(value, {}) }
+
+    override fun equals(other: Any?): Boolean = value == other || other is KTAFValue<*> && other == other.value
+    override fun hashCode(): Int = value.hashCode()
+    override fun toString(): String = value.toString()
 
     private var connections = mutableListOf<(T) -> Any?>()
     private var connections2 = mutableListOf<(T, T) -> Any?>()
+    private var setting = false
 }
 
 fun <T> KTAFValue<T>.joinTo(other: KTAFValue<T>) {

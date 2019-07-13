@@ -46,9 +46,6 @@ class UIButton(text: String): UINode(), Clickable {
         onMousePress { state.push(PRESSED) }
         onMouseRelease { state.remove(PRESSED) }
 
-        onMouseEnter { state.push(HOVER) }
-        onMouseExit { state.remove(HOVER) }
-
         colour(Colour.blue)
         padding(Border(8f, 16f))
     }
