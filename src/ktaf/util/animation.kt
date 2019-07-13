@@ -24,6 +24,7 @@ class Animation<T>(
         val set: (T) -> Unit
 ) {
     private var clock = 0f
+    val onFinish = KTAFValue <(T) -> Unit> {}
 
     fun update(dt: Float) {
         clock += dt
@@ -32,6 +33,15 @@ class Animation<T>(
     }
 
     fun finished() = clock >= duration
+
+    fun cancel() {
+        onFinish.get()(eval(initial, final, easing(clock, duration)))
+    }
+
+    fun finish() {
+        set(final)
+        onFinish.get()(final)
+    }
 
     companion object {
         val Float: AnimationEvaluator<Float> = { a, b, t -> a + (b - a) * t }
@@ -54,6 +64,7 @@ fun Animations.update(dt: Float) {
     for ((_, m) in animations) for ((_, animation) in m)
         animation.update(dt)
 
+    animations.map { (_, m) -> m.values.filter { it.finished() } .forEach { it.finish() } }
     animations.map { (node, m) -> node to m.filterValues { !it.finished() } }
 }
 
@@ -62,21 +73,21 @@ fun Animations.update(dt: Float) {
 fun <T: Animateable<T>> Animations.animate(owner: Any, property: KProperty0<KTAFValue<T>>, to: T, duration: Float = Animation.NORMAL, easing: EasingFunction = Easing.SMOOTH)
         = animate(owner, property.name, property.get(), to, duration, easing)
 
-fun <T: Animateable<T>> Animations.animate(owner: Any, property: String, value: KTAFValue<T>, to: T, duration: Float = Animation.NORMAL, easing: EasingFunction = Easing.SMOOTH) {
-    animations.computeIfAbsent(owner) { mutableMapOf() } [property] = Animation(
+fun <T: Animateable<T>> Animations.animate(owner: Any, property: String, value: KTAFValue<T>, to: T, duration: Float = Animation.NORMAL, easing: EasingFunction = Easing.SMOOTH): Animation<T> {
+    return Animation(
             value.get(), to, duration, easing,
             { a, b, t -> a.transitionTo(b, t) }, value::setValue
-    )
+    ).also { animations.computeIfAbsent(owner) { mutableMapOf() } [property] = it }
 }
 
 fun Animations.animate(owner: Any, property: KProperty0<KTAFValue<Float>>, to: Float, duration: Float = Animation.NORMAL, easing: EasingFunction = Easing.SMOOTH)
         = animate(owner, property.name, property.get(), to, duration, easing)
 
-fun Animations.animate(owner: Any, property: String, value: KTAFValue<Float>, to: Float, duration: Float = Animation.NORMAL, easing: EasingFunction = Easing.SMOOTH) {
-    animations.computeIfAbsent(owner) { mutableMapOf() } [property] = Animation(
+fun Animations.animate(owner: Any, property: String, value: KTAFValue<Float>, to: Float, duration: Float = Animation.NORMAL, easing: EasingFunction = Easing.SMOOTH): Animation<Float> {
+    return Animation(
             value.get(), to, duration, easing,
             { a, b, t -> a + (b - a) * t }, value::setValue
-    )
+    ).also { animations.computeIfAbsent(owner) { mutableMapOf() } [property] = it }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -84,39 +95,40 @@ fun Animations.animate(owner: Any, property: String, value: KTAFValue<Float>, to
 fun <T: Animateable<T>> Animations.animateNullable(owner: Any, property: KProperty0<KTAFValue<T?>>, to: T?, duration: Float = Animation.NORMAL, easing: EasingFunction = Easing.SMOOTH)
         = animateNullable(owner, property.name, property.get(), to, duration, easing)
 
-fun <T: Animateable<T>> Animations.animateNullable(owner: Any, property: String, value: KTAFValue<T?>, to: T?, duration: Float = Animation.NORMAL, easing: EasingFunction = Easing.SMOOTH) {
+fun <T: Animateable<T>> Animations.animateNullable(owner: Any, property: String, value: KTAFValue<T?>, to: T?, duration: Float = Animation.NORMAL, easing: EasingFunction = Easing.SMOOTH): Animation<T>? {
     val prev = value.get()
 
     if (prev == null || to == null) {
         value.setValue(to)
-        return
+        return null
     }
 
-    animations.computeIfAbsent(owner) { mutableMapOf() } [property] = Animation(
+    return Animation(
             prev, to, duration, easing,
             { a, b, t -> a.transitionTo(b, t) }, value::setValue
-    )
+    ).also { animations.computeIfAbsent(owner) { mutableMapOf() } [property] = it }
 }
 
 fun Animations.animateNullable(owner: Any, property: KProperty0<KTAFValue<Float?>>, to: Float?, duration: Float = Animation.NORMAL, easing: EasingFunction = Easing.SMOOTH)
         = animateNullable(owner, property.name, property.get(), to, duration, easing)
 
-fun Animations.animateNullable(owner: Any, property: String, value: KTAFValue<Float?>, to: Float?, duration: Float = Animation.NORMAL, easing: EasingFunction = Easing.SMOOTH) {
+fun Animations.animateNullable(owner: Any, property: String, value: KTAFValue<Float?>, to: Float?, duration: Float = Animation.NORMAL, easing: EasingFunction = Easing.SMOOTH): Animation<Float>? {
     val prev = value.get()
 
     if (prev == null || to == null) {
         value.setValue(to)
-        return
+        return null
     }
 
-    animations.computeIfAbsent(owner) { mutableMapOf() } [property] = Animation(
+    return Animation(
             prev, to, duration, easing,
             { a, b, t -> a + (b - a) * t }, value::setValue
-    )
+    ).also { animations.computeIfAbsent(owner) { mutableMapOf() } [property] = it }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 fun Animations.cancelAnimation(owner: Any, property: String) {
+    animations[owner] ?.let { it[property] ?.cancel() }
     animations.computeIfAbsent(owner) { mutableMapOf() } .remove(property)
 }

@@ -159,7 +159,6 @@ abstract class UINode {
     internal open val cursor: GLFWCursor? = GLFWCursor.DEFAULT
 
     // state
-    internal var mouseInside = true
     internal var computedXInternal: Float by Delegates.observable(0f) { _, old, new ->
         if (old != new) { scene.get()?.animations?.animate(this, ::computedX, new) }
     }
