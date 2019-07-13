@@ -14,14 +14,12 @@ class FlowLayout: UILayout() {
         rows = mutableListOf(mutableListOf())
     }
 
-    override fun computeChildrenWidth(widthAllocatedForContent: Float): Lazy<Float> {
-        // compute the width for each child where allocated width fills the area
+    // compute the width for each child where allocated width fills the area
+    override fun computeChildrenWidths(widthAllocatedForContent: Float) {
         UILayout.fillChildrenWidths(children, widthAllocatedForContent)
-        // return the largest of the children's widths as the content width
-        return lazy { UILayout.sumChildrenWidth(children) }
     }
 
-    override fun computeChildrenHeight(width: Float, heightAllocatedForContent: Float?): Lazy<Float> {
+    override fun computeChildrenHeights(width: Float, heightAllocatedForContent: Float?) {
         val xOverflow = width
 
         // compute the height for each child where allocated height is non-existent
@@ -40,9 +38,13 @@ class FlowLayout: UILayout() {
                 x + w + horizontalSpacing.get().fixed
             }
         }
-
-        return lazy { rows.map { row -> UILayout.maximumChildHeight(row) } .sum() }
     }
+
+    // return the largest of the children's widths as the content width
+    override fun computeChildrenWidth() = UILayout.sumChildrenWidth(children)
+
+    // TODO: this process needs documenting
+    override fun computeChildrenHeight() = rows.map { row -> UILayout.maximumChildHeight(row) } .sum()
 
     // TODO: this process needs better documenting
     override fun position(width: Float, height: Float) {

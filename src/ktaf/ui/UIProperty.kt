@@ -12,10 +12,14 @@ typealias UINodeState = String
 const val DEFAULT_STATE: UINodeState = "default"
 
 open class UIProperty<T>(value: T,
-        private val setterCallback: UIProperty<T>.(T) -> Unit = { v -> stateValues.keys.map { this[it](v) } }
+        private var setterCallback: UIProperty<T>.(T) -> Unit = { v -> stateValues.keys.map { this[it](v) } }
 ): KTAFValue<T>(value) {
     internal val stateValues: MutableMap<UINodeState, T> = mutableMapOf(DEFAULT_STATE to value)
     private var activeState = DEFAULT_STATE
+
+    fun setSetter(setter: UIProperty<T>.(T) -> Unit) {
+        setterCallback = setter
+    }
 
     fun setState(state: UINodeState) {
         if (activeState != state) {

@@ -7,19 +7,21 @@ class ListLayout : UILayout() {
     val alignment = KTAFValue(0.5f)
     val spacing = KTAFValue(Spacing.SPACE_AFTER)
 
-    override fun computeChildrenWidth(widthAllocatedForContent: Float): Lazy<Float> {
-        // compute the width for each child where allocated width fills the area
+    // compute the width for each child where allocated width fills the area
+    override fun computeChildrenWidths(widthAllocatedForContent: Float) {
         UILayout.fillChildrenWidths(children, widthAllocatedForContent)
-        // return the largest of the children's widths as the content width
-        return lazy { UILayout.maximumChildWidth(children) }
     }
 
-    override fun computeChildrenHeight(width: Float, heightAllocatedForContent: Float?): Lazy<Float> {
-        // compute the height for each child where allocated height is non-existent
+    // compute the height for each child where allocated height is non-existent
+    override fun computeChildrenHeights(width: Float, heightAllocatedForContent: Float?) {
         UILayout.setChildrenHeights(children, null)
-        // return the sum of the children's widths plus the fixed spacing
-        return lazy { UILayout.sumChildrenHeight(children) + (children.size - 1) * spacing.get().fixed() }
     }
+
+    // return the largest of the children's widths as the content width
+    override fun computeChildrenWidth() = UILayout.maximumChildWidth(children)
+
+    // return the sum of the children's widths plus the fixed spacing
+    override fun computeChildrenHeight() = UILayout.sumChildrenHeight(children) + (children.size - 1) * spacing.get().fixed()
 
     override fun position(width: Float, height: Float) {
         val contentHeight = UILayout.sumChildrenHeight(children)

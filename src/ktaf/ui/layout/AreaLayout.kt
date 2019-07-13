@@ -13,18 +13,24 @@ class AreaLayout: UILayout() {
     fun elem(node: UINode, area: String) { elements[node] = area }
 
     // TODO: this process needs better documenting
-    override fun computeChildrenWidth(widthAllocatedForContent: Float): Lazy<Float> {
+    override fun computeChildrenWidths(widthAllocatedForContent: Float) {
         val widths = area.widths("", 0f, widthAllocatedForContent)
         children.map { elements[it] ?.let { label -> widths[label] } ?.let { w -> it.computeWidth(w) } }
-        return lazy { widthAllocatedForContent }
     }
 
     // TODO: this process needs better documenting
-    override fun computeChildrenHeight(width: Float, heightAllocatedForContent: Float?): Lazy<Float> {
+    override fun computeChildrenHeights(width: Float, heightAllocatedForContent: Float?) {
         val heights = area.heights("", 0f, heightAllocatedForContent ?: 0f)
         children.map { elements[it] ?.let { label -> heights[label] } ?.let { h -> it.computeHeight(h) } }
-        return lazy { heightAllocatedForContent ?: 0f }
     }
+
+    // TODO: this process needs better documenting
+    // TODO
+    override fun computeChildrenWidth() = 0f
+
+    // TODO: this process needs better documenting
+    // TODO
+    override fun computeChildrenHeight() = 0f
 
     // TODO: this process needs better documenting
     override fun position(width: Float, height: Float) {

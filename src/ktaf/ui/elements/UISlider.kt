@@ -3,7 +3,6 @@ package ktaf.ui.elements
 import ktaf.core.*
 import ktaf.graphics.DrawContext2D
 import ktaf.typeclass.minus
-import ktaf.ui.graphics.ColourBackground
 import ktaf.ui.layout.height
 import ktaf.ui.layout.tl
 import ktaf.ui.layout.width
@@ -14,6 +13,10 @@ import kotlin.math.max
 import kotlin.math.min
 
 class UISlider: UINode() {
+    // TODO
+    override fun computeContentWidth(width: Float?): Float = 0f
+    override fun computeContentHeight(width: Float, height: Float?): Float = 0f
+
     val direction = KTAFValue(UISliderDirection.HORIZONTAL)
     val x = KTAFValue(0f)
     val y = KTAFValue(0f)
@@ -32,7 +35,7 @@ class UISlider: UINode() {
             slider.getKeyboardHandler(key, modifiers)
 
     override fun draw(context: DrawContext2D, position: vec2, size: vec2) {
-        super.draw(context, position, size)
+        fillBackground(context, position, size, backgroundColour.get())
         drawChildren(listOf(slider), context, position)
     }
 
@@ -47,8 +50,6 @@ class UISlider: UINode() {
     }
 
     private val slider = SliderObject()
-    private var background = addBackground(ColourBackground())
-    private var sliderBackground = slider.addBackground(ColourBackground())
 
     init {
         x.connect { slider.computedX.setValue(it * (computedWidth.get() - padding.get().width - slider.computedWidth.get())) }
@@ -57,8 +58,7 @@ class UISlider: UINode() {
         ySteps.connect { s -> y(divisions(y.get(), s ?.let { it - 1 })) }
         sliderWidth.connect { slider.width(it.takeIf { direction.get() != UISliderDirection.VERTICAL }) }
         sliderHeight.connect { slider.height(it.takeIf { direction.get() != UISliderDirection.HORIZONTAL }) }
-        sliderColour.connect { sliderBackground = slider.replaceBackground(sliderBackground, sliderBackground.copy(colour = it)) }
-        backgroundColour.connect { background = replaceBackground(background, background.copy(colour = it)) }
+        sliderColour.connect(slider.colour::setter)
 
         scene.joinTo(slider.scene)
 
@@ -107,6 +107,15 @@ class UISlider: UINode() {
 
 private class SliderObject: UINode() {
     override fun cursor() = GLFWCursor.POINTER
+    val colour = KTAFValue(rgba(0f))
+
+    // TODO
+    override fun computeContentWidth(width: Float?): Float = 0f
+    override fun computeContentHeight(width: Float, height: Float?): Float = 0f
+
+    override fun draw(context: DrawContext2D, position: vec2, size: vec2) {
+        fillBackground(context, position, size, colour.get())
+    }
 
     init {
         onMousePress { state.push(UISlider.PRESSED) }

@@ -2,20 +2,14 @@ package ktaf.ui.node
 
 import ktaf.core.*
 import ktaf.graphics.DrawContext2D
-import ktaf.typeclass.minus
-import ktaf.typeclass.plus
 import ktaf.ui.*
-import ktaf.ui.graphics.Background
-import ktaf.ui.graphics.Foreground
 import ktaf.ui.layout.Border
-import ktaf.ui.layout.size
-import ktaf.ui.layout.tl
 import ktaf.ui.scene.UIScene
 import ktaf.util.animate
 import lwjglkt.GLFWCursor
 import kotlin.properties.Delegates
 
-open class UINode {
+abstract class UINode {
     // structure
     val scene = KTAFValue<UIScene?>(null)
     val parent = KTAFValue<UIContainer?>(null)
@@ -55,15 +49,9 @@ open class UINode {
 
     open fun update(dt: Float) {}
 
-    open fun draw(context: DrawContext2D, position: vec2, size: vec2) {
-        backgroundsInternal.reversed().forEach {
-            it.draw(context, position, size)
-        }
-
-        foregroundsInternal.forEach {
-            it.draw(context, position + padding.get().tl, size - padding.get().size)
-        }
-    }
+    abstract fun draw(context: DrawContext2D, position: vec2, size: vec2)
+    abstract fun computeContentWidth(width: Float?): Float
+    abstract fun computeContentHeight(width: Float, height: Float?): Float
 
     /** Return true if this node can handle the key event */
     open fun handlesKey(key: GLFWKey, modifiers: Set<GLFWKeyModifier>): Boolean
@@ -91,7 +79,7 @@ open class UINode {
     open fun computeWidth(widthAllocated: Float) {
         // TODO: comment
         computedWidthInternal = width.get()
-                ?: widthAllocated.takeIf { fillSize } ?: computeInternalWidth() ?: 0f
+                ?: widthAllocated.takeIf { fillSize } ?: computeContentWidth(widthAllocated)
     }
 
     /**
@@ -101,7 +89,7 @@ open class UINode {
     open fun computeHeight(heightAllocated: Float?) {
         // TODO: comment
         computedHeightInternal = height.get()
-                ?: heightAllocated.takeIf { fillSize } ?: computeInternalHeight(computedWidthInternal) ?: 0f
+                ?: heightAllocated.takeIf { fillSize } ?: computeContentHeight(computedWidthInternal, heightAllocated)
     }
 
 
@@ -129,8 +117,6 @@ open class UINode {
     }
 
     // configuration internals
-    internal val foregroundsInternal = mutableListOf<Foreground>()
-    internal val backgroundsInternal = mutableListOf<Background>()
     internal open var fillSize = true // whether the node should fill allocated size when positioning
 
     // state

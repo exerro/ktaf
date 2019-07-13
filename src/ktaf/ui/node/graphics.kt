@@ -1,36 +1,46 @@
 package ktaf.ui.node
 
-import ktaf.ui.graphics.Background
-import ktaf.ui.graphics.Foreground
+import ktaf.core.RGBA
+import ktaf.core.vec2
+import ktaf.graphics.*
+import ktaf.util.wrapText
+import kotlin.math.max
 
-fun <B: Background> UINode.addBackground(background: B, init: B.() -> Unit = {}): B {
-    init(background)
-    backgroundsInternal.add(background)
-    return background
+fun fillBackground(context: DrawContext2D, position: vec2, size: vec2,
+        colour: RGBA
+) {
+    context.draw {
+        context.colour = colour
+        context.fill = true
+        rectangle(position, size)
+    }
 }
 
-fun <B: Background> UINode.removeBackground(background: B): B {
-    if (backgroundsInternal.contains(background)) backgroundsInternal.remove(background)
-    return background
+fun drawText(context: DrawContext2D, position: vec2, size: vec2,
+        text: String,
+        font: Font,
+        wrap: Boolean,
+        alignment: vec2,
+        colour: RGBA
+) {
+    val lines = if (wrap) wrapText(text, font, size.x) else listOf(text.replace("\n", " "))
+    var y = position.y + (size.y - lines.size * font.height) * alignment.y
+
+    context.draw {
+        context.colour = colour
+        lines.forEach { line ->
+            val x = position.x + (size.x - font.widthOf(line)) * alignment.x
+            write(line, font, vec2(x, y))
+            y += font.height
+        }
+    }
 }
 
-fun <B: Background> UINode.replaceBackground(old: Background, new: B): B {
-    removeBackground(old)
-    return addBackground(new)
+fun textWidth(text: String, font: Font, wrap: Boolean): Float {
+    return if (wrap) text.split("\n").map { font.widthOf(it) } .fold(0f, ::max) + 1
+         else font.widthOf(text.replace("\n", " ")) + 1
 }
 
-fun <F: Foreground> UINode.addForeground(foreground: F, init: F.() -> Unit = {}): F {
-    init(foreground)
-    foregroundsInternal.add(foreground)
-    return foreground
-}
-
-fun <F: Foreground> UINode.removeForeground(foreground: F): F {
-    if (foregroundsInternal.contains(foreground)) foregroundsInternal.remove(foreground)
-    return foreground
-}
-
-fun <F: Foreground> UINode.replaceForeground(old: Foreground, new: F): F {
-    removeForeground(old)
-    return addForeground(new)
+fun textHeight(text: String, font: Font, wrap: Boolean, width: Float): Float {
+    return if (wrap) wrapText(text, font, width).size * font.height else font.height
 }

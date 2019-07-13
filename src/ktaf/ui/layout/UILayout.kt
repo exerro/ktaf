@@ -6,16 +6,19 @@ import ktaf.typeclass.minus
 import ktaf.typeclass.plus
 import ktaf.ui.node.UIContainer
 import ktaf.ui.node.UINode
-import ktaf.ui.node.computeInternalWidth
 import ktaf.ui.node.orderedChildren
 import kotlin.math.max
 
 abstract class UILayout {
     protected lateinit var children: List<UINode>
-    /** Sets the width of children and returns the content width of those children */
-    abstract fun computeChildrenWidth(widthAllocatedForContent: Float): Lazy<Float>
-    /** Sets the height of children and returns the content height of those children */
-    abstract fun computeChildrenHeight(width: Float, heightAllocatedForContent: Float?): Lazy<Float>
+    /** Computes the width of children */
+    abstract fun computeChildrenWidths(widthAllocatedForContent: Float)
+    /** Computes the height of children */
+    abstract fun computeChildrenHeights(width: Float, heightAllocatedForContent: Float?)
+    /** Returns the content width of children */
+    abstract fun computeChildrenWidth(): Float
+    /** Returns the content height of children */
+    abstract fun computeChildrenHeight(): Float
     /** Positions the children */
     abstract fun position(width: Float, height: Float)
     /** Called prior to positioning */

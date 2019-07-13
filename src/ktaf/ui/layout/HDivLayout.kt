@@ -7,19 +7,21 @@ class HDivLayout: UILayout() {
     val alignment = KTAFValue(vec2(0.5f))
     val spacing = KTAFValue(0f) // TODO: use proper spacing
 
-    override fun computeChildrenWidth(widthAllocatedForContent: Float): Lazy<Float> {
-        // compute the width for each child where allocated width fills the area divided evenly amongst children
+    // compute the width for each child where allocated width fills the area divided evenly amongst children
+    override fun computeChildrenWidths(widthAllocatedForContent: Float) {
         UILayout.setChildrenWidths(children, (widthAllocatedForContent - (children.size - 1) * spacing.get()) / children.size)
-        // return the sum of the widths for each child plus appropriate spacing
-        return lazy { UILayout.sumChildrenWidth(children) + spacing.get() * (children.size - 1) }
     }
 
-    override fun computeChildrenHeight(width: Float, heightAllocatedForContent: Float?): Lazy<Float> {
-        // compute the height for each child where allocated height fills the area
+    // compute the height for each child where allocated height fills the area
+    override fun computeChildrenHeights(width: Float, heightAllocatedForContent: Float?) {
         UILayout.setChildrenHeights(children, heightAllocatedForContent)
-        // return the sum of the largest heights of each row plus spacing
-        return lazy { UILayout.maximumChildHeight(children) }
     }
+
+    // return the sum of the widths for each child plus appropriate spacing
+    override fun computeChildrenWidth() = UILayout.sumChildrenWidth(children) + spacing.get() * (children.size - 1)
+
+    // return the sum of the largest heights of each row plus spacing
+    override fun computeChildrenHeight() = UILayout.maximumChildHeight(children)
 
     // TODO: this process needs better documenting
     override fun position(width: Float, height: Float) {
