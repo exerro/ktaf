@@ -16,8 +16,6 @@ fun main() = application("Hello world") {
     val scene = scene(display, context) {
         root.set(UIContainer()) {
             val content = children.add(UIContainer()) {
-                width(200f)
-                height(400f)
                 padding(Border(16f, 0f))
             }
 
@@ -67,16 +65,15 @@ fun main() = application("Hello world") {
                 onClick { content.addButton() }
             }
 
-            layout(FreeLayout()) {
-//                elem(content) {
-//                    topOffset = 100f
-//                    leftOffset = 100f
-//                }
-//
-//                elem(button) {
-//                    topOffset = 100f
-//                    leftOffset = 300f
-//                }
+            layout(AreaLayout()) {
+                areas {
+                    split(50.pc()) { labels("l", "r") }
+                    area("r") {
+                        vsplit(50.pc()) { labels("t", "b") }
+                    }
+                }
+                elem(content, "l")
+                elem(button, "t")
             }
         }
     }
