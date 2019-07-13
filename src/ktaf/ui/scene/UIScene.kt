@@ -5,6 +5,7 @@ import ktaf.graphics.DrawContext2D
 import ktaf.ui.UIFocusEvent
 import ktaf.ui.UIUnFocusEvent
 import ktaf.ui.node.UINode
+import ktaf.ui.node.handleEvent
 import ktaf.util.Animations
 import lwjglkt.GLFWDisplay
 

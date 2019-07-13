@@ -27,7 +27,7 @@ fun positionDemo(): UINode {
                 children.add(UIButton("")) {
                     val index = KTAFValue(0)
 
-                    width(96f)
+                    width(128f)
                     height(32f)
                     colour(rgba(0.9f, 0.4f, 0.2f))
 
@@ -106,56 +106,47 @@ fun positionDemo(): UINode {
             }
 
             children.add(UIButton("ALIGN LEFT")) {
-                width(144f)
-                height(32f)
+                shrink()
                 onClick { setLayout(buttons, { ListLayout() }) { it.alignment.set(0f) } }
             }
 
             children.add(UIButton("ALIGN CENTER")) {
-                width(144f)
-                height(32f)
+                shrink()
                 onClick { setLayout(buttons, { ListLayout() }) { it.alignment.set(0.5f) } }
             }
 
             children.add(UIButton("ALIGN RIGHT")) {
-                width(144f)
-                height(32f)
+                shrink()
                 onClick { setLayout(buttons, { ListLayout() }) { it.alignment.set(1f) } }
             }
 
             children.add(UIButton("SPACE_AFTER")) {
-                width(144f)
-                height(32f)
+                shrink()
                 onClick { setLayout(buttons, { ListLayout() }) { it.spacing.set(Spacing.SPACE_AFTER) } }
             }
 
             children.add(UIButton("SPACE_AROUND")) {
-                width(144f)
-                height(32f)
+                shrink()
                 onClick { setLayout(buttons, { ListLayout() }) { it.spacing.set(Spacing.SPACE_AROUND) } }
             }
 
             children.add(UIButton("SPACE_BETWEEN")) {
-                width(144f)
-                height(32f)
+                shrink()
                 onClick { setLayout(buttons, { ListLayout() }) { it.spacing.set(Spacing.SPACE_BETWEEN) } }
             }
 
             children.add(UIButton("SPACE_BEFORE")) {
-                width(144f)
-                height(32f)
+                shrink()
                 onClick { setLayout(buttons, { ListLayout() }) { it.spacing.set(Spacing.SPACE_BEFORE) } }
             }
 
             children.add(UIButton("SPACE_WRAP")) {
-                width(144f)
-                height(32f)
+                shrink()
                 onClick { setLayout(buttons, { ListLayout() }) { it.spacing.set(Spacing.SPACE_WRAP) } }
             }
 
             children.add(UIButton("SPACE_EVENLY")) {
-                width(144f)
-                height(32f)
+                shrink()
                 onClick { setLayout(buttons, { ListLayout() }) { it.spacing.set(Spacing.SPACE_EVENLY) } }
             }
 
@@ -167,74 +158,62 @@ fun positionDemo(): UINode {
             }
 
             children.add(UIButton("SPACE_AFTER")) {
-                width(144f)
-                height(32f)
+                shrink()
                 onClick { setLayout(buttons, { FlowLayout() }) { it.horizontalSpacing.set(Spacing.SPACE_AFTER) } }
             }
 
             children.add(UIButton("SPACE_AROUND")) {
-                width(144f)
-                height(32f)
+                shrink()
                 onClick { setLayout(buttons, { FlowLayout() }) { it.horizontalSpacing.set(Spacing.SPACE_AROUND) } }
             }
 
             children.add(UIButton("SPACE_BETWEEN")) {
-                width(144f)
-                height(32f)
+                shrink()
                 onClick { setLayout(buttons, { FlowLayout() }) { it.horizontalSpacing.set(Spacing.SPACE_BETWEEN) } }
             }
 
             children.add(UIButton("SPACE_BEFORE")) {
-                width(144f)
-                height(32f)
+                shrink()
                 onClick { setLayout(buttons, { FlowLayout() }) { it.horizontalSpacing.set(Spacing.SPACE_BEFORE) } }
             }
 
             children.add(UIButton("SPACE_WRAP")) {
-                width(144f)
-                height(32f)
+                shrink()
                 onClick { setLayout(buttons, { FlowLayout() }) { it.horizontalSpacing.set(Spacing.SPACE_WRAP) } }
             }
 
             children.add(UIButton("SPACE_EVENLY")) {
-                width(144f)
-                height(32f)
+                shrink()
                 onClick { setLayout(buttons, { FlowLayout() }) { it.horizontalSpacing.set(Spacing.SPACE_EVENLY) } }
             }
 
             children.add(UIButton("SPACE_AFTER")) {
-                width(144f)
-                height(32f)
+                shrink()
                 onClick { setLayout(buttons, { FlowLayout() }) { it.verticalSpacing.set(Spacing.SPACE_AFTER) } }
             }
 
             children.add(UIButton("SPACE_AROUND")) {
-                width(144f)
-                height(32f)
+                shrink()
                 onClick { setLayout(buttons, { FlowLayout() }) { it.verticalSpacing.set(Spacing.SPACE_AROUND) } }
             }
 
             children.add(UIButton("SPACE_BETWEEN")) {
-                width(144f)
-                height(32f)
+                shrink()
                 onClick { setLayout(buttons, { FlowLayout() }) { it.verticalSpacing.set(Spacing.SPACE_BETWEEN) } }
             }
 
             children.add(UIButton("SPACE_BEFORE")) {
-                width(144f)
-                height(32f)
+                shrink()
                 onClick { setLayout(buttons, { FlowLayout() }) { it.verticalSpacing.set(Spacing.SPACE_BEFORE) } }
             }
 
             children.add(UIButton("SPACE_WRAP")) {
-                width(144f)
-                height(32f)
+                shrink()
                 onClick { setLayout(buttons, { FlowLayout() }) { it.verticalSpacing.set(Spacing.SPACE_WRAP) } }
             }
 
             children.add(UIButton("SPACE_EVENLY")) {
-                width(144f)
-                height(32f)
+                shrink()
                 onClick { setLayout(buttons, { FlowLayout() }) { it.verticalSpacing.set(Spacing.SPACE_EVENLY) } }
             }
 
@@ -246,44 +225,37 @@ fun positionDemo(): UINode {
             }
 
             children.add(UIButton("ADD ROW")) {
-                width(96f)
-                height(32f)
+                shrink()
                 onClick { setLayout(buttons, { GridLayout() }) { it.rows.set(it.rows.get() + 1) } }
             }
 
             children.add(UIButton("REMOVE ROW")) {
-                width(144f)
-                height(32f)
+                shrink()
                 onClick { setLayout(buttons, { GridLayout() }) { it.rows.set(max(1, it.rows.get() - 1)) } }
             }
 
             children.add(UIButton("ADD COLUMN")) {
-                width(144f)
-                height(32f)
+                shrink()
                 onClick { setLayout(buttons, { GridLayout() }) { it.columns.set(it.columns.get() + 1) } }
             }
 
             children.add(UIButton("REMOVE COLUMN")) {
-                width(192f)
-                height(32f)
+                shrink()
                 onClick { setLayout(buttons, { GridLayout() }) { it.columns.set(max(1, it.columns.get() - 1)) } }
             }
 
             children.add(UIButton("TOP LEFT")) {
-                width(192f)
-                height(32f)
+                shrink()
                 onClick { setLayout(buttons, { GridLayout() }) { it.alignment.set(vec2(0f)) } }
             }
 
-            children.add(UIButton("BOTTOM RIGHT")) {
-                width(192f)
-                height(32f)
+            children.add(UIButton("BOTTOM\nRIGHT")) {
+                shrink()
                 onClick { setLayout(buttons, { GridLayout() }) { it.alignment.set(vec2(1f)) } }
             }
 
             children.add(UIButton("RANDOM ALIGN")) {
-                width(192f)
-                height(32f)
+                shrink()
                 onClick { setLayout(buttons, { GridLayout() }) { it.alignment.set(vec2(Math.random().toFloat(), Math.random().toFloat())) } }
             }
         }

@@ -6,14 +6,16 @@ import ktaf.graphics.widthOf
 fun lineWrapText(text: String, font: Font, width: Float): Pair<String, String?> {
     val trimmedText = text.trim()
 
-    if (font.widthOf(trimmedText) <= width)
+    if (font.widthOf(trimmedText) <= width || trimmedText.length <= 1)
         return trimmedText to null
 
-    // TODO: fix issues with very small widths
+    // the character where the text overflows the width given
     val overflow = (1 until trimmedText.length).firstOrNull { font.widthOf(trimmedText.substring(0, it + 1)) > width } ?: 1
-    val length = (overflow - 1 downTo 0).first { !trimmedText[it].isWhitespace() }
+    trimmedText.substring(0, overflow).indexOf('\n').takeIf { it != -1 } ?.let { return trimmedText.substring(0, it).trim() to trimmedText.substring(it).trim() }
+    val wrapAt = if (trimmedText[overflow].isWhitespace()) overflow
+    else trimmedText.substring(0, overflow).indexOfLast(Char::isWhitespace).takeIf { it != -1 } ?: overflow
 
-    return trimmedText.substring(0, length + 1) to trimmedText.substring(overflow)
+    return trimmedText.substring(0, wrapAt).trim() to trimmedText.substring(wrapAt).trim()
 }
 
 fun wrapText(text: String, font: Font, width: Float): List<String> {

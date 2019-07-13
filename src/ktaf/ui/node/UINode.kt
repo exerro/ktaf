@@ -53,8 +53,6 @@ abstract class UINode {
     val onKeyRelease = EventHandlerList<UIKeyReleaseEvent>()
     val onTextInput = EventHandlerList<UITextInputEvent>()
 
-    open fun computeHeight(width: Float) = height.get()
-
     open fun update(dt: Float) {}
 
     open fun draw(context: DrawContext2D, position: vec2, size: vec2) {
@@ -91,32 +89,6 @@ abstract class UINode {
 
     open fun getInputHandler(): UINode?
             = children.reversed().firstNotNull { it.getInputHandler() } ?: this.takeIf { handlesInput() }
-
-    fun handleEvent(event: UIEvent) {
-        when (event) {
-            is UIKeyEvent -> onKeyEvent.trigger(event)
-            is UIMouseEvent -> onMouseEvent.trigger(event)
-        }
-
-        when (event) {
-            is UIMouseButtonEvent -> onMouseButtonEvent.trigger(event)
-        }
-
-        when (event) {
-            is UIMouseEnterEvent -> onMouseEnter.trigger(event)
-            is UIMouseExitEvent -> onMouseExit.trigger(event)
-            is UIMouseMoveEvent -> onMouseMove.trigger(event)
-            is UIMouseDragEvent -> onMouseDrag.trigger(event)
-            is UIMousePressEvent -> onMousePress.trigger(event)
-            is UIMouseReleaseEvent -> onMouseRelease.trigger(event)
-            is UIMouseClickEvent -> onMouseClick.trigger(event)
-            is UIKeyPressEvent -> onKeyPress.trigger(event)
-            is UIKeyReleaseEvent -> onKeyRelease.trigger(event)
-            is UITextInputEvent -> onTextInput.trigger(event)
-            is UIFocusEvent -> onFocus.trigger(event)
-            is UIUnFocusEvent -> onUnFocus.trigger(event)
-        }
-    }
 
     protected fun <T> propertyState(property: UIProperty<T>) {
         state.connect { property.setState(state.current()) }
@@ -170,6 +142,32 @@ abstract class UINode {
     }
     internal var computedHeightInternal: Float by Delegates.observable(0f) { _, old, new ->
         if (old != new) { scene.get()?.animations?.animate(this, ::computedHeight, new) }
+    }
+}
+
+fun UINode.handleEvent(event: UIEvent) {
+    when (event) {
+        is UIKeyEvent -> onKeyEvent.trigger(event)
+        is UIMouseEvent -> onMouseEvent.trigger(event)
+    }
+
+    when (event) {
+        is UIMouseButtonEvent -> onMouseButtonEvent.trigger(event)
+    }
+
+    when (event) {
+        is UIMouseEnterEvent -> onMouseEnter.trigger(event)
+        is UIMouseExitEvent -> onMouseExit.trigger(event)
+        is UIMouseMoveEvent -> onMouseMove.trigger(event)
+        is UIMouseDragEvent -> onMouseDrag.trigger(event)
+        is UIMousePressEvent -> onMousePress.trigger(event)
+        is UIMouseReleaseEvent -> onMouseRelease.trigger(event)
+        is UIMouseClickEvent -> onMouseClick.trigger(event)
+        is UIKeyPressEvent -> onKeyPress.trigger(event)
+        is UIKeyReleaseEvent -> onKeyRelease.trigger(event)
+        is UITextInputEvent -> onTextInput.trigger(event)
+        is UIFocusEvent -> onFocus.trigger(event)
+        is UIUnFocusEvent -> onUnFocus.trigger(event)
     }
 }
 

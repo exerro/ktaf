@@ -5,6 +5,8 @@ import ktaf.core.vec2
 import ktaf.typeclass.minus
 import ktaf.typeclass.plus
 import ktaf.ui.node.UINode
+import ktaf.ui.node.computeHeight
+import ktaf.ui.node.computeWidth
 import ktaf.ui.node.orderedChildren
 import kotlin.math.max
 
@@ -48,7 +50,7 @@ fun UILayout.computeWidthFor(node: UINode, widthAllocated: Float) {
     val contentWidth by computeChildrenWidth(widthAllocatedInternal)
     // update the node's width
     node.computedWidthInternal = node.width.get()
-            ?: if (node.fillSize) widthAllocated else contentWidth + node.padding.get().width
+            ?: if (node.fillSize) widthAllocated else larger(node.computeWidth(), contentWidth + node.padding.get().width)
 }
 
 /**
@@ -57,17 +59,15 @@ fun UILayout.computeWidthFor(node: UINode, widthAllocated: Float) {
  * @param heightAllocated the height allocated for the node, or null if no height was allocated
  */
 fun UILayout.computeHeightFor(node: UINode, heightAllocated: Float?) {
-    // the height computed based off the node's width
-    val computedHeight = node.computeHeight(node.computedWidthInternal)
     // the height allocated for the children (ignoring subtracting the node's padding)
-    val heightAllocatedInternalPlusPadding = (computedHeight ?: heightAllocated ?.let { it - node.margin.get().height })
+    val heightAllocatedInternalPlusPadding = (node.height.get() ?: heightAllocated ?.let { it - node.margin.get().height })
     // the getter for the height of the content based on the node's children
     val contentHeight by computeChildrenHeight(
             node.computedWidthInternal - node.padding.get().width,
             heightAllocatedInternalPlusPadding ?.let { it - node.padding.get().height }
     )
-    node.computedHeightInternal = computedHeight
-            ?: heightAllocated.takeIf { node.fillSize } ?: contentHeight + node.padding.get().height
+    node.computedHeightInternal = node.height.get()
+            ?: heightAllocated.takeIf { node.fillSize } ?: larger(node.computeHeight(node.computedWidthInternal), contentHeight + node.padding.get().height)
 }
 
 /**
@@ -132,3 +132,5 @@ fun UILayout.Companion.sumChildrenHeight(children: List<UINode>)
 
 fun <T> UILayout.Companion.positionChildren(children: List<UINode>, start: T, fn: (T, UINode) -> T)
         = children.fold(start, fn)
+
+private fun larger(a: Float?, b: Float) = a ?.let { max(a, b) } ?: b

@@ -7,7 +7,7 @@ import ktaf.ui.node.UINode
 class FlowLayout: UILayout() {
     val horizontalSpacing = KTAFValue(Spacing.SPACE_AFTER)
     val verticalSpacing = KTAFValue(Spacing.SPACE_AFTER)
-    val verticalAlignment = KTAFValue(0.5f)
+    val verticalAlignment = KTAFValue(0f)
 
     override fun begin(children: List<UINode>) {
         super.begin(children)

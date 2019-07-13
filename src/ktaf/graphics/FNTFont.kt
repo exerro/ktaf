@@ -38,9 +38,9 @@ class FNTFont internal constructor(
             charTextures
     )
 
-    override fun getCharSize(char: Char): vec2 = charSizes[char]!!
-    override fun getCharOffset(char: Char): vec2 = charOffsets[char]!!
-    override fun getCharAdvance(char: Char): Float = charAdvances[char]!!
+    override fun getCharSize(char: Char): vec2 = charSizes[char] ?: vec2(0f)
+    override fun getCharOffset(char: Char): vec2 = charOffsets[char] ?: vec2(0f)
+    override fun getCharAdvance(char: Char): Float = charAdvances[char] ?: 0f
     override fun getKerning(char1: Char, char2: Char): Float = charKernings[char1]?.get(char2) ?: 0f
     override fun getVAO(char: Char): GLVAO = charVAOs[char]!!
     override fun getVAOVertexCount(char: Char) = 6

@@ -8,6 +8,7 @@ import ktaf.graphics.Font
 import ktaf.graphics.widthOf
 import ktaf.graphics.write
 import ktaf.util.wrapText
+import kotlin.math.max
 
 data class TextForeground(
         val text: String,
@@ -27,6 +28,14 @@ data class TextForeground(
                 y += font.height
             }
         }
+    }
+
+    override fun computeWidth(): Float? {
+        return text.split("\n").map { font.widthOf(it) + 1 } .fold(0f, ::max)
+    }
+
+    override fun computeHeight(width: Float): Float? {
+        return wrapText(text, font, width).size * font.height
     }
 
     // TODO: override fun getHeight(width: Float): Float? = height of wrapped text

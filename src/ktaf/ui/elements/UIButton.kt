@@ -4,6 +4,7 @@ import ktaf.core.*
 import ktaf.ui.*
 import ktaf.ui.graphics.ColourBackground
 import ktaf.ui.graphics.TextForeground
+import ktaf.ui.layout.Border
 import ktaf.ui.node.*
 import ktaf.util.Animation
 import lwjglkt.GLFWCursor
@@ -55,6 +56,7 @@ class UIButton(text: String): UINode() {
         onMouseExit { state.remove(HOVER) }
 
         colour(rgba(0.27f, 0.54f, 0.81f))
+        padding(Border(8f, 16f))
     }
 
     companion object {

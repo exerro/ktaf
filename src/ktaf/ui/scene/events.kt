@@ -5,6 +5,7 @@ import ktaf.typeclass.minus
 import ktaf.ui.*
 import ktaf.ui.layout.*
 import ktaf.ui.node.absolutePosition
+import ktaf.ui.node.handleEvent
 import ktaf.util.update
 import lwjglkt.GLFWCursor
 import lwjglkt.setCursor
