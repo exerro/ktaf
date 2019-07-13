@@ -31,30 +31,36 @@ class KTAFMutableList<T>(
         return element
     }
 
-    fun connectAdded(fn: (T) -> Any?) {
+    fun connectAdded(fn: (T) -> Any?): (T) -> Any? {
         addedConnections.add(fn)
+        return fn
     }
 
-    fun disconnectAdded(fn: (T) -> Any?) {
+    fun disconnectAdded(fn: (T) -> Any?): (T) -> Any? {
         addedConnections.remove(fn)
+        return fn
     }
 
-    fun connectRemoved(fn: (T) -> Any?) {
+    fun connectRemoved(fn: (T) -> Any?): (T) -> Any? {
         removedConnections.add(fn)
+        return fn
     }
 
-    fun disconnectRemoved(fn: (T) -> Any?) {
+    fun disconnectRemoved(fn: (T) -> Any?): (T) -> Any? {
         removedConnections.remove(fn)
+        return fn
     }
 
-    fun connectChanged(fn: (T) -> Any?) {
+    fun connectChanged(fn: (T) -> Any?): (T) -> Any? {
         addedConnections.add(fn)
         removedConnections.add(fn)
+        return fn
     }
 
-    fun disconnectChanged(fn: (T) -> Any?) {
+    fun disconnectChanged(fn: (T) -> Any?): (T) -> Any? {
         addedConnections.remove(fn)
         removedConnections.remove(fn)
+        return fn
     }
 
     override val size: Int get() = value.size

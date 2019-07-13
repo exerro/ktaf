@@ -36,7 +36,8 @@ open class KTAFMutableValue<T>(
     }
 
     operator fun <TT: T> invoke(value: TT, init: TT.() -> Unit = {}): TT = set(value, init)
-    open fun <TT: T> set(value: TT, init: TT.() -> Unit = {}): TT { init(value); setValue(value); return value }
+    open fun <TT: T> set(value: TT, init: TT.() -> Unit): TT { init(value); setValue(value); return value }
+    fun set(value: T): T = set(value, {})
 
     private var connections = mutableListOf<(T) -> Any?>()
     private var connections2 = mutableListOf<(T, T) -> Any?>()

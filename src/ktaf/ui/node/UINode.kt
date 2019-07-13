@@ -74,60 +74,47 @@ abstract class UINode {
         }
     }
 
+    /** Return true if this node can handle the key event */
+    open fun handlesKey(key: GLFWKey, modifiers: Set<GLFWKeyModifier>): Boolean
+            = hotkeys.any { it.matches(key, modifiers) }
+
+    /** Return true if this node can handle input */
+    open fun handlesInput(): Boolean
+            = false
+
     open fun getMouseHandler(position: vec2): UINode?
             =  children.reversed().firstNotNull { it.getMouseHandler(position - padding.get().tl - it.computedPosition.get()) }
             ?: this.takeIf { position.x >= 0 && position.y >= 0 && position.x < computedWidth.get() && position.y < computedHeight.get() }
 
-    open fun handlesKey(key: GLFWKey, modifiers: Set<GLFWKeyModifier>): Boolean
-            = hotkeys.any { it.matches(key, modifiers) }
-
     open fun getKeyboardHandler(key: GLFWKey, modifiers: Set<GLFWKeyModifier>): UINode?
             = children.reversed().firstNotNull { it.getKeyboardHandler(key, modifiers) } ?: this.takeIf { handlesKey(key, modifiers) }
-
-    open fun handlesInput(): Boolean
-            = false
 
     open fun getInputHandler(): UINode?
             = children.reversed().firstNotNull { it.getInputHandler() } ?: this.takeIf { handlesInput() }
 
-    open fun handleEvent(event: UIEvent) {
+    fun handleEvent(event: UIEvent) {
         when (event) {
-            is UIKeyEvent -> handleKeyEvent(event)
-            is UIMouseEvent -> handleMouseEvent(event)
-            is UITextInputEvent -> onTextInput.trigger(event)
-            is UIFocusEvent -> onFocus.trigger(event)
-            is UIUnFocusEvent -> onUnFocus.trigger(event)
+            is UIKeyEvent -> onKeyEvent.trigger(event)
+            is UIMouseEvent -> onMouseEvent.trigger(event)
         }
-    }
-
-    open fun handleKeyEvent(event: UIKeyEvent) {
-        onKeyEvent.trigger(event)
 
         when (event) {
-            is UIKeyPressEvent -> onKeyPress.trigger(event)
-            is UIKeyReleaseEvent -> onKeyRelease.trigger(event)
+            is UIMouseButtonEvent -> onMouseButtonEvent.trigger(event)
         }
-    }
-
-    open fun handleMouseButtonEvent(event: UIMouseButtonEvent) {
-        onMouseButtonEvent.trigger(event)
 
         when (event) {
-            is UIMousePressEvent -> onMousePress.trigger(event)
-            is UIMouseReleaseEvent -> onMouseRelease.trigger(event)
-            is UIMouseClickEvent -> onMouseClick.trigger(event)
-        }
-    }
-
-    open fun handleMouseEvent(event: UIMouseEvent) {
-        onMouseEvent.trigger(event)
-
-        when (event) {
-            is UIMouseButtonEvent -> handleMouseButtonEvent(event)
             is UIMouseEnterEvent -> onMouseEnter.trigger(event)
             is UIMouseExitEvent -> onMouseExit.trigger(event)
             is UIMouseMoveEvent -> onMouseMove.trigger(event)
             is UIMouseDragEvent -> onMouseDrag.trigger(event)
+            is UIMousePressEvent -> onMousePress.trigger(event)
+            is UIMouseReleaseEvent -> onMouseRelease.trigger(event)
+            is UIMouseClickEvent -> onMouseClick.trigger(event)
+            is UIKeyPressEvent -> onKeyPress.trigger(event)
+            is UIKeyReleaseEvent -> onKeyRelease.trigger(event)
+            is UITextInputEvent -> onTextInput.trigger(event)
+            is UIFocusEvent -> onFocus.trigger(event)
+            is UIUnFocusEvent -> onUnFocus.trigger(event)
         }
     }
 
@@ -187,7 +174,7 @@ abstract class UINode {
     }
 }
 
-private fun <T, R> List<T>.firstNotNull(fn: (T) -> R?): R? {
+fun <T, R> List<T>.firstNotNull(fn: (T) -> R?): R? {
     for (x in this) fn(x)?.let { return it }
     return null
 }
