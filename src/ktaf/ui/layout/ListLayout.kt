@@ -3,9 +3,9 @@ package ktaf.ui.layout
 import ktaf.core.KTAFValue
 import ktaf.core.vec2
 
-class ListLayout : UILayout() {
+class ListLayout(spacing: Spacing = Spacing.SPACE_AFTER): UILayout() {
     val alignment = KTAFValue(0.5f)
-    val spacing = KTAFValue(Spacing.SPACE_AFTER)
+    val spacing = KTAFValue(spacing)
 
     // compute the width for each child where allocated width fills the area
     override fun computeChildrenWidths(widthAllocatedForContent: Float?) {

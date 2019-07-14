@@ -59,6 +59,10 @@ class UISlider(min: Float = 0f, max: Float = 1f): UIContainer() {
     private fun positionSliderY() { slider.computedY.setValue(yRatio.get() * (computedHeight.get() - padding.get().height - slider.computedHeight.get())) }
 
     init {
+        propertyState(backgroundColour)
+        propertyState(sliderWidth)
+        propertyState(sliderHeight)
+
         // ratio <-> value
         x.connect { xRatio(divisions((it - xMin.get()) / (xMax.get() - xMin.get()), xSteps.get())); setX() }
         y.connect { yRatio(divisions((it - yMin.get()) / (yMax.get() - yMin.get()), ySteps.get())); setY() }

@@ -1,15 +1,29 @@
 package ktaf.ui.layout
 
+import ktaf.core.KTAFList
 import ktaf.core.KTAFValue
 import ktaf.core.vec2
 
-class HDivLayout: UILayout() {
+class HDivLayout(spacing: Float, vararg sections: LayoutValue): UILayout() {
+    constructor(vararg sections: LayoutValue): this(0f, *sections)
+
+    val sections = KTAFList(sections.map { KTAFValue(it) } .toMutableList())
     val alignment = KTAFValue(vec2(0.5f))
-    val spacing = KTAFValue(0f) // TODO: use proper spacing
+    val spacing = KTAFValue(spacing)
 
     // compute the width for each child where allocated width fills the area divided evenly amongst children
     override fun computeChildrenWidths(widthAllocatedForContent: Float?) {
-        UILayout.setChildrenWidths(children, widthAllocatedForContent ?.let { w -> (w - (children.size - 1) * spacing.get()) / children.size })
+        val widthAllocatedForChildren = widthAllocatedForContent ?.let { w -> w - (children.size - 1) * spacing.get() }
+        val sectionValues = listOf(0f) + sections.map { widthAllocatedForChildren ?.let { w -> it.get().apply(w) } }
+        val lastSectionDelta = widthAllocatedForChildren ?.let { w -> sectionValues.last() ?.let { l -> w - l } }
+        val sectionValuesToAppend = (1 .. (children.size - sections.size)).map { i ->
+            lastSectionDelta ?.let { sectionValues.last()!! + it * i / (children.size - sections.size) }
+        }
+        val sectionWidths = (sectionValues + sectionValuesToAppend).let { it.zip(it.drop(1)).map { (a, b) -> b ?.let { a ?.let { b - a } } } }
+
+        children.zip(sectionWidths).forEach { (child, widthAllocatedForChild) ->
+            child.computeWidth(widthAllocatedForChild ?.let { w -> w - child.margin.get().width })
+        }
     }
 
     // compute the height for each child where allocated height fills the area
@@ -25,13 +39,19 @@ class HDivLayout: UILayout() {
 
     // TODO: this process needs better documenting
     override fun position(width: Float, height: Float) {
-        val w = (width - (children.size - 1) * spacing.get()) / children.size
-        val h = height
-
         UILayout.positionChildrenChildren(children)
 
+        val widthAllocatedForChildren = width - (children.size - 1) * spacing.get()
+        val sectionValues = listOf(0f) + sections.map { widthAllocatedForChildren.let { w -> it.get().apply(w) } }
+        val lastSectionDelta = widthAllocatedForChildren - sectionValues.last()
+        val sectionValuesToAppend = (1 .. (children.size - sections.size)).map { i ->
+            sectionValues.last() + lastSectionDelta * i / (children.size - sections.size)
+        }
+        val sectionPositions = sectionValues + sectionValuesToAppend
+        val sectionWidths = (sectionValues + sectionValuesToAppend).let { it.zip(it.drop(1)).map { (a, b) -> b - a } }
+
         UILayout.positionChildren(children, 0) { index, child ->
-            align(child, vec2(index * (w + spacing.get()), 0f), vec2(w, h), alignment.get())
+            align(child, vec2(sectionPositions[index], 0f), vec2(sectionWidths[index], height), alignment.get())
             index + 1
         }
     }

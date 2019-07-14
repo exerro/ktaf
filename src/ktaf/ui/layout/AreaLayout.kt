@@ -41,17 +41,13 @@ class AreaLayout: UILayout() {
         } }
     }
 
-    fun Float.px() = Value(this, 0f)
-    fun Float.pc() = Value(0f, this)
-    fun Int.px() = toFloat().px()
-    fun Int.pc() = toFloat().pc()
-
     private val area = Area()
     private val elements: MutableMap<UINode, String> = mutableMapOf()
 }
 
 // TODO: this needs better documenting
 class Area {
+    // TODO: store LayoutValue not component values
     val topPercentage = KTAFValue(0f)
     val topPixels = KTAFValue(0f)
     val rightPercentage = KTAFValue(100f)
@@ -61,22 +57,22 @@ class Area {
     val leftPercentage = KTAFValue(0f)
     val leftPixels = KTAFValue(0f)
 
-    fun top(value: Value) {
+    fun top(value: LayoutValue) {
         topPercentage(value.percentage)
         topPixels(value.pixels)
     }
 
-    fun right(value: Value) {
+    fun right(value: LayoutValue) {
         rightPercentage(value.percentage)
         rightPixels(value.pixels)
     }
 
-    fun bottom(value: Value) {
+    fun bottom(value: LayoutValue) {
         bottomPercentage(value.percentage)
         bottomPixels(value.pixels)
     }
 
-    fun left(value: Value) {
+    fun left(value: LayoutValue) {
         leftPercentage(value.percentage)
         leftPixels(value.pixels)
     }
@@ -106,32 +102,32 @@ class Area {
         }
     }
 
-    fun split(label: String, vararg values: Value) {
-        val lefts = listOf(Value(0f, 0f)) + values
-        val rights = values.toList() + listOf(Value(0f, 100f))
+    fun split(label: String, vararg values: LayoutValue) {
+        val lefts = listOf(LayoutValue(0f, 0f)) + values
+        val rights = values.toList() + listOf(LayoutValue(0f, 100f))
 
         lefts.zip(rights).mapIndexed { i, (left, right) -> area("$label[$i]") { left(left); right(right) } }
     }
 
-    fun vsplit(label: String, vararg values: Value) {
-        val tops = listOf(Value(0f, 0f)) + values
-        val bottoms = values.toList() + listOf(Value(0f, 100f))
+    fun vsplit(label: String, vararg values: LayoutValue) {
+        val tops = listOf(LayoutValue(0f, 0f)) + values
+        val bottoms = values.toList() + listOf(LayoutValue(0f, 100f))
 
         tops.zip(bottoms).mapIndexed { i, (top, bottom) -> area("$label[$i]") { top(top); bottom(bottom) } }
     }
 
-    fun split(vararg values: Value, fn: Labeller.() -> Any?) {
-        val lefts = listOf(Value(0f, 0f)) + values
-        val rights = values.toList() + listOf(Value(0f, 100f))
+    fun split(vararg values: LayoutValue, fn: Labeller.() -> Any?) {
+        val lefts = listOf(LayoutValue(0f, 0f)) + values
+        val rights = values.toList() + listOf(LayoutValue(0f, 100f))
         val baseIndex = subAreas.size
 
         lefts.zip(rights).map { (left, right) -> area { left(left); right(right) } }
         fn(Labeller(baseIndex, labels, labelLookup))
     }
 
-    fun vsplit(vararg values: Value, fn: Labeller.() -> Any?) {
-        val tops = listOf(Value(0f, 0f)) + values
-        val bottoms = values.toList() + listOf(Value(0f, 100f))
+    fun vsplit(vararg values: LayoutValue, fn: Labeller.() -> Any?) {
+        val tops = listOf(LayoutValue(0f, 0f)) + values
+        val bottoms = values.toList() + listOf(LayoutValue(0f, 100f))
         val baseIndex = subAreas.size
 
         tops.zip(bottoms).map { (top, bottom) -> area { top(top); bottom(bottom) } }
@@ -170,11 +166,6 @@ class Area {
     private val subAreas: MutableList<Area> = mutableListOf()
     private val labels: MutableMap<Int, String> = mutableMapOf()
     private val labelLookup: MutableMap<String, Int> = mutableMapOf()
-}
-
-data class Value internal constructor(val pixels: Float, val percentage: Float) {
-    operator fun plus(other: Value) = Value(pixels + other.pixels, percentage + other.percentage)
-    operator fun minus(other: Value) = Value(pixels - other.pixels, percentage - other.percentage)
 }
 
 class Labeller internal constructor(private var baseIndex: Int, private val labels: MutableMap<Int, String>, private val labelLookup: MutableMap<String, Int>) {
