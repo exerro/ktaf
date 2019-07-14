@@ -30,7 +30,7 @@ class DrawContext2D(val viewport: GLViewport) {
         set(width) { activeState.lineWidth = width }
 
     var scissor: AABB?
-        get() = states.fold(state.scissor) { a, b -> b.scissor?.let { a?.intersection(it) } }
+        get() = states.fold(state.scissor) { a, b -> b.scissor?.let { a?.intersection(it) } ?: b.scissor ?: a }
         set(scissor) { activeState.scissor = scissor?.intersection(AABB(vec2(0f), viewport.size)) }
 
     val shader get() = shaderProgram2D

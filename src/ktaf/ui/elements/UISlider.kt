@@ -91,14 +91,14 @@ class UISlider(min: Float = 0f, max: Float = 1f): UIContainer() {
         slider.onMouseDrag.connect { event ->
             val dp = event.position - event.firstPosition
 
-            if (direction.get() != UISliderDirection.VERTICAL) {
+            if (direction.get() != UISliderDirection.VERTICAL && dp.x != 0f) {
                 val size = computedWidth.get() - padding.get().width - slider.computedWidth.get()
                 val pos = slider.computedX.get() + dp.x
                 val ratio = max(0f, min(1f, pos / size))
                 xRatio(divisions(ratio, xSteps.get()))
             }
 
-            if (direction.get() != UISliderDirection.HORIZONTAL) {
+            if (direction.get() != UISliderDirection.HORIZONTAL && dp.y != 0f) {
                 val size = computedHeight.get() - padding.get().height - slider.computedHeight.get()
                 val pos = slider.computedY.get() + dp.y
                 val ratio = max(0f, min(1f, pos / size))
