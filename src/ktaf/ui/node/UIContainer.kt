@@ -42,7 +42,8 @@ open class UIContainer(colour: RGBA = rgba(1f, 0f)): UINode() {
 
     // check children for input handlers before deferring to super
     override fun getMouseHandler(position: vec2): UINode?
-            =  children.reversed().firstNotNull { it.getMouseHandler(position - padding.get().tl - it.computedPosition.get()) }
+            = children.takeIf { position.x >= 0 && position.y >= 0 && position.x <= computedWidth.get() && position.y <= computedHeight.get() }
+            ?.reversed() ?.firstNotNull { it.getMouseHandler(position - padding.get().tl - it.computedPosition.get()) }
             ?: super.getMouseHandler(position)
 
     // check children for input handlers before deferring to super

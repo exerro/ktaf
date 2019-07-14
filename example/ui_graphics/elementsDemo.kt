@@ -104,6 +104,9 @@ fun elementsDemo(): UINode {
             content.layout(ListLayout(Spacing.fixed(16f)))
         }
 
+        val checkboxLabel = children.add(UILabel("Checkbox: ")) {}
+        checkboxLabel.target(children.add(UICheckbox()) {})
+
         slider.x.joinTo(slider2.x)
 
         button.text.connect { mirror.text.set(it) }
