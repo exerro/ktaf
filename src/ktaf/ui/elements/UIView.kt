@@ -7,10 +7,12 @@ import ktaf.core.vec2
 import ktaf.graphics.DrawContext2D
 import ktaf.graphics.push
 import ktaf.typeclass.minus
+import ktaf.typeclass.plus
 import ktaf.ui.layout.ViewLayout
 import ktaf.ui.layout.tl
 import ktaf.ui.node.UIContainer
 import ktaf.ui.node.UINode
+import ktaf.util.AABB
 
 class UIView: UIContainer() {
     val active = KTAFValue(null as UINode?)
@@ -50,7 +52,7 @@ class UIView: UIContainer() {
 
     override fun draw(context: DrawContext2D, position: vec2, size: vec2) {
         context.push {
-            // TODO: set a scissor or something to limit where is drawn
+            context.scissor = AABB(position, position + size)
             super.draw(context, position, size)
         }
     }

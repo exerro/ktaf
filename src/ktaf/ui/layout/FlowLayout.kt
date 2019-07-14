@@ -20,8 +20,6 @@ class FlowLayout: UILayout() {
     }
 
     override fun computeChildrenHeights(width: Float, heightAllocatedForContent: Float?) {
-        val xOverflow = width
-
         // compute the height for each child where allocated height is non-existent
         UILayout.setChildrenHeights(children, null)
 
@@ -29,9 +27,9 @@ class FlowLayout: UILayout() {
         children.fold(0f) { x, child ->
             val w = child.margin.get().width + child.computedWidthInternal
 
-            if (x + w > xOverflow) {
+            if (x + w > width) {
                 rows.add(mutableListOf(child))
-                w
+                w + horizontalSpacing.get().fixed
             }
             else {
                 rows.last().add(child)
@@ -41,7 +39,7 @@ class FlowLayout: UILayout() {
     }
 
     // return the largest of the children's widths as the content width
-    override fun computeChildrenWidth() = UILayout.sumChildrenWidth(children)
+    override fun computeChildrenWidth() = UILayout.sumChildrenWidth(children) + children.size * horizontalSpacing.get().fixed()
 
     // TODO: this process needs documenting
     override fun computeChildrenHeight() = rows.map { row -> UILayout.maximumChildHeight(row) } .sum() + (rows.size - 1) * verticalSpacing.get().fixed()

@@ -51,7 +51,7 @@ class HDivLayout(spacing: Float, vararg sections: LayoutValue): UILayout() {
         val sectionWidths = (sectionValues + sectionValuesToAppend).let { it.zip(it.drop(1)).map { (a, b) -> b - a } }
 
         UILayout.positionChildren(children, 0) { index, child ->
-            align(child, vec2(sectionPositions[index], 0f), vec2(sectionWidths[index], height), alignment.get())
+            align(child, vec2(sectionPositions[index] + spacing.get() * index, 0f), vec2(sectionWidths[index], height), alignment.get())
             index + 1
         }
     }

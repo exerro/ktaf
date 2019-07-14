@@ -69,7 +69,8 @@ abstract class UINode {
     open fun computeWidth(widthAllocated: Float?) {
         // TODO: comment
         computedWidthInternal = width.get()
-                ?: widthAllocated.takeIf { fill.get() } ?: computeContentWidth(widthAllocated)
+                ?: widthAllocated.takeIf { fill.get() }
+                ?: computeContentWidth(widthAllocated)
     }
 
     /**
@@ -79,7 +80,8 @@ abstract class UINode {
     open fun computeHeight(heightAllocated: Float?) {
         // TODO: comment
         computedHeightInternal = height.get()
-                ?: heightAllocated.takeIf { fill.get() } ?: computeContentHeight(computedWidthInternal, heightAllocated)
+                ?: heightAllocated.takeIf { fill.get() }
+                ?: computeContentHeight(computedWidthInternal, heightAllocated)
     }
 
     /** Return the width of the content of this node */

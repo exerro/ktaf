@@ -1,6 +1,8 @@
 import ktaf.core.Colour
 import ktaf.core.joinTo
 import ktaf.core.rgba
+import ktaf.core.vec2
+import ktaf.typeclass.minus
 import ktaf.ui.elements.*
 import ktaf.ui.layout.*
 import ktaf.ui.node.UIContainer
@@ -48,6 +50,7 @@ fun elementsDemo(): UINode {
             padding(Border(8f, 16f))
             width(256f)
             sliderWidth(48f)
+            sliderColour(Colour.purple)
         }
 
         val sliderLabel = sliderRow1.children.add(UILabel("(0, 0)")) {
@@ -59,6 +62,7 @@ fun elementsDemo(): UINode {
             width(256f)
             height(256f)
             ySteps(11)
+            sliderColour(Colour.red)
         }
 
         val slider2Label = sliderRow2.children.add(UILabel("(0, 0)")) {
@@ -104,8 +108,46 @@ fun elementsDemo(): UINode {
             content.layout(ListLayout(Spacing.fixed(16f)))
         }
 
-        val checkboxLabel = children.add(UILabel("Checkbox: ")) {}
-        checkboxLabel.target(children.add(UICheckbox()) {})
+        children.add(UIContainer()) {
+            layout(HDivLayout(100.pc() - 40.px())) { spacing(4f) }
+
+            val checkboxLabel = children.add(UILabel("Checkbox")) {
+                colour(rgba(0.86f))
+                padding(Border(4f, 8f))
+            }
+            checkboxLabel.target(children.add(UICheckbox()) {})
+        }
+
+        children.add(UIContainer()) {
+            width(144f)
+            colour(rgba(0.85f))
+            layout(ListLayout()) { spacing(Spacing.fixed(4f)) }
+
+            children.add(UILabel("Radio buttons")) {
+                colour(rgba(0.2f))
+                textColour(rgba(1f))
+                alignment(vec2(0.5f))
+            }
+
+            val group = RadioButtonGroup()
+
+            ('A' .. 'F').forEach { ch ->
+                children.add(UIContainer()) {
+                    colour(Colour.red)
+                    padding(Border(0f, 8f))
+                    layout(HDivLayout(100.pc() - 20.px()))
+
+                    val label = children.add(UILabel(ch.toString())) {
+                        padding(Border(4f, 8f))
+                        textColour(rgba(1f))
+                    }
+                    label.target(children.add(UIRadioButton()) {
+                        group(group)
+                        colour(rgba(0.78f))
+                    })
+                }
+            }
+        }
 
         slider.x.joinTo(slider2.x)
 
