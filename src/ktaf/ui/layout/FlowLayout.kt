@@ -44,7 +44,7 @@ class FlowLayout: UILayout() {
     override fun computeChildrenWidth() = UILayout.sumChildrenWidth(children)
 
     // TODO: this process needs documenting
-    override fun computeChildrenHeight() = rows.map { row -> UILayout.maximumChildHeight(row) } .sum()
+    override fun computeChildrenHeight() = rows.map { row -> UILayout.maximumChildHeight(row) } .sum() + (rows.size - 1) * verticalSpacing.get().fixed()
 
     // TODO: this process needs better documenting
     override fun position(width: Float, height: Float) {

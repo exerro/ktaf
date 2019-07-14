@@ -89,6 +89,18 @@ abstract class UINode {
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+    /** Return the mouse event handler for an event at the given location */
+    open fun getMouseHandler(position: vec2): UINode?
+            = this.takeIf { position.x >= 0 && position.y >= 0 && position.x < computedWidth.get() && position.y < computedHeight.get() }
+
+    /** Return the keyboard event handler for an event */
+    open fun getKeyboardHandler(key: GLFWKey, modifiers: Set<GLFWKeyModifier>): UINode?
+            = this.takeIf { handlesKey(key, modifiers) }
+
+    /** Return the input event handler for an event */
+    open fun getInputHandler(): UINode?
+            = this.takeIf { handlesInput() }
+
     /** Return true if this node can handle the key event */
     open fun handlesKey(key: GLFWKey, modifiers: Set<GLFWKeyModifier>): Boolean
             = hotkeys.any { it.matches(key, modifiers) }
@@ -96,15 +108,6 @@ abstract class UINode {
     /** Return true if this node can handle input */
     open fun handlesInput(): Boolean
             = false
-
-    open fun getMouseHandler(position: vec2): UINode?
-            =  this.takeIf { position.x >= 0 && position.y >= 0 && position.x < computedWidth.get() && position.y < computedHeight.get() }
-
-    open fun getKeyboardHandler(key: GLFWKey, modifiers: Set<GLFWKeyModifier>): UINode?
-            = null
-
-    open fun getInputHandler(): UINode?
-            = null
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

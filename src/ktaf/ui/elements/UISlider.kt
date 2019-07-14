@@ -13,10 +13,6 @@ import kotlin.math.max
 import kotlin.math.min
 
 class UISlider: UINode() {
-    // TODO
-    override fun computeContentWidth(width: Float?): Float = 0f
-    override fun computeContentHeight(width: Float, height: Float?): Float = 0f
-
     val direction = KTAFValue(UISliderDirection.HORIZONTAL)
     val x = KTAFValue(0f)
     val y = KTAFValue(0f)
@@ -28,7 +24,10 @@ class UISlider: UINode() {
     val backgroundColour = KTAFValue(rgba(0f))
     val value = KTAFValue(vec2(0f))
 
-    override fun update(dt: Float) { slider.update(dt) }
+    override fun update(dt: Float) {
+        super.update(dt)
+        slider.update(dt)
+    }
     override fun getMouseHandler(position: vec2): UINode? = slider.getMouseHandler(position - padding.get().tl - slider.computedPosition.get())
     override fun getInputHandler(): UINode? = slider.getInputHandler()
     override fun getKeyboardHandler(key: GLFWKey, modifiers: Set<GLFWKeyModifier>): UINode? =
@@ -39,14 +38,18 @@ class UISlider: UINode() {
         drawChildren(listOf(slider), context, position)
     }
 
+    override fun computeContentWidth(width: Float?): Float = 0f
+    override fun computeContentHeight(width: Float, height: Float?): Float = 0f
+
     override fun computeWidth(widthAllocated: Float?) {
         super.computeWidth(widthAllocated)
         slider.computeWidth(widthAllocated)
     }
 
+    // TODO: this needs improving
     override fun computeHeight(heightAllocated: Float?) {
         super.computeHeight(heightAllocated)
-        slider.computeHeight(heightAllocated)
+        slider.computeHeight(height.get() ?.let { it - padding.get().height })
     }
 
     private val slider = SliderObject()
@@ -109,7 +112,6 @@ private class SliderObject: UINode() {
     override fun cursor() = GLFWCursor.POINTER
     val colour = KTAFValue(rgba(0f))
 
-    // TODO
     override fun computeContentWidth(width: Float?): Float = 0f
     override fun computeContentHeight(width: Float, height: Float?): Float = 0f
 

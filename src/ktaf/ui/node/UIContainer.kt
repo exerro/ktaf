@@ -26,21 +26,31 @@ open class UIContainer: UINode() {
         )
     }
 
-    override fun cursor(): GLFWCursor? = null
+    // update children
+    override fun update(dt: Float) {
+        super.update(dt)
+        children.forEach { it.update(dt) }
+    }
 
+    // draw children
     override fun draw(context: DrawContext2D, position: vec2, size: vec2) {
         drawChildren(children, context, position)
     }
 
+    // check children for input handlers before deferring to super
     override fun getMouseHandler(position: vec2): UINode?
             =  children.reversed().firstNotNull { it.getMouseHandler(position - padding.get().tl - it.computedPosition.get()) }
             ?: super.getMouseHandler(position)
 
+    // check children for input handlers before deferring to super
     override fun getKeyboardHandler(key: GLFWKey, modifiers: Set<GLFWKeyModifier>): UINode?
-            = children.reversed().firstNotNull { it.getKeyboardHandler(key, modifiers) } ?: this.takeIf { handlesKey(key, modifiers) } ?: super.getKeyboardHandler(key, modifiers)
+            =  children.reversed().firstNotNull { it.getKeyboardHandler(key, modifiers) }
+            ?: super.getKeyboardHandler(key, modifiers)
 
+    // check children for input handlers before deferring to super
     override fun getInputHandler(): UINode?
-            = children.reversed().firstNotNull { it.getInputHandler() } ?: this.takeIf { handlesInput() } ?: super.getInputHandler()
+            =  children.reversed().firstNotNull { it.getInputHandler() }
+            ?: super.getInputHandler()
 
     // compute the width of children prior to calling the super method
     override fun computeWidth(widthAllocated: Float?) {
@@ -85,5 +95,7 @@ open class UIContainer: UINode() {
         }
 
         scene.connect { scene -> children.forEach { it.scene.set(scene) } }
+
+        fill(true)
     }
 }

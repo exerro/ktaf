@@ -17,6 +17,7 @@ open class KTAFValue<T>(
 
     fun connect(fn: (T) -> Unit): (T) -> Unit {
         connections.add(fn)
+        fn(value)
         return fn
     }
 

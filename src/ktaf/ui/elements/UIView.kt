@@ -4,6 +4,8 @@ import ktaf.core.GLFWKey
 import ktaf.core.GLFWKeyModifier
 import ktaf.core.KTAFValue
 import ktaf.core.vec2
+import ktaf.graphics.DrawContext2D
+import ktaf.graphics.push
 import ktaf.typeclass.minus
 import ktaf.ui.layout.ViewLayout
 import ktaf.ui.layout.tl
@@ -11,7 +13,6 @@ import ktaf.ui.node.UIContainer
 import ktaf.ui.node.UINode
 
 class UIView: UIContainer() {
-    val viewLayout = KTAFValue(ViewLayout())
     val active = KTAFValue(null as UINode?)
 
     fun show(node: UINode) {
@@ -47,6 +48,16 @@ class UIView: UIContainer() {
     override fun getInputHandler(): UINode?
             = active.get() ?.getInputHandler() ?: this.takeIf { handlesInput() }
 
+    override fun draw(context: DrawContext2D, position: vec2, size: vec2) {
+        context.push {
+            // TODO: set a scissor or something to limit where is drawn
+            super.draw(context, position, size)
+        }
+    }
+
+    private val viewLayout = KTAFValue(ViewLayout())
+    private var functions = listOf<(UINode) -> Any?>()
+
     init {
         layout(viewLayout.get())
         viewLayout.connect { layout.set(it) }
@@ -54,6 +65,4 @@ class UIView: UIContainer() {
         children.connectAdded { if (children.size == 1) show(it) }
         children.connectRemoved { if (active.get() == it) children.lastOrNull() ?.let { show(it) } }
     }
-
-    private var functions = listOf<(UINode) -> Any?>()
 }

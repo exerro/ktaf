@@ -4,6 +4,7 @@ data class Spacing(val fixed: Float, val spacer: (Float, Int) -> Float, val offs
     companion object {
         private val zero: (Float, Int) -> Float = { _, _ -> 0f }
 
+        /** ......OOOOOO...... */
         val SPACE_AROUND = align(0.5f)
         /** ...OO...OO...OO... */
         val SPACE_EVENLY = Spacing(0f, { s, n -> s / (n + 1) }, { s, _ -> s / 2 })
@@ -17,6 +18,12 @@ data class Spacing(val fixed: Float, val spacer: (Float, Int) -> Float, val offs
         val SPACE_BEFORE = Spacing(0f, zero, { s, _ -> s })
         /** OO.OO.OO...... */
         fun fixed(spacing: Float) = Spacing(spacing, zero, zero)
+        /** OO.OO.OO...... */
+        fun proportional(k: Float) = Spacing(0f, { s, n -> s * k / (n - 1) }, zero)
+        /** OO.OO.OO...... */
+        fun fixedOffset(offset: Float) = Spacing(0f, zero, { _, _ -> offset })
+        /** OO.OO.OO...... */
+        fun proportionalOffset(k: Float) = Spacing(0f, zero, { s, _ -> s * k })
         /** ..<~OOOOOO~>.. */
         fun align(alignment: Float) = Spacing(0f, zero, { s, _ -> s * alignment })
     }
