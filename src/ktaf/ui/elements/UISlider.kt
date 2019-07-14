@@ -1,80 +1,88 @@
+@file:JvmName("UISliderKt")
+
 package ktaf.ui.elements
 
 import ktaf.core.*
 import ktaf.graphics.DrawContext2D
 import ktaf.typeclass.minus
+import ktaf.ui.DEFAULT_STATE
+import ktaf.ui.UIAnimatedProperty
+import ktaf.ui.UIProperty
+import ktaf.ui.elements.UISlider.Companion.PRESSED
+import ktaf.ui.layout.Border
+import ktaf.ui.layout.DummyLayout
 import ktaf.ui.layout.height
-import ktaf.ui.layout.tl
 import ktaf.ui.layout.width
 import ktaf.ui.node.*
+import ktaf.util.Animation
 import lwjglkt.GLFWCursor
 import kotlin.math.floor
 import kotlin.math.max
 import kotlin.math.min
 
-class UISlider: UINode() {
+class UISlider(min: Float = 0f, max: Float = 1f): UIContainer() {
+    constructor(steps: Int): this() { xSteps(steps) }
+    constructor(min: Float, max: Float, steps: Int): this(min, max) { xSteps(steps) }
+
+    private val slider = children.add(SliderObject()) {}
+
     val direction = KTAFValue(UISliderDirection.HORIZONTAL)
+    val backgroundColour = UIAnimatedProperty(rgba(0f), this, "backgroundColour")
+
     val x = KTAFValue(0f)
     val y = KTAFValue(0f)
-    val xSteps = KTAFValue<Int?>(null)
-    val ySteps = KTAFValue<Int?>(null)
-    val sliderWidth = KTAFValue(0f)
-    val sliderHeight = KTAFValue(0f)
-    val sliderColour = KTAFValue(rgba(0f))
-    val backgroundColour = KTAFValue(rgba(0f))
     val value = KTAFValue(vec2(0f))
 
-    override fun update(dt: Float) {
-        super.update(dt)
-        slider.update(dt)
-    }
-    override fun getMouseHandler(position: vec2): UINode? = slider.getMouseHandler(position - padding.get().tl - slider.computedPosition.get())
-    override fun getInputHandler(): UINode? = slider.getInputHandler()
-    override fun getKeyboardHandler(key: GLFWKey, modifiers: Set<GLFWKeyModifier>): UINode? =
-            slider.getKeyboardHandler(key, modifiers)
+    val xSteps = KTAFValue<Int?>(null)
+    val xMin = KTAFValue(min)
+    val xMax = KTAFValue(max)
+
+    val ySteps = KTAFValue<Int?>(null)
+    val yMin = KTAFValue(0f)
+    val yMax = KTAFValue(1f)
+
+    val sliderWidth = UIProperty(0f)
+    val sliderHeight = UIProperty(0f)
+    val sliderColour = slider.colour
 
     override fun draw(context: DrawContext2D, position: vec2, size: vec2) {
         fillBackground(context, position, size, backgroundColour.get())
-        drawChildren(listOf(slider), context, position)
+        super.draw(context, position, size)
     }
 
-    override fun computeContentWidth(width: Float?): Float = 0f
-    override fun computeContentHeight(width: Float, height: Float?): Float = 0f
+    private val xRatio = KTAFValue(0f)
+    private val yRatio = KTAFValue(0f)
 
-    override fun computeWidth(widthAllocated: Float?) {
-        super.computeWidth(widthAllocated)
-        slider.computeWidth(widthAllocated)
-    }
-
-    // TODO: this needs improving
-    override fun computeHeight(heightAllocated: Float?) {
-        super.computeHeight(heightAllocated)
-        slider.computeHeight(height.get() ?.let { it - padding.get().height })
-    }
-
-    private val slider = SliderObject()
+    private fun setX() { x(xMin.get() + xRatio.get() * (xMax.get() - xMin.get())) }
+    private fun setY() { y(yMin.get() + yRatio.get() * (yMax.get() - yMin.get())) }
+    private fun positionSliderX() { slider.computedX.setValue(xRatio.get() * (computedWidth.get() - padding.get().width - slider.computedWidth.get())) }
+    private fun positionSliderY() { slider.computedY.setValue(yRatio.get() * (computedHeight.get() - padding.get().height - slider.computedHeight.get())) }
 
     init {
-        x.connect { slider.computedX.setValue(it * (computedWidth.get() - padding.get().width - slider.computedWidth.get())) }
-        y.connect { slider.computedY.setValue(it * (computedHeight.get() - padding.get().height - slider.computedHeight.get())) }
-        xSteps.connect { s -> x(divisions(x.get(), s ?.let { it - 1 })) }
-        ySteps.connect { s -> y(divisions(y.get(), s ?.let { it - 1 })) }
-        sliderWidth.connect { slider.width(it.takeIf { direction.get() != UISliderDirection.VERTICAL }) }
-        sliderHeight.connect { slider.height(it.takeIf { direction.get() != UISliderDirection.HORIZONTAL }) }
-        sliderColour.connect(slider.colour::setter)
+        // ratio <-> value
+        x.connect { xRatio(divisions((it - xMin.get()) / (xMax.get() - xMin.get()), xSteps.get())); setX() }
+        y.connect { yRatio(divisions((it - yMin.get()) / (yMax.get() - yMin.get()), ySteps.get())); setY() }
+        xRatio.connect { x(xMin.get() + it * (xMax.get() - xMin.get())) }
+        yRatio.connect { y(yMin.get() + it * (yMax.get() - yMin.get())) }
 
-        scene.joinTo(slider.scene)
-
-        x.connect { x(divisions(it, xSteps.get() ?.let { s -> s - 1 })) }
-        y.connect { y(divisions(it, ySteps.get() ?.let { s -> s - 1 })) }
+        // value <-> (x, y)
         x.connect { value(vec2(x.get(), y.get())) }
         y.connect { value(vec2(x.get(), y.get())) }
         value.connect { x(it.x); y(it.y) }
 
-        direction.connect {
-            slider.width(sliderWidth.get().takeIf { direction.get() != UISliderDirection.VERTICAL })
-            slider.height(sliderHeight.get().takeIf { direction.get() != UISliderDirection.HORIZONTAL })
-        }
+        // update ratio on step count or range change
+        xSteps.connect { xRatio(xRatio.get()) }
+        ySteps.connect { yRatio(yRatio.get()) }
+
+        // update value on range change
+        xMin.connect { setX() }
+        xMax.connect { setX() }
+        yMin.connect { setY() }
+        yMax.connect { setY() }
+
+        // update slider position on ratio change
+        xRatio.connect { positionSliderX() }
+        yRatio.connect { positionSliderY() }
 
         slider.onMouseDrag.connect { event ->
             val dp = event.position - event.firstPosition
@@ -83,17 +91,18 @@ class UISlider: UINode() {
                 val size = computedWidth.get() - padding.get().width - slider.computedWidth.get()
                 val pos = slider.computedX.get() + dp.x
                 val ratio = max(0f, min(1f, pos / size))
-                x(divisions(ratio, xSteps.get() ?.let { it - 1 }))
+                xRatio(divisions(ratio, xSteps.get()))
             }
 
             if (direction.get() != UISliderDirection.HORIZONTAL) {
                 val size = computedHeight.get() - padding.get().height - slider.computedHeight.get()
                 val pos = slider.computedY.get() + dp.y
                 val ratio = max(0f, min(1f, pos / size))
-                y(divisions(ratio, ySteps.get() ?.let { it - 1 }))
+                yRatio(divisions(ratio, ySteps.get()))
             }
         }
 
+        layout(SliderLayout(direction, sliderWidth, sliderHeight))
         direction(UISliderDirection.HORIZONTAL)
         x(0f)
         y(0f)
@@ -108,20 +117,19 @@ class UISlider: UINode() {
     }
 }
 
-private class SliderObject: UINode() {
+private class SliderObject: UIPane() {
     override fun cursor() = GLFWCursor.POINTER
-    val colour = KTAFValue(rgba(0f))
-
-    override fun computeContentWidth(width: Float?): Float = 0f
-    override fun computeContentHeight(width: Float, height: Float?): Float = 0f
-
-    override fun draw(context: DrawContext2D, position: vec2, size: vec2) {
-        fillBackground(context, position, size, colour.get())
-    }
 
     init {
-        onMousePress { state.push(UISlider.PRESSED) }
-        onMouseRelease { state.remove(UISlider.PRESSED) }
+        onMousePress { state.push(PRESSED) }
+        onMouseRelease { state.remove(PRESSED) }
+
+        colour.duration = Animation.QUICK
+        colour.setSetter {
+            this[DEFAULT_STATE](it)
+            this[HOVER](it.lighten())
+            this[PRESSED](it.darken())
+        }
     }
 }
 
@@ -131,7 +139,25 @@ enum class UISliderDirection {
     BOTH
 }
 
+private class SliderLayout(
+        val direction: KTAFValue<UISliderDirection>,
+        val sliderWidth: KTAFValue<Float>,
+        val sliderHeight: KTAFValue<Float>
+): DummyLayout() {
+    override fun computeChildrenWidths(widthAllocatedForContent: Float?) {
+        children.forEach { it.computedWidth(
+                (widthAllocatedForContent.takeIf { direction.get() == UISliderDirection.VERTICAL } ?: sliderWidth.get())
+        ) }
+    }
+
+    override fun computeChildrenHeights(width: Float, heightAllocatedForContent: Float?) {
+        children.forEach { it.computedHeight(
+                (heightAllocatedForContent.takeIf { direction.get() == UISliderDirection.HORIZONTAL } ?: sliderHeight.get())
+        ) }
+    }
+}
+
 private fun divisions(ratio: Float, divisions: Int?): Float {
     if (divisions == null) return ratio
-    return floor(ratio * divisions + 0.5f) / divisions
+    return floor(ratio * (divisions - 1) + 0.5f) / (divisions - 1)
 }

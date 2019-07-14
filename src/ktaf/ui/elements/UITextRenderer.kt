@@ -25,7 +25,7 @@ abstract class UITextRenderer: UINode() {
     val textColour = UIAnimatedProperty(rgba(0f, 0.9f), this, "textColour", duration = Animation.QUICK)
     val text = UIProperty("")
     val font = UIProperty(Font.DEFAULT_FONT.scaleTo(16f))
-    val alignment = UIProperty(vec2(0f))
+    val alignment = UIAnimatedProperty(vec2(0f), this, "alignment")
     val wrap = UIProperty(true)
 
     override fun computeContentWidth(width: Float?): Float {

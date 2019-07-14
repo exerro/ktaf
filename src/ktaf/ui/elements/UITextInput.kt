@@ -11,13 +11,13 @@ import org.lwjgl.glfw.GLFW
 // TODO: this needs a hell of a lot of work!
 class UITextInput: UITextRenderer() {
     override fun handlesKey(key: GLFWKey, modifiers: Set<GLFWKeyModifier>): Boolean
-            = super.handlesKey(key, modifiers) || focussed.get()
+            = super.handlesKey(key, modifiers) || focused.get()
 
-    override fun handlesInput(): Boolean = focussed.get()
+    override fun handlesInput(): Boolean = focused.get()
     override fun cursor(): GLFWCursor? = GLFWCursor.IBEAM
 
     init {
-        focussed.connect { if (it) state.push(EDITING) else state.remove(EDITING) }
+        focused.connect { if (it) state.push(EDITING) else state.remove(EDITING) }
 
         onTextInput {
             text(text.get() + it.input)
@@ -36,6 +36,7 @@ class UITextInput: UITextRenderer() {
         }
 
         colour(rgba(0.75f))
+        textColour(rgba(0f))
         alignment(vec2(0f, 0.5f))
         padding(Border(8f, 16f))
     }

@@ -7,7 +7,7 @@ import ktaf.ui.UIAnimatedProperty
 import ktaf.ui.node.UIContainer
 import ktaf.ui.node.fillBackground
 
-class UIPane: UIContainer() {
+open class UIPane: UIContainer() {
     var colour = UIAnimatedProperty(rgba(1f, 0.02f), this, "colour")
 
     override fun draw(context: DrawContext2D, position: vec2, size: vec2) {

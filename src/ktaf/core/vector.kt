@@ -35,6 +35,8 @@ fun vec3.length() = sqrt(length2())
 
 fun vec2.normalise() = this / length()
 fun vec3.normalise() = this / length()
+fun vec2.normalise(length: Float) = this * length / length()
+fun vec3.normalise(length: Float) = this * length / length()
 
 infix fun vec2.dot(v: vec2) = x * v.x + y * v.y
 infix fun vec3.dot(v: vec3) = x * v.x + y * v.y + z * v.z

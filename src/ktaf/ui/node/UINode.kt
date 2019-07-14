@@ -24,7 +24,7 @@ abstract class UINode {
 
     // state
     val state = KTAFValue(listOf<UINodeState>()) // TODO: comment
-    val focussed = KTAFValue(false) // TODO: comment
+    val focused = KTAFValue(false) // TODO: comment
     val computedX = KTAFValue(0f)
     val computedY = KTAFValue(0f)
     val computedWidth = KTAFValue(0f)
@@ -117,7 +117,16 @@ abstract class UINode {
         propertyState(margin)
         propertyState(padding)
 
-        focussed.connect { if (it) scene.get()?.focussedNode?.set(this) }
+// TODO:
+//        this.javaClass.declaredFields
+//                .map { it.kotlinProperty }
+//                .filter { it?.isAccessible ?: false }
+//                .mapNotNull { it?.getter?.call(this) }
+//                .map { println(it) }
+//                .filterIsInstance<UIProperty<*>>()
+//                .forEach { propertyState(it) }
+
+        focused.connect { if (it) scene.get()?.focussedNode?.set(this) }
         computedX.connect { computedPosition.set(vec2(it, computedY.get())) }
         computedY.connect { computedPosition.set(vec2(computedX.get(), it)) }
 
@@ -151,32 +160,6 @@ abstract class UINode {
 
     companion object {
         const val HOVER = "hover"
-    }
-}
-
-fun UINode.handleEvent(event: UIEvent) {
-    when (event) {
-        is UIKeyEvent -> onKeyEvent.trigger(event)
-        is UIMouseEvent -> onMouseEvent.trigger(event)
-    }
-
-    when (event) {
-        is UIMouseButtonEvent -> onMouseButtonEvent.trigger(event)
-    }
-
-    when (event) {
-        is UIMouseEnterEvent -> onMouseEnter.trigger(event)
-        is UIMouseExitEvent -> onMouseExit.trigger(event)
-        is UIMouseMoveEvent -> onMouseMove.trigger(event)
-        is UIMouseDragEvent -> onMouseDrag.trigger(event)
-        is UIMousePressEvent -> onMousePress.trigger(event)
-        is UIMouseReleaseEvent -> onMouseRelease.trigger(event)
-        is UIMouseClickEvent -> onMouseClick.trigger(event)
-        is UIKeyPressEvent -> onKeyPress.trigger(event)
-        is UIKeyReleaseEvent -> onKeyRelease.trigger(event)
-        is UITextInputEvent -> onTextInput.trigger(event)
-        is UIFocusEvent -> onFocus.trigger(event)
-        is UIUnFocusEvent -> onUnFocus.trigger(event)
     }
 }
 
