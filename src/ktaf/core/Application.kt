@@ -3,8 +3,11 @@ package ktaf.core
 import lwjglkt.*
 import org.lwjgl.glfw.Callbacks
 import org.lwjgl.glfw.GLFW
+import kotlin.system.exitProcess
 
 const val DISPLAY_FPS_READINGS = 10
+
+class WindowResizeEvent(val size: vec2): Event()
 
 class Application(val display: GLFWDisplay) {
     private val startTime = System.currentTimeMillis()
@@ -17,24 +20,26 @@ class Application(val display: GLFWDisplay) {
     val viewport
         get() = GLViewport({0}, {0}, {display.width}, {display.height})
 
-    internal val onResizedCallbacks = mutableListOf<ResizeCallback>()
-    internal val onKeyPressedCallbacks = mutableListOf<KeyPressedCallback>()
-    internal val onKeyReleasedCallbacks = mutableListOf<KeyReleasedCallback>()
-    internal val onTextInputCallbacks = mutableListOf<TextInputCallback>()
-    internal val onMousePressedCallbacks = mutableListOf<MousePressedCallback>()
-    internal val onMouseReleasedCallbacks = mutableListOf<MouseReleasedCallback>()
-    internal val onMouseMovedCallbacks = mutableListOf<MouseMovedCallback>()
-    internal val onMouseDraggedCallbacks = mutableListOf<MouseDraggedCallback>()
-    internal val onDrawCallbacks = mutableListOf<DrawCallback>()
-    internal val onUpdateCallbacks = mutableListOf<UpdateCallback>()
+    val onResize = EventHandlerList<WindowResizeEvent>()
+    val onUpdate = EventHandlerList<UpdateEvent>()
+
+    val onKeyEvent = EventHandlerList<KeyEvent>()
+    val onKeyPress = EventHandlerList<KeyPressEvent>()
+    val onKeyRelease = EventHandlerList<KeyReleaseEvent>()
+    val onTextInput = EventHandlerList<TextInputEvent>()
+    val onMousePress = EventHandlerList<MousePressEvent>()
+    val onMouseRelease = EventHandlerList<MouseReleaseEvent>()
+    val onMouseMove = EventHandlerList<MouseMoveEvent>()
+    val onMouseDrag = EventHandlerList<MouseDragEvent>()
+
+    val onDraw = EventHandlerList<DrawEvent>()
 
     internal val mainThreadFunctions = mutableListOf<() -> Unit>()
 
     internal val heldMouseButtons = mutableListOf<GLFWMouseButton>()
-    internal var lastMouseX = 0
-    internal var lastMouseY = 0
-    internal var firstMouseX = 0
-    internal var firstMouseY = 0
+    internal var mouseModifiers = setOf<GLFWMouseModifier>()
+    internal var lastMousePosition = vec2(0f)
+    internal var firstMousePosition = vec2(0f)
 }
 
 fun Application.thread(fn: () -> Unit) {
@@ -51,25 +56,6 @@ fun <T> Application.computeOnMainThread(fn: () -> T): T {
     while (true) { if (evaluator.hasValue()) return evaluator.getValue() }
 }
 
-fun Application.draw(draw: (Application).() -> Unit)
-        = onDrawCallbacks.add { draw(this) }
-fun Application.update(update: (Application).(Float) -> Unit)
-        = onUpdateCallbacks.add { update(this, it) }
-fun Application.onMousePressed(handler: (Application).(GLFWMouseButton, Int, Int, Set<GLFWMouseModifier>) -> Unit)
-        = onMousePressedCallbacks.add { a, b, c, d -> handler(this, a, b, c, d) }
-fun Application.onMouseReleased(handler: (Application).(GLFWMouseButton, Int, Int, Set<GLFWMouseModifier>) -> Unit)
-        = onMouseReleasedCallbacks.add { a, b, c, d -> handler(this, a, b, c, d) }
-fun Application.onMouseMoved(handler: (Application).(Int, Int, Int, Int) -> Unit)
-        = onMouseMovedCallbacks.add { a, b, c, d -> handler(this, a, b, c, d) }
-fun Application.onMouseDragged(handler: (Application).(Int, Int, Int, Int, Int, Int, Set<GLFWMouseButton>) -> Unit)
-        = onMouseDraggedCallbacks.add { a, b, c, d, e, f, g -> handler(this, a, b, c, d, e, f, g) }
-fun Application.onKeyPressed(handler: (Application).(GLFWKey, Set<GLFWKeyModifier>) -> Unit)
-        = onKeyPressedCallbacks.add { a, b -> handler(this, a, b) }
-fun Application.onKeyReleased(handler: (Application).(GLFWKey, Set<GLFWKeyModifier>) -> Unit)
-        = onKeyReleasedCallbacks.add { a, b -> handler(this, a, b) }
-fun Application.onTextInput(handler: (Application).(String) -> Unit)
-        = onTextInputCallbacks.add { a -> handler(this, a) }
-
 fun application(name: String, load: (Application).() -> Unit) {
     val width = 1080
     val height = 720
@@ -77,7 +63,7 @@ fun application(name: String, load: (Application).() -> Unit) {
     load(app)
     run(app)
     destroy(app)
-    System.exit(0)
+    exitProcess(0)
 }
 
 private fun setup(title: String, width: Int, height: Int): Application {
@@ -90,44 +76,47 @@ private fun setup(title: String, width: Int, height: Int): Application {
     GLFW.glfwSetWindowSizeCallback(display.windowID) { _, w, h ->
         app.display.width = w
         app.display.height = h
-        app.onResizedCallbacks.map { it(w, h) }
+        app.onResize.trigger(WindowResizeEvent(vec2(w.toFloat(), h.toFloat())))
     }
 
     GLFW.glfwSetKeyCallback(display.windowID) { _, key, _, action, mods ->
-        if (action == GLFW.GLFW_PRESS) app.onKeyPressedCallbacks.map { it(key, keyModifiers(mods)) }
-        if (action == GLFW.GLFW_RELEASE) app.onKeyReleasedCallbacks.map { it(key, keyModifiers(mods)) }
+        if (action == GLFW.GLFW_PRESS) {
+            app.onKeyPress.trigger(KeyPressEvent(key, keyModifiers(mods)))
+            app.onKeyEvent.trigger(KeyPressEvent(key, keyModifiers(mods)))
+        }
+        if (action == GLFW.GLFW_RELEASE) {
+            app.onKeyRelease.trigger(KeyReleaseEvent(key, keyModifiers(mods)))
+            app.onKeyEvent.trigger(KeyReleaseEvent(key, keyModifiers(mods)))
+        }
     }
 
     GLFW.glfwSetCharCallback(display.windowID) { _, codepoint ->
-        app.onTextInputCallbacks.map { it(String(Character.toChars(codepoint))) }
+        app.onTextInput.trigger(TextInputEvent(String(Character.toChars(codepoint))))
     }
 
     GLFW.glfwSetCursorPosCallback(display.windowID) { _, xr, yr ->
-        val x = xr.toInt()
-        val y = yr.toInt()
-        if (app.heldMouseButtons.isEmpty()) app.onMouseMovedCallbacks.map { it(x, y, app.lastMouseX, app.lastMouseY) }
-        else app.onMouseDraggedCallbacks.map { it(x, y, app.lastMouseX, app.lastMouseY, app.firstMouseX, app.firstMouseY, app.heldMouseButtons.toSet()) }
-        app.lastMouseX = x
-        app.lastMouseY = y
+        val position = vec2(xr.toFloat(), yr.toFloat())
+        if (app.heldMouseButtons.isEmpty()) app.onMouseMove.trigger(MouseMoveEvent(position, app.lastMousePosition))
+        else app.onMouseDrag.trigger(MouseDragEvent(position, app.lastMousePosition, app.firstMousePosition, app.heldMouseButtons.toSet(), app.mouseModifiers))
     }
 
     GLFW.glfwSetMouseButtonCallback(display.windowID) { _, button, action, mods ->
         val xt = DoubleArray(1)
         val yt = DoubleArray(1)
         GLFW.glfwGetCursorPos(display.windowID, xt, yt)
-        val x = xt[0].toInt()
-        val y = yt[0].toInt()
+        val position = vec2(xt[0].toFloat(), yt[0].toFloat())
 
         if (action == GLFW.GLFW_PRESS) {
             if (app.heldMouseButtons.isEmpty()) {
-                app.firstMouseX = x
-                app.firstMouseY = y
+                app.firstMousePosition = position
             }
+            app.mouseModifiers = mouseModifiers(mods)
             app.heldMouseButtons.add(button)
-            app.onMousePressedCallbacks.map { it(button, x, y, mouseModifiers(mods)) }
-        } else if (action == GLFW.GLFW_RELEASE) {
+            app.onMousePress.trigger(MousePressEvent(position, button, app.mouseModifiers))
+        }
+        else if (action == GLFW.GLFW_RELEASE) {
             app.heldMouseButtons.remove(button)
-            app.onMouseReleasedCallbacks.map { it(button, x, y, mouseModifiers(mods)) }
+            app.onMouseRelease.trigger(MouseReleaseEvent(position, button, mouseModifiers(mods)))
         }
     }
 
@@ -155,11 +144,11 @@ private fun run(app: Application) {
         app.fpsInternal = (fpsReadings.fold(dt) { acc, it -> acc + it } / (fpsReadings.size + 1)).toInt()
 
         // call the update callbacks
-        app.onUpdateCallbacks.map { it(dt / 1000f) }
+        app.onUpdate.trigger(UpdateEvent(dt / 1000f))
 
         // call the ktaf.graphics.draw callbacks
         checkGLError { GL.finish() }
-        app.onDrawCallbacks.map { it() }
+        app.onDraw.trigger(DrawEvent)
 
         // run the main thread functions
         app.mainThreadFunctions.forEach { it() }

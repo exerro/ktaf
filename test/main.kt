@@ -9,7 +9,7 @@ fun main() = application("Hello world") {
     val context = DrawContext2D(viewport)
 //    val texture = loadTextureFile2D("img.jpg")
 
-    draw {
+    onDraw.connect {
         val font = FNTFont.DEFAULT_FONT
         val width = font.widthOf("Hello g")
         val height = font.height
@@ -22,7 +22,7 @@ fun main() = application("Hello world") {
         }
     }
 
-    draw {
+    onDraw.connect {
         context.push {
             //            translate(ktaf.core.vec2(100f))
 //            colour = RGB(0f, 1f, 1f)
@@ -38,7 +38,7 @@ fun main() = application("Hello world") {
 
     }
 
-    update {
+    onUpdate.connect {
         println(fps)
     }
 }

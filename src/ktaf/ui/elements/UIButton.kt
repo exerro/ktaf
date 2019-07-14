@@ -8,11 +8,11 @@ import ktaf.ui.typeclass.Clickable
 import lwjglkt.GLFWCursor
 
 class UIButton(text: String): UITextRenderer(), Clickable {
-    val onClick = EventHandlerList<UIEvent>()
+    val onClick = EventHandlerList<Event>()
 
     override fun cursor(): GLFWCursor? = GLFWCursor.POINTER
 
-    override fun click(event: UIEvent) {
+    override fun click(event: Event) {
         onClick.trigger(event)
     }
 

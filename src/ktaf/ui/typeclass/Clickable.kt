@@ -1,7 +1,7 @@
 package ktaf.ui.typeclass
 
-import ktaf.ui.UIEvent
+import ktaf.core.Event
 
 interface Clickable {
-    fun click(event: UIEvent)
+    fun click(event: Event)
 }

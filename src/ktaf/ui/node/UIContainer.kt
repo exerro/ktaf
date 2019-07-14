@@ -3,19 +3,21 @@ package ktaf.ui.node
 import ktaf.core.*
 import ktaf.graphics.DrawContext2D
 import ktaf.typeclass.minus
+import ktaf.ui.UIAnimatedProperty
 import ktaf.ui.layout.*
 import lwjglkt.GLFWCursor
 
-open class UIContainer: UINode() {
+open class UIContainer(colour: RGBA = rgba(1f, 0f)): UINode() {
     // structure
     val children = KTAFList<UINode>()
-    var ordering = KTAFValue(Ordering())
+    val ordering = KTAFValue(Ordering())
+    val colour = UIAnimatedProperty(colour, this, "colour")
 
     // configuration
     val layout = KTAFValue<UILayout>(FillLayout())
 
     /**
-     * TODO
+     * TODO: comment
      */
     open fun computePositionForChildren() {
         val node = this
@@ -27,13 +29,14 @@ open class UIContainer: UINode() {
     }
 
     // update children
-    override fun update(dt: Float) {
-        super.update(dt)
-        children.forEach { it.update(dt) }
+    override fun update(event: UpdateEvent) {
+        super.update(event)
+        children.forEach { it.update(event) }
     }
 
     // draw children
     override fun draw(context: DrawContext2D, position: vec2, size: vec2) {
+        fillBackground(context, position, size, colour.get())
         drawChildren(children, context, position)
     }
 
@@ -84,6 +87,8 @@ open class UIContainer: UINode() {
             = layout.get().computeChildrenHeight() + padding.get().height
 
     init {
+        propertyState(this.colour)
+
         children.connectAdded { child ->
             child.parent.set(this)
             child.scene.set(scene.get())

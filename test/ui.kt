@@ -1,8 +1,8 @@
 
+import ktaf.core.MouseClickEvent
 import ktaf.core.application
 import ktaf.graphics.DrawContext2D
 import ktaf.ui.Hotkey
-import ktaf.ui.UIMouseClickEvent
 import ktaf.ui.elements.UIButton
 import ktaf.ui.node.UIContainer
 import ktaf.ui.layout.*
@@ -32,7 +32,7 @@ fun main() = application("Hello world") {
                     hotkeys.add(Hotkey(GLFW.GLFW_KEY_0 + container.children.size))
 
                     onClick { event -> when (event) {
-                        is UIMouseClickEvent -> parent(null)
+                        is MouseClickEvent -> parent(null)
                         else -> this.height(Math.random().toFloat() * 20f + 20f)
                     } }
 

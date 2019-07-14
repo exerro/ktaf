@@ -28,8 +28,6 @@ enum class GLFWMouseModifier {
 typealias GLFWKey = Int
 typealias GLFWMouseButton = Int
 
-typealias KeyPressedCallback = (GLFWKey, Set<GLFWKeyModifier>) -> Unit
-typealias KeyReleasedCallback = (GLFWKey, Set<GLFWKeyModifier>) -> Unit
 typealias TextInputCallback = (String) -> Unit
 typealias MousePressedCallback = (GLFWMouseButton, Int, Int, Set<GLFWMouseModifier>) -> Unit
 typealias MouseReleasedCallback = (GLFWMouseButton, Int, Int, Set<GLFWMouseModifier>) -> Unit

@@ -11,13 +11,13 @@ fun scene(display: GLFWDisplay, context: DrawContext2D, init: UIScene.() -> Unit
 }
 
 fun UIScene.attachCallbacks(application: Application) {
-    application.update(updater)
-    application.draw(drawer)
-    application.onMousePressed(mousePresser)
-    application.onMouseReleased(mouseReleaser)
-    application.onMouseMoved(mouseMover)
-    application.onMouseDragged(mouseDragger)
-    application.onKeyPressed(keyPresser)
-    application.onKeyReleased(keyReleaser)
-    application.onTextInput(textInputter)
+    application.onUpdate.connect(this::update)
+    application.onDraw.connect(this::draw)
+    application.onMousePress.connect(this::mousePressed)
+    application.onMouseRelease.connect(this::mouseReleased)
+    application.onMouseMove.connect(this::mouseMoved)
+    application.onMouseDrag.connect(this::mouseDragged)
+    application.onKeyPress.connect(this::keyPressed)
+    application.onKeyRelease.connect(this::keyReleased)
+    application.onTextInput.connect(this::textInput)
 }

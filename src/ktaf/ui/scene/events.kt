@@ -10,8 +10,8 @@ import ktaf.util.update
 import lwjglkt.GLFWCursor
 import lwjglkt.setCursor
 
-fun UIScene.update(dt: Float) {
-    animations.update(dt)
+fun UIScene.update(event: UpdateEvent) {
+    animations.update(event.dt)
 
     root.get()?.let {
         it.layout.get().beginPositioning(it)
@@ -20,14 +20,14 @@ fun UIScene.update(dt: Float) {
         it.computePositionForChildren()
         it.layout.get().finishPositioning(it)
 
-        it.update(dt)
+        it.update(event)
 
         it.computedXInternal = 0f
         it.computedYInternal = 0f
     }
 }
 
-fun UIScene.draw() {
+fun UIScene.draw(event: DrawEvent) {
     display.setCursor(focussedNodeHover?.cursor() ?: GLFWCursor.DEFAULT)
 
     root.get()?.let {
@@ -40,35 +40,34 @@ fun UIScene.draw() {
     }
 }
 
-fun UIScene.mousePressed(button: GLFWMouseButton, position: vec2, modifiers: Set<GLFWMouseModifier>) {
+fun UIScene.mousePressed(event: MousePressEvent) {
     root.get() ?.let { root ->
-        root.getMouseHandler(position - root.computedPosition.get()) ?.let { target ->
-            target.handleEvent(UIMousePressEvent(position - target.absolutePosition(), button, modifiers))
+        root.getMouseHandler(event.position - root.computedPosition.get()) ?.let { target ->
+            target.handleEvent(MousePressEvent(event.position - target.absolutePosition(), event.button, event.modifiers))
             focussedNode(target)
-            firstRelativeMouseLocation = position - target.absolutePosition()
+            firstRelativeMouseLocation = event.position - target.absolutePosition()
         }
 
         lastRelativeMouseLocation = firstRelativeMouseLocation
-        mouseModifiers = modifiers
     }
 }
 
-fun UIScene.mouseReleased(button: GLFWMouseButton, position: vec2, modifiers: Set<GLFWMouseModifier>) {
+fun UIScene.mouseReleased(event: MouseReleaseEvent) {
     focussedNode.get() ?.let { node ->
-        node.handleEvent(UIMouseReleaseEvent(position - node.absolutePosition(), button, modifiers))
-        node.handleEvent(UIMouseClickEvent(position - node.absolutePosition(), button, modifiers)) // TODO: maybe do a bounds check?
+        node.handleEvent(MouseReleaseEvent(event.position - node.absolutePosition(), event.button, event.modifiers))
+        node.handleEvent(MouseClickEvent(event.position - node.absolutePosition(), event.button, event.modifiers)) // TODO: maybe do a bounds check?
     }
 }
 
-fun UIScene.mouseMoved(position: vec2, last: vec2) {
+fun UIScene.mouseMoved(event: MouseMoveEvent) {
     val previousFocussedNode = focussedNodeHover
 
     root.get() ?.let { root ->
-        val currentFocussedNode = root.getMouseHandler(position - root.computedPosition.get())
+        val currentFocussedNode = root.getMouseHandler(event.position - root.computedPosition.get())
 
-        currentFocussedNode?.handleEvent(UIMouseMoveEvent(
-                position - currentFocussedNode.absolutePosition(),
-                last - currentFocussedNode.absolutePosition()
+        currentFocussedNode?.handleEvent(MouseMoveEvent(
+                event.position - currentFocussedNode.absolutePosition(),
+                event.lastPosition - currentFocussedNode.absolutePosition()
         ))
 
         if (previousFocussedNode != currentFocussedNode) {
@@ -76,31 +75,31 @@ fun UIScene.mouseMoved(position: vec2, last: vec2) {
             val oldParents = generateSequence(previousFocussedNode?.parent?.get()) { it.parent.get() }
 
             focussedNodeHover = currentFocussedNode
-            previousFocussedNode?.handleEvent(UIMouseExitEvent(true, position - previousFocussedNode.absolutePosition()))
-            (oldParents - inside - previousFocussedNode).forEach { it?.handleEvent(UIMouseExitEvent(false, position - it.absolutePosition())) }
-            currentFocussedNode?.handleEvent(UIMouseEnterEvent(true, position - currentFocussedNode.absolutePosition()))
-            (inside - oldParents - currentFocussedNode).forEach { it?.handleEvent(UIMouseEnterEvent(false, position - it.absolutePosition())) }
+            previousFocussedNode?.handleEvent(UIMouseExitEvent(true, event.position - previousFocussedNode.absolutePosition()))
+            (oldParents - inside - previousFocussedNode).forEach { it?.handleEvent(UIMouseExitEvent(false, event.position - it.absolutePosition())) }
+            currentFocussedNode?.handleEvent(UIMouseEnterEvent(true, event.position - currentFocussedNode.absolutePosition()))
+            (inside - oldParents - currentFocussedNode).forEach { it?.handleEvent(UIMouseEnterEvent(false, event.position - it.absolutePosition())) }
         }
     }
 }
 
-fun UIScene.mouseDragged(position: vec2) {
+fun UIScene.mouseDragged(event: MouseDragEvent) {
     focussedNode.get() ?.let { node ->
-        node.handleEvent(UIMouseDragEvent(position - node.absolutePosition(), lastRelativeMouseLocation, firstRelativeMouseLocation, mouseModifiers))
-        lastRelativeMouseLocation = position - node.absolutePosition()
+        node.handleEvent(MouseDragEvent(event.position - node.absolutePosition(), lastRelativeMouseLocation, firstRelativeMouseLocation, event.buttons, event.modifiers))
+        lastRelativeMouseLocation = event.position - node.absolutePosition()
     }
 }
 
-fun UIScene.keyPressed(key: GLFWKey, modifiers: Set<GLFWKeyModifier>) {
-    keyboardTarget(key, modifiers) ?.handleEvent(UIKeyPressEvent(key, modifiers))
+fun UIScene.keyPressed(event: KeyPressEvent) {
+    keyboardTarget(event.key, event.modifiers) ?.handleEvent(event)
 }
 
-fun UIScene.keyReleased(key: GLFWKey, modifiers: Set<GLFWKeyModifier>) {
-    keyboardTarget(key, modifiers) ?.handleEvent(UIKeyReleaseEvent(key, modifiers))
+fun UIScene.keyReleased(event: KeyReleaseEvent) {
+    keyboardTarget(event.key, event.modifiers) ?.handleEvent(event)
 }
 
-fun UIScene.textInput(text: String) {
-    inputTarget() ?.handleEvent(UITextInputEvent(text))
+fun UIScene.textInput(event: TextInputEvent) {
+    inputTarget() ?.handleEvent(event)
 }
 
 private fun UIScene.keyboardTarget(key: GLFWKey, modifiers: Set<GLFWKeyModifier>)

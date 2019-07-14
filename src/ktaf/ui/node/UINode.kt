@@ -34,24 +34,24 @@ abstract class UINode {
     // callbacks
     val onFocus = EventHandlerList<UIFocusEvent>()
     val onUnFocus = EventHandlerList<UIUnFocusEvent>()
-    val onMouseEvent = EventHandlerList<UIMouseEvent>()
-    val onMouseButtonEvent = EventHandlerList<UIMouseButtonEvent>()
+    val onMouseEvent = EventHandlerList<MouseEvent>()
+    val onMouseButtonEvent = EventHandlerList<MouseButtonEvent>()
     val onMouseEnter = EventHandlerList<UIMouseEnterEvent>()
     val onMouseExit = EventHandlerList<UIMouseExitEvent>()
-    val onMousePress = EventHandlerList<UIMousePressEvent>()
-    val onMouseRelease = EventHandlerList<UIMouseReleaseEvent>()
-    val onMouseClick = EventHandlerList<UIMouseClickEvent>()
-    val onMouseMove = EventHandlerList<UIMouseMoveEvent>()
-    val onMouseDrag = EventHandlerList<UIMouseDragEvent>()
-    val onKeyEvent = EventHandlerList<UIKeyEvent>()
-    val onKeyPress = EventHandlerList<UIKeyPressEvent>()
-    val onKeyRelease = EventHandlerList<UIKeyReleaseEvent>()
-    val onTextInput = EventHandlerList<UITextInputEvent>()
+    val onMousePress = EventHandlerList<MousePressEvent>()
+    val onMouseRelease = EventHandlerList<MouseReleaseEvent>()
+    val onMouseClick = EventHandlerList<MouseClickEvent>()
+    val onMouseMove = EventHandlerList<MouseMoveEvent>()
+    val onMouseDrag = EventHandlerList<MouseDragEvent>()
+    val onKeyEvent = EventHandlerList<KeyEvent>()
+    val onKeyPress = EventHandlerList<KeyPressEvent>()
+    val onKeyRelease = EventHandlerList<KeyReleaseEvent>()
+    val onTextInput = EventHandlerList<TextInputEvent>()
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     /** Update the node */
-    open fun update(dt: Float) {}
+    open fun update(event: UpdateEvent) {}
 
     /** Draw the node */
     abstract fun draw(context: DrawContext2D, position: vec2, size: vec2)
