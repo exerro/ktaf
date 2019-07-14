@@ -28,5 +28,6 @@ class KeyReleaseEvent(key: GLFWKey, modifiers: Set<GLFWKeyModifier>): KeyEvent(k
 class MousePressEvent(position: vec2, button: GLFWMouseButton, val modifiers: Set<GLFWMouseModifier>): MouseButtonEvent(position, button)
 class MouseReleaseEvent(position: vec2, button: GLFWMouseButton, val modifiers: Set<GLFWMouseModifier>): MouseButtonEvent(position, button)
 class MouseClickEvent(position: vec2, button: GLFWMouseButton, val modifiers: Set<GLFWMouseModifier>): MouseButtonEvent(position, button)
+class MouseScrollEvent(position: vec2, val direction: vec2, val modifiers: Set<GLFWMouseModifier>): MouseEvent(position)
 class MouseMoveEvent(position: vec2, val lastPosition: vec2): MouseEvent(position)
 class MouseDragEvent(position: vec2, val lastPosition: vec2, val firstPosition: vec2, val buttons: Set<GLFWMouseButton>, val modifiers: Set<GLFWMouseModifier>): MouseEvent(position)

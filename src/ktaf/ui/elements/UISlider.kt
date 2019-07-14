@@ -69,6 +69,10 @@ class UISlider(min: Float = 0f, max: Float = 1f): UIContainer() {
         xRatio.connect { x(xMin.get() + it * (xMax.get() - xMin.get())) }
         yRatio.connect { y(yMin.get() + it * (yMax.get() - yMin.get())) }
 
+        // ensure ratio is in fact 0->1
+        xRatio.connect { xRatio(max(0f, min(1f, it))) }
+        yRatio.connect { yRatio(max(0f, min(1f, it))) }
+
         // value <-> (x, y)
         x.connect { value(vec2(x.get(), y.get())) }
         y.connect { value(vec2(x.get(), y.get())) }

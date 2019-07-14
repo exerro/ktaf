@@ -15,6 +15,7 @@ fun UIScene.attachCallbacks(application: Application) {
     application.onDraw.connect(this::draw)
     application.onMousePress.connect(this::mousePressed)
     application.onMouseRelease.connect(this::mouseReleased)
+    application.onMouseScroll.connect(this::mouseScrolled)
     application.onMouseMove.connect(this::mouseMoved)
     application.onMouseDrag.connect(this::mouseDragged)
     application.onKeyPress.connect(this::keyPressed)

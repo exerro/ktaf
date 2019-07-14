@@ -29,6 +29,7 @@ class Application(val display: GLFWDisplay) {
     val onTextInput = EventHandlerList<TextInputEvent>()
     val onMousePress = EventHandlerList<MousePressEvent>()
     val onMouseRelease = EventHandlerList<MouseReleaseEvent>()
+    val onMouseScroll = EventHandlerList<MouseScrollEvent>()
     val onMouseMove = EventHandlerList<MouseMoveEvent>()
     val onMouseDrag = EventHandlerList<MouseDragEvent>()
 
@@ -118,6 +119,15 @@ private fun setup(title: String, width: Int, height: Int): Application {
             app.heldMouseButtons.remove(button)
             app.onMouseRelease.trigger(MouseReleaseEvent(position, button, mouseModifiers(mods)))
         }
+    }
+
+    GLFW.glfwSetScrollCallback(display.windowID) { _, xo, yo ->
+        val xt = DoubleArray(1)
+        val yt = DoubleArray(1)
+        GLFW.glfwGetCursorPos(display.windowID, xt, yt)
+        val position = vec2(xt[0].toFloat(), yt[0].toFloat())
+        // TODO: fix mouse modifiers!
+        app.onMouseScroll.trigger(MouseScrollEvent(position, vec2(xo.toFloat(), yo.toFloat()), setOf()))
     }
 
     return app

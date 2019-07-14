@@ -24,6 +24,7 @@ fun UINode.handleEvent(event: Event) {
     when (event) {
         is UIMouseEnterEvent -> onMouseEnter.trigger(event)
         is UIMouseExitEvent -> onMouseExit.trigger(event)
+        is MouseScrollEvent -> onMouseScroll.trigger(event)
         is MouseMoveEvent -> onMouseMove.trigger(event)
         is MouseDragEvent -> onMouseDrag.trigger(event)
         is MousePressEvent -> onMousePress.trigger(event)

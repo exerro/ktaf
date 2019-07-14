@@ -59,6 +59,13 @@ fun UIScene.mouseReleased(event: MouseReleaseEvent) {
     }
 }
 
+fun UIScene.mouseScrolled(event: MouseScrollEvent) {
+    root.get() ?.let { root ->
+        val parents = generateSequence(root.getMouseHandler(event.position - root.computedPosition.get())) { it.parent.get() }
+        parents.firstOrNull { it.handlesScroll() } ?.handleEvent(event)
+    }
+}
+
 fun UIScene.mouseMoved(event: MouseMoveEvent) {
     val previousFocussedNode = focussedNodeHover
 

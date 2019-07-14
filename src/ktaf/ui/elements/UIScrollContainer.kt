@@ -37,6 +37,8 @@ class UIScrollContainer: UIContainer() {
         }
     }
 
+    override fun handlesScroll() = true
+
     init {
         // scrollbars <-> scroll members
 //        scrollbarX.x.joinTo(scrollX)
@@ -56,6 +58,10 @@ class UIScrollContainer: UIContainer() {
         layout(HDivLayout(0.px())) {
             alignment(vec2(0f))
             scrollbarY.computedWidth.connect { sections[0](100.pc() - it.px()) }
+        }
+
+        onMouseScroll { event ->
+            scrollY(scrollY.get() - event.direction.y * 40f)
         }
     }
 

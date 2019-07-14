@@ -41,6 +41,7 @@ abstract class UINode {
     val onMousePress = EventHandlerList<MousePressEvent>()
     val onMouseRelease = EventHandlerList<MouseReleaseEvent>()
     val onMouseClick = EventHandlerList<MouseClickEvent>()
+    val onMouseScroll = EventHandlerList<MouseScrollEvent>()
     val onMouseMove = EventHandlerList<MouseMoveEvent>()
     val onMouseDrag = EventHandlerList<MouseDragEvent>()
     val onKeyEvent = EventHandlerList<KeyEvent>()
@@ -107,6 +108,10 @@ abstract class UINode {
 
     /** Return true if this node can handle input */
     open fun handlesInput(): Boolean
+            = false
+
+    /** Return true if this node can handle mouse scrolling */
+    open fun handlesScroll(): Boolean
             = false
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
