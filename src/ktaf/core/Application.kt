@@ -1,5 +1,6 @@
 package ktaf.core
 
+import ktaf.graphics.RenderTarget
 import lwjglkt.*
 import org.lwjgl.glfw.Callbacks
 import org.lwjgl.glfw.GLFW
@@ -16,9 +17,7 @@ class Application(val display: GLFWDisplay) {
     var running = true
     val time get() = (System.currentTimeMillis() - startTime) / 1000f
     val fps get() = fpsInternal
-
-    val viewport
-        get() = GLViewport({0}, {0}, {display.width}, {display.height})
+    val screen = RenderTarget.Screen(display.width, display.height)
 
     val onResize = EventHandlerList<WindowResizeEvent>()
     val onUpdate = EventHandlerList<UpdateEvent>()
@@ -77,6 +76,8 @@ private fun setup(title: String, width: Int, height: Int): Application {
     GLFW.glfwSetWindowSizeCallback(display.windowID) { _, w, h ->
         app.display.width = w
         app.display.height = h
+        app.screen.screenWidth(w)
+        app.screen.screenHeight(h)
         app.onResize.trigger(WindowResizeEvent(vec2(w.toFloat(), h.toFloat())))
     }
 

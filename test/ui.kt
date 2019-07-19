@@ -11,7 +11,7 @@ import ktaf.ui.scene.scene
 import org.lwjgl.glfw.GLFW
 
 fun main() = application("Hello world") {
-    val context = DrawContext2D(viewport)
+    val context = DrawContext2D(screen)
     val scene = scene(display, context) {
         root.set(UIContainer()) {
             val content = children.add(UIContainer()) {

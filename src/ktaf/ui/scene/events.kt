@@ -15,8 +15,8 @@ fun UIScene.update(event: UpdateEvent) {
 
     root.get()?.let {
         it.layout.get().beginPositioning(it)
-        it.computeWidth(context.viewport.width().toFloat())
-        it.computeHeight(context.viewport.height().toFloat())
+        it.computeWidth(context.target.width.toFloat())
+        it.computeHeight(context.target.height.toFloat())
         it.computePositionForChildren()
         it.layout.get().finishPositioning(it)
 
@@ -33,8 +33,8 @@ fun UIScene.draw(event: DrawEvent) {
     root.get()?.let {
         it.draw(context, it.margin.get().tl,
                 vec2(
-                        context.viewport.width().toFloat() - it.margin.get().width,
-                        context.viewport.height().toFloat() - it.margin.get().height
+                        context.target.width.toFloat() - it.margin.get().width,
+                        context.target.height.toFloat() - it.margin.get().height
                 )
         )
     }

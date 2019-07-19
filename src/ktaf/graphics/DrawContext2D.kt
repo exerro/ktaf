@@ -16,49 +16,44 @@ fun <T> DrawContext2D.push(fn: DrawContext2D.() -> T): T {
     return result
 }
 
-class DrawContext2D(val viewport: GLViewport) {
+class DrawContext2D(val target: RenderTarget) {
     var fill: Boolean
-        get() = activeState.fill
-        set(fill) { activeState.fill = fill }
+        get() = stateManager.activeState.fill
+        set(fill) { stateManager.activeState.fill = fill }
 
     var colour: RGBA
-        get() = activeState.colour
-        set(colour) { activeState.colour = colour }
+        get() = stateManager.activeState.colour
+        set(colour) { stateManager.activeState.colour = colour }
 
     var lineWidth: Float
-        get() = activeState.lineWidth
-        set(width) { activeState.lineWidth = width }
+        get() = stateManager.activeState.lineWidth
+        set(width) { stateManager.activeState.lineWidth = width }
 
     var scissor: AABB?
-        get() = states.fold(state.scissor) { a, b -> b.scissor?.let { a?.intersection(it) } ?: b.scissor ?: a }
-        set(scissor) { activeState.scissor = scissor?.intersection(AABB(vec2(0f), viewport.size)) }
+        get() = stateManager.fold(null as AABB?) { a, b -> b.scissor?.let { a?.intersection(it) } ?: b.scissor ?: a }
+        set(scissor) { stateManager.activeState.scissor = scissor?.intersection(AABB(vec2(0f), target.size)) }
 
     val shader get() = shaderProgram2D
 
     val transform: mat4
-        get() = (scissor?.let { it.max - it.min } ?: viewport.size) .let { viewSize ->
+        get() = (scissor?.let { it.max - it.min } ?: target.size) .let { viewSize ->
             mat4_identity *
                     mat3_scale(vec3(1f, -1f, 1f)).mat4() *
                     mat4_translate(vec3(-1f, -1f, 0f)) *
                     mat3_scale(vec3(2 / viewSize.x, 2 / viewSize.y, 1f)).mat4() *
                     mat4_translate(-vec3(scissor?.min?.x ?: 0f, scissor?.min?.y ?: 0f, 0f)) *
-                    states.fold(state.transform) { a, b -> a * b.transform }
+                    stateManager.fold(mat4_identity) { a, b -> a * b.transform }
         }
 
-    fun push() {
-        states.add(DrawState(activeState))
-    }
-
-    fun pop() {
-        if (states.isNotEmpty()) states.removeAt(states.size - 1)
-    }
+    fun push() { stateManager.push() }
+    fun pop() { stateManager.pop() }
 
     fun translate(translation: vec2) {
-        activeState.transform *= mat4_translate(translation.vec3(0f))
+        stateManager.activeState.transform *= mat4_translate(translation.vec3(0f))
     }
 
     fun rotate(theta: Float) {
-        activeState.transform *= mat3_rotate(theta, vec3(0f, 0f, -1f)).mat4()
+        stateManager.activeState.transform *= mat3_rotate(theta, vec3(0f, 0f, -1f)).mat4()
     }
 
     fun rotateAbout(position: vec2, theta: Float) {
@@ -68,28 +63,34 @@ class DrawContext2D(val viewport: GLViewport) {
     }
 
     fun scale(scale: vec2) {
-        activeState.transform *= mat3_scale(scale.vec3(1f)).mat4()
+        stateManager.activeState.transform *= mat3_scale(scale.vec3(1f)).mat4()
     }
 
     fun scale(scale: Float) {
-        activeState.transform *= mat3_scale(vec3(scale, scale, 1f)).mat4()
+        stateManager.activeState.transform *= mat3_scale(vec3(scale, scale, 1f)).mat4()
+    }
+
+    fun getTransformation() {
+        return (scissor?.let { it.max - it.min } ?: target.size) .let { viewSize ->
+            mat4_identity *
+                    mat3_scale(vec3(1f, -1f, 1f)).mat4() *
+                    mat4_translate(vec3(-1f, -1f, 0f)) *
+                    mat3_scale(vec3(2 / viewSize.x, 2 / viewSize.y, 1f)).mat4() *
+                    mat4_translate(-vec3(scissor?.min?.x ?: 0f, scissor?.min?.y ?: 0f, 0f)) *
+                    stateManager.fold(mat4_identity) { a, b -> a * b.transform }
+        }
     }
 
     fun draw(fn: DrawContext2DRenderer.() -> Unit) {
-        val sOffset = viewport.offset + vec2(scissor?.min?.x ?: 0f, viewport.size.y - (scissor?.max?.y
-                ?: viewport.size.y))
-        val sSize = scissor?.max?.minus(scissor?.min ?: vec2(0f)) ?: viewport.size
-        GLViewport(sOffset.x.toInt(), sOffset.y.toInt(), sSize.x.toInt(), sSize.y.toInt()).setGLViewport()
+        val sOffset = target.offset + vec2(scissor?.min?.x ?: 0f, target.size.y - (scissor?.max?.y
+                ?: target.size.y))
+        val sSize = scissor?.max?.minus(scissor?.min ?: vec2(0f)) ?: target.size
+        GL.viewport(sOffset.x.toInt(), sOffset.y.toInt(), sSize.x.toInt(), sSize.y.toInt())
         val renderer = DrawContext2DRenderer(this)
         shaderProgram2D.useIn { fn(renderer) }
     }
 
-    private val state = DrawState()
-
-    private val states: MutableList<DrawState> = mutableListOf()
-
-    private val activeState: DrawState
-        get() = if (states.isNotEmpty()) states.last() else state
+    private val stateManager = DrawStateManager()
 
     companion object {
         internal val shaderProgram2D: GLShaderProgram = createGLShaderProgram {
@@ -131,6 +132,25 @@ class DrawContext2D(val viewport: GLViewport) {
             detach(vertex)
         }
     }
+}
+
+private class DrawStateManager {
+    val activeState: DrawState
+        get() = if (states.isNotEmpty()) states.last() else state
+
+    fun push() {
+        states.add(DrawState(activeState))
+    }
+
+    fun pop() {
+        if (states.isNotEmpty()) states.removeAt(states.size - 1)
+    }
+
+    fun <T> fold(default: T, fn: (T, DrawState) -> T): T
+            = states.fold(fn(default, state), fn)
+
+    private val state = DrawState()
+    private val states: MutableList<DrawState> = mutableListOf()
 }
 
 private class DrawState(parent: DrawState? = null) {

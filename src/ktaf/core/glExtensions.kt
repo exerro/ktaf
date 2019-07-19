@@ -9,12 +9,6 @@ const val VERTEX_UV_ATTRIBUTE = 1
 const val VERTEX_NORMAL_ATTRIBUTE = 2
 const val VERTEX_COLOUR_ATTRIBUTE = 3
 
-val GLViewport.offset: vec2
-    get() = vec2(x().toFloat(), y().toFloat())
-
-val GLViewport.size: vec2
-    get() = vec2(width().toFloat(), height().toFloat())
-
 val GLTexture2.size: vec2
     get() = vec2(width.toFloat(), height.toFloat())
 

@@ -6,7 +6,7 @@ import kotlin.math.sin
 fun main() = application("Hello world") {
     GL.debug()
 
-    val context = DrawContext2D(viewport)
+    val context = DrawContext2D(screen)
 //    val texture = loadTextureFile2D("img.jpg")
 
     onDraw.connect {

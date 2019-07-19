@@ -269,7 +269,7 @@ import ktaf.ui.scene.scene
 //}
 
 fun main() = application("UI Test 2") {
-    val context = DrawContext2D(viewport)
+    val context = DrawContext2D(screen)
     val scene = scene(display, context)
     val node = scene.root(UIContainer()) {
 //        layout(FreeLayout())

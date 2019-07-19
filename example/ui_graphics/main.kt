@@ -16,7 +16,7 @@ import ktaf.ui.scene.scene
 import org.lwjgl.glfw.GLFW
 
 fun main() = application("UI Graphics") {
-    val context = DrawContext2D(viewport)
+    val context = DrawContext2D(screen)
     val scene = scene(display, context) {
         root(UIContainer()) {
             val buttons = children.add(UIContainer()) { layout(HDivLayout()) }
