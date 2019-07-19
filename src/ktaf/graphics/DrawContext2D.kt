@@ -6,17 +6,7 @@ import ktaf.typeclass.plus
 import ktaf.util.*
 import lwjglkt.*
 
-fun <T> DrawContext2D.draw(fn: DrawContext2D.() -> T)
-        = fn(this)
-
-fun <T> DrawContext2D.push(fn: DrawContext2D.() -> T): T {
-    push()
-    val result = fn()
-    pop()
-    return result
-}
-
-class DrawContext2D(val target: RenderTarget) {
+class DrawContext2D(target: RenderTarget): DrawContext<DrawContext2DRenderer>(target) {
     var fill: Boolean
         get() = stateManager.activeState.fill
         set(fill) { stateManager.activeState.fill = fill }
@@ -33,8 +23,6 @@ class DrawContext2D(val target: RenderTarget) {
         get() = stateManager.fold(null as AABB?) { a, b -> b.scissor?.let { a?.intersection(it) } ?: b.scissor ?: a }
         set(scissor) { stateManager.activeState.scissor = scissor?.intersection(AABB(vec2(0f), target.size)) }
 
-    val shader get() = shaderProgram2D
-
     val transform: mat4
         get() = (scissor?.let { it.max - it.min } ?: target.size) .let { viewSize ->
             mat4_identity *
@@ -44,6 +32,13 @@ class DrawContext2D(val target: RenderTarget) {
                     mat4_translate(-vec3(scissor?.min?.x ?: 0f, scissor?.min?.y ?: 0f, 0f)) *
                     stateManager.fold(mat4_identity) { a, b -> a * b.transform }
         }
+
+    fun <T> push(fn: DrawContext2D.() -> T): T {
+        push()
+        val result = fn(this)
+        pop()
+        return result
+    }
 
     fun push() { stateManager.push() }
     fun pop() { stateManager.pop() }
@@ -70,25 +65,29 @@ class DrawContext2D(val target: RenderTarget) {
         stateManager.activeState.transform *= mat3_scale(vec3(scale, scale, 1f)).mat4()
     }
 
-    fun getTransformation() {
-        return (scissor?.let { it.max - it.min } ?: target.size) .let { viewSize ->
-            mat4_identity *
-                    mat3_scale(vec3(1f, -1f, 1f)).mat4() *
-                    mat4_translate(vec3(-1f, -1f, 0f)) *
-                    mat3_scale(vec3(2 / viewSize.x, 2 / viewSize.y, 1f)).mat4() *
-                    mat4_translate(-vec3(scissor?.min?.x ?: 0f, scissor?.min?.y ?: 0f, 0f)) *
-                    stateManager.fold(mat4_identity) { a, b -> a * b.transform }
-        }
+    public override fun getTransformation(): mat4 {
+        val viewSize = scissor?.let { it.max - it.min } ?: target.size
+
+        return mat4_identity *
+                mat3_scale(vec3(1f, -1f, 1f)).mat4() *
+                mat4_translate(vec3(-1f, -1f, 0f)) *
+                mat3_scale(vec3(2 / viewSize.x, 2 / viewSize.y, 1f)).mat4() *
+                mat4_translate(-vec3(scissor?.min?.x ?: 0f, scissor?.min?.y ?: 0f, 0f)) *
+                stateManager.fold(mat4_identity) { a, b -> a * b.transform }
     }
 
-    fun draw(fn: DrawContext2DRenderer.() -> Unit) {
+    override fun setRenderState(fn: () -> Unit) {
         val sOffset = target.offset + vec2(scissor?.min?.x ?: 0f, target.size.y - (scissor?.max?.y
                 ?: target.size.y))
         val sSize = scissor?.max?.minus(scissor?.min ?: vec2(0f)) ?: target.size
         GL.viewport(sOffset.x.toInt(), sOffset.y.toInt(), sSize.x.toInt(), sSize.y.toInt())
-        val renderer = DrawContext2DRenderer(this)
-        shaderProgram2D.useIn { fn(renderer) }
+        fn()
     }
+
+    override fun getShader(): GLShaderProgram = shaderProgram2D
+    override fun setConstantUniforms(shader: GLShaderProgram) {}
+    override fun createRenderer(shader: GLShaderProgram): DrawContext2DRenderer
+            = DrawContext2DRenderer(this, shader)
 
     private val stateManager = DrawStateManager()
 
@@ -105,9 +104,10 @@ class DrawContext2D(val target: RenderTarget) {
                     "out vec2 fragment_uv;\n" +
                     "\n" +
                     "uniform mat4 transform;\n" +
+                    "uniform mat4 modelTransform;\n" +
                     "\n" +
                     "void main(void) {\n" +
-                    "    gl_Position = transform * vec4(vertex, 1);\n" +
+                    "    gl_Position = transform * modelTransform * vec4(vertex, 1);\n" +
                     "    fragment_colour = vertex_colour;\n" +
                     "    fragment_uv = vertex_uv;\n" +
                     "}")

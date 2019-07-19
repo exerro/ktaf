@@ -4,26 +4,28 @@ import lwjglkt.*
 import ktaf.core.*
 import kotlin.math.max
 
-class DrawContext2DRenderer(val context: DrawContext2D) { init {
-    rasterState {
-        defaults()
+class DrawContext2DRenderer(context: DrawContext2D, shader: GLShaderProgram): DrawContextRenderer<DrawContext2D>(context, shader) {
+    override fun begin() {
+        rasterState {
+            defaults()
+        }
+
+        postFragmentShaderState {
+            defaults()
+            blendFunction(GLBLendFunction.GL_SRC_ALPHA, GLBLendFunction.GL_ONE_MINUS_SRC_ALPHA)
+        }
+
+        GL.enable(GLOption.GL_BLEND)
     }
 
-    postFragmentShaderState {
-        defaults()
-        blendFunction(GLBLendFunction.GL_SRC_ALPHA, GLBLendFunction.GL_ONE_MINUS_SRC_ALPHA)
+    override fun finish() {
+        rasterState { defaults() }
+        postFragmentShaderState { defaults() }
     }
-
-    GL.enable(GLOption.GL_BLEND)
-} }
+}
 
 fun DrawContext2DRenderer.vao(vao: GLVAO, vertexCount: Int, transform: mat4 = mat4_identity, textured: Boolean = false, mode: GLDrawMode = GLDrawMode.GL_TRIANGLES) {
-    context.shader.uniform("transform", context.transform * transform)
-    context.shader.uniform("colour", context.colour)
-    context.shader.uniform("useTexture", textured)
-    vao.bindIn {
-        GL.drawElements(mode, vertexCount, 0)
-    }
+    vao(vao, vertexCount, transform, textured, context.colour, mode)
 }
 
 fun DrawContext2DRenderer.rectangle(position: vec2, size: vec2) {
