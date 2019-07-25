@@ -33,11 +33,6 @@ fun elementsDemo(): UINode {
             colour(Colour.orange)
         }
 
-        children.add(UITextInput()) {
-            width(200f)
-            height(30f)
-        }
-
         val sliders = children.add(UIContainer()) {
             colour(rgba(0f, 0.05f))
             layout(ListLayout(Spacing.fixed(20f))) { alignment(0f) }

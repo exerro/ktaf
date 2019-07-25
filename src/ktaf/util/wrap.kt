@@ -2,6 +2,7 @@ package ktaf.util
 
 import ktaf.graphics.Font
 import ktaf.graphics.widthOf
+import kotlin.math.max
 
 fun getOverflow(text: String, font: Font, width: Float): Int {
     if (font.widthOf(text) <= width)
@@ -15,8 +16,9 @@ fun getOverflow(text: String, font: Font, width: Float): Int {
 }
 
 fun findPreceedingWhitespace(text: String, character: Int): Int {
+    if (text.isEmpty()) return 0
     if (character < text.length && text[character].isWhitespace()) return character
-    (character downTo 0).forEach { i -> if (text[i].isWhitespace()) return i }
+    (character - 1 downTo 0).forEach { i -> if (text[i].isWhitespace()) return i }
     return character
 }
 
@@ -28,7 +30,10 @@ fun lineWrapText(text: String, font: Font, width: Float): Pair<String, String?> 
         return trimmedText.substring(0, newline).trim() to trimmedText.substring(newline + 1).trim()
 
     val overflow = getOverflow(trimmedText, font, width)
-    val wrapAt = findPreceedingWhitespace(trimmedText, overflow)
+    val wrapAt = max(1, findPreceedingWhitespace(trimmedText, overflow))
+
+    if (wrapAt >= trimmedText.length)
+        return trimmedText.substring(0, wrapAt).trim() to null
 
     return trimmedText.substring(0, wrapAt).trim() to trimmedText.substring(wrapAt).trim()
 }
