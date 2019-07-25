@@ -42,7 +42,7 @@ class HDivLayout(spacing: Float, vararg sections: LayoutValue): UILayout() {
         UILayout.positionChildrenChildren(children)
 
         val widthAllocatedForChildren = width - (children.size - 1) * spacing.get()
-        val sectionValues = listOf(0f) + sections.map { widthAllocatedForChildren.let { w -> it.get().apply(w) } }
+        val sectionValues = listOf(0f) + sections.map { it.get().apply(widthAllocatedForChildren) }
         val lastSectionDelta = widthAllocatedForChildren - sectionValues.last()
         val sectionValuesToAppend = (1 .. (children.size - sections.size)).map { i ->
             sectionValues.last() + lastSectionDelta * i / (children.size - sections.size)
