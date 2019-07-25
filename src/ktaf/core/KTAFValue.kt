@@ -50,6 +50,6 @@ open class KTAFValue<T>(
 }
 
 fun <T> KTAFValue<T>.joinTo(other: KTAFValue<T>) {
-    connect(other::setValue)
-    other.connect(::setValue)
+    connect(other::setter)
+    other.connect(::setter)
 }

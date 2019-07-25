@@ -15,35 +15,67 @@ class KTAFList<T>(
         return element
     }
 
-    fun connectAdded(fn: (T) -> Any?): (T) -> Any? {
+    fun <R> connectAddedIndexed(fn: (Int, T) -> R): (Int, T) -> R {
         addedConnections.add(fn)
         return fn
     }
 
-    fun disconnectAdded(fn: (T) -> Any?): (T) -> Any? {
+    fun <R> disconnectAddedIndexed(fn: (Int, T) -> R): (Int, T) -> R {
         addedConnections.remove(fn)
         return fn
     }
 
-    fun connectRemoved(fn: (T) -> Any?): (T) -> Any? {
+    fun <R> connectRemovedIndexed(fn: (Int, T) -> R): (Int, T) -> R {
         removedConnections.add(fn)
         return fn
     }
 
-    fun disconnectRemoved(fn: (T) -> Any?): (T) -> Any? {
+    fun <R> disconnectRemovedIndexed(fn: (Int, T) -> R): (Int, T) -> R {
         removedConnections.remove(fn)
         return fn
     }
 
-    fun connectChanged(fn: (T) -> Any?): (T) -> Any? {
+    fun <R> connectChangedIndexed(fn: (Int, T) -> R): (Int, T) -> R {
         addedConnections.add(fn)
         removedConnections.add(fn)
         return fn
     }
 
-    fun disconnectChanged(fn: (T) -> Any?): (T) -> Any? {
+    fun <R> disconnectChangedIndexed(fn: (Int, T) -> R): (Int, T) -> R {
         addedConnections.remove(fn)
         removedConnections.remove(fn)
+        return fn
+    }
+
+    fun <R> connectAdded(fn: (T) -> R): (T) -> R {
+        addedConnections.add { _, item -> fn(item) }
+        return fn
+    }
+
+    fun <R> disconnectAdded(fn: (T) -> R): (T) -> R {
+        addedConnections.remove { _, item -> fn(item) }
+        return fn
+    }
+
+    fun <R> connectRemoved(fn: (T) -> R): (T) -> R {
+        removedConnections.add { _, item -> fn(item) }
+        return fn
+    }
+
+    fun <R> disconnectRemoved(fn: (T) -> R): (T) -> R {
+        removedConnections.remove { _, item -> fn(item) }
+        return fn
+    }
+
+    fun <R> connectChanged(fn: (T) -> R): (T) -> R {
+        addedConnections.add { _, item -> fn(item) }
+        removedConnections.add { _, item -> fn(item) }
+        return fn
+    }
+
+    fun <R> disconnectChanged(fn: (T) -> R): (T) -> R {
+        addedConnections.remove { _, item -> fn(item) }
+        removedConnections.remove { _, item -> fn(item) }
         return fn
     }
 
@@ -62,60 +94,61 @@ class KTAFList<T>(
 
     override fun add(element: T): Boolean {
         value.add(element)
-        addedConnections.forEach { it(element) }
+        addedConnections.forEach { it(size - 1, element) }
         return true
     }
 
     override fun add(index: Int, element: T) {
         value.add(index, element)
-        addedConnections.forEach { it(element) }
+        addedConnections.forEach { it(index, element) }
     }
 
     override fun addAll(index: Int, elements: Collection<T>): Boolean {
+        val sizeBefore = size
         value.addAll(index, elements)
-        addedConnections.forEach { fn -> elements.forEach { fn(it) } }
+        addedConnections.forEach { fn -> elements.forEachIndexed { index, item -> fn(sizeBefore + index, item) } }
         return elements.isNotEmpty()
     }
 
     override fun addAll(elements: Collection<T>): Boolean {
-        value.addAll(elements)
-        addedConnections.forEach { fn -> elements.forEach { fn(it) } }
-        return elements.isNotEmpty()
+        return addAll(size, elements)
     }
 
     override fun clear() {
         val items = value.map { it }
         value.clear()
-        removedConnections.forEach { fn -> items.forEach { fn(it) } }
+        removedConnections.forEach { fn -> items.forEachIndexed { index, item -> fn(index, item) } }
     }
 
     override fun remove(element: T): Boolean {
-        return if (value.remove(element)) {
-            removedConnections.forEach { it(element) }
+        val index = value.indexOf(element)
+        return if (index != -1) {
+            value.removeAt(index)
+            removedConnections.forEach { it(index, element) }
             true
         } else false
     }
 
     override fun removeAt(index: Int): T {
         val result = value.removeAt(index)
-        removedConnections.forEach { it(result) }
+        removedConnections.forEach { it(index, result) }
         return result
     }
 
     override fun retainAll(elements: Collection<T>): Boolean {
-        val removed = value - elements
+        val removed = (value - elements).let { items -> items.map { Pair(it, value.indexOf(it)) } }
         val result = value.retainAll(elements)
-        removedConnections.forEach { fn -> removed.forEach { fn(it) } }
+        removedConnections.forEach { fn -> removed.forEach { (item, index) -> fn(index, item) } }
         return result
     }
 
     override fun set(index: Int, element: T): T {
         val old = value.set(index, element)
-        removedConnections.forEach { it(old) }
-        addedConnections.forEach { it(element) }
+        removedConnections.forEach { it(index, old) }
+        addedConnections.forEach { it(index, element) }
         return old
     }
 
-    private var addedConnections = mutableListOf<(T) -> Any?>()
-    private var removedConnections = mutableListOf<(T) -> Any?>()
+    private var addedConnections = mutableListOf<(Int, T) -> Any?>()
+    private var removedConnections = mutableListOf<(Int, T) -> Any?>()
 }

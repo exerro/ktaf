@@ -3,25 +3,50 @@ package ktaf.util
 import ktaf.graphics.Font
 import ktaf.graphics.widthOf
 
+fun getOverflow(text: String, font: Font, width: Float): Int {
+    if (font.widthOf(text) <= width)
+        return text.length
+
+    for (i in 1 until text.length) {
+        if (font.widthOf(text, 0, i) > width) return i
+    }
+
+    return text.length
+}
+
+fun findPreceedingWhitespace(text: String, character: Int): Int {
+    if (character < text.length && text[character].isWhitespace()) return character
+    (character downTo 0).forEach { i -> if (text[i].isWhitespace()) return i }
+    return character
+}
+
 fun lineWrapText(text: String, font: Font, width: Float): Pair<String, String?> {
     val trimmedText = text.trim()
+    val newline = trimmedText.indexOf("\n")
 
-    if (trimmedText.contains("\n") && font.widthOf(trimmedText.substring(0, trimmedText.indexOf("\n"))) <= width)
-        return trimmedText.substring(0, trimmedText.indexOf("\n")).trim() to trimmedText.substring(trimmedText.indexOf("\n") + 1).trim()
+    if (newline != -1 && font.widthOf(trimmedText.substring(0, newline)) <= width)
+        return trimmedText.substring(0, newline).trim() to trimmedText.substring(newline + 1).trim()
 
-    if (font.widthOf(trimmedText) <= width || trimmedText.length <= 1)
-        return trimmedText to null
-
-    // the character where the text overflows the width given
-    val overflow = (1 until trimmedText.length).firstOrNull { font.widthOf(trimmedText.substring(0, it + 1)) > width } ?: 1
-    val wrapAt = if (trimmedText[overflow].isWhitespace()) overflow
-    else trimmedText.substring(0, overflow).indexOfLast(Char::isWhitespace).takeIf { it != -1 } ?: overflow
+    val overflow = getOverflow(trimmedText, font, width)
+    val wrapAt = findPreceedingWhitespace(trimmedText, overflow)
 
     return trimmedText.substring(0, wrapAt).trim() to trimmedText.substring(wrapAt).trim()
 }
 
 fun wrapText(text: String, font: Font, width: Float): List<String> {
     return generateSequence(lineWrapText(text, font, width)) { (_, rest) -> rest ?.let { lineWrapText(rest, font, width) } }
+            .map { (line, _) -> line }
+            .toList()
+}
+
+fun lineWrapTextLossless(text: String, font: Font, width: Float): Pair<String, String?> {
+    val overflow = getOverflow(text, font, width)
+    val wrapAt = findPreceedingWhitespace(text, overflow)
+    return text.substring(0, wrapAt) to text.substring(wrapAt)
+}
+
+fun wrapTextLossless(text: String, font: Font, width: Float): List<String> {
+    return generateSequence(lineWrapTextLossless(text, font, width)) { (_, rest) -> rest ?.let { lineWrapTextLossless(rest, font, width) } }
             .map { (line, _) -> line }
             .toList()
 }

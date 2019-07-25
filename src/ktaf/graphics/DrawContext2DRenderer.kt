@@ -4,7 +4,10 @@ import lwjglkt.*
 import ktaf.core.*
 import kotlin.math.max
 
-class DrawContext2DRenderer(context: DrawContext2D, shader: GLShaderProgram): DrawContextRenderer<DrawContext2D>(context, shader) {
+class DrawContext2DRenderer(
+        context: DrawContext2D,
+        shader: GLShaderProgram
+): DrawContextRenderer<DrawContext2D>(context, shader, context::getTransformation) {
     override fun begin() {
         rasterState {
             defaults()

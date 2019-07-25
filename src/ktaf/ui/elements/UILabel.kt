@@ -15,7 +15,7 @@ class UILabel(text: String, target: Clickable? = null): UITextRenderer() {
         onMouseClick { this.target.get()?.click(it) }
 
         colour(rgba(1f, 0f))
-        textColour(rgba(0f, 1f))
+        textColour(rgba(0f))
         text(text)
         alignment(vec2(0f, 0.5f))
         padding(Border(8f, 16f))

@@ -103,11 +103,10 @@ class DrawContext2D(target: RenderTarget): DrawContext<DrawContext2DRenderer>(ta
                     "out vec3 fragment_colour;\n" +
                     "out vec2 fragment_uv;\n" +
                     "\n" +
-                    "uniform mat4 transform;\n" +
-                    "uniform mat4 modelTransform;\n" +
+                    "uniform mat4 $TRANSFORM_UNIFORM;\n" +
                     "\n" +
                     "void main(void) {\n" +
-                    "    gl_Position = transform * modelTransform * vec4(vertex, 1);\n" +
+                    "    gl_Position = $TRANSFORM_UNIFORM * vec4(vertex, 1);\n" +
                     "    fragment_colour = vertex_colour;\n" +
                     "    fragment_uv = vertex_uv;\n" +
                     "}")
@@ -136,7 +135,7 @@ class DrawContext2D(target: RenderTarget): DrawContext<DrawContext2DRenderer>(ta
 
 private class DrawStateManager {
     val activeState: DrawState
-        get() = if (states.isNotEmpty()) states.last() else state
+        get() = states.lastOrNull() ?: state
 
     fun push() {
         states.add(DrawState(activeState))

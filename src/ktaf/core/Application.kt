@@ -1,6 +1,7 @@
 package ktaf.core
 
 import ktaf.graphics.RenderTarget
+import ktaf.ui.layout.px
 import lwjglkt.*
 import org.lwjgl.glfw.Callbacks
 import org.lwjgl.glfw.GLFW
@@ -78,6 +79,8 @@ private fun setup(title: String, width: Int, height: Int): Application {
         app.display.height = h
         app.screen.screenWidth(w)
         app.screen.screenHeight(h)
+        app.screen.maxX(RatioValue(w.toFloat(), 0f))
+        app.screen.maxY(RatioValue(h.toFloat(), 0f))
         app.onResize.trigger(WindowResizeEvent(vec2(w.toFloat(), h.toFloat())))
     }
 
