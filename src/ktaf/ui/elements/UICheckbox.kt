@@ -18,7 +18,7 @@ import ktaf.ui.typeclass.Clickable
 import ktaf.util.Animation
 import lwjglkt.GLFWCursor
 
-class UICheckbox: UINode(), Clickable {
+open class UICheckbox: UINode(), Clickable {
     val colour = UIAnimatedProperty(rgba(0f), this, "colour", duration = Animation.QUICK)
     val hoverColour = UIProperty(rgba(0f, 0.9f))
     val checkColour = UIProperty(rgba(0f, 0.9f))

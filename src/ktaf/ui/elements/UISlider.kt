@@ -20,7 +20,7 @@ import kotlin.math.floor
 import kotlin.math.max
 import kotlin.math.min
 
-class UISlider(min: Float = 0f, max: Float = 1f): UIContainer() {
+open class UISlider(min: Float = 0f, max: Float = 1f): UIContainer() {
     constructor(steps: Int): this() { xSteps(steps) }
     constructor(min: Float, max: Float, steps: Int): this(min, max) { xSteps(steps) }
 

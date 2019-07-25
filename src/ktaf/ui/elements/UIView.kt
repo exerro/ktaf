@@ -13,7 +13,7 @@ import ktaf.ui.node.UIContainer
 import ktaf.ui.node.UINode
 import ktaf.util.AABB
 
-class UIView: UIContainer() {
+open class UIView: UIContainer() {
     val active = KTAFValue(null as UINode?)
 
     fun show(node: UINode) {

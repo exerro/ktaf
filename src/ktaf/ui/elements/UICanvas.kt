@@ -7,7 +7,7 @@ import ktaf.typeclass.plus
 import ktaf.ui.node.UINode
 import ktaf.util.AABB
 
-class UICanvas: UINode() {
+open class UICanvas: UINode() {
     override fun computeContentWidth(width: Float?): Float = 0f
     override fun computeContentHeight(width: Float, height: Float?): Float = 0f
 

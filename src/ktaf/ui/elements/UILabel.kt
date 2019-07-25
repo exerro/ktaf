@@ -5,7 +5,7 @@ import ktaf.ui.layout.Border
 import ktaf.ui.typeclass.Clickable
 import lwjglkt.GLFWCursor
 
-class UILabel(text: String, target: Clickable? = null): UITextRenderer() {
+open class UILabel(text: String, target: Clickable? = null): UITextRenderer() {
     val target = KTAFValue(target)
 
     override fun cursor(): GLFWCursor? = GLFWCursor.POINTER.takeIf { target.get() != null }

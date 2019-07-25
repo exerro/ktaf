@@ -17,7 +17,7 @@ import ktaf.util.AABB
 import kotlin.math.max
 import kotlin.math.min
 
-class UIScrollContainer: UIContainer() {
+open class UIScrollContainer: UIContainer() {
     // TODO: support horizontal scrolling
     //    private val left = children.add(UIContainer()) {}
     //    val content = left.children.add(UIContainer())

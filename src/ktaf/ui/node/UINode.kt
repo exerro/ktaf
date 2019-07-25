@@ -170,6 +170,12 @@ abstract class UINode {
     }
 }
 
+fun UINode.addHotkey(key: GLFWKey, vararg modifiers: GLFWKeyModifier, fn: (KeyPressEvent) -> Unit) {
+    val hotkey = Hotkey(key, *modifiers)
+    hotkeys.add(hotkey)
+    onKeyPress.connect { e -> if (hotkey.matches(e.key, e.modifiers)) fn(e) }
+}
+
 // TODO: move to utils
 fun <T, R> List<T>.firstNotNull(fn: (T) -> R?): R? {
     for (x in this) fn(x)?.let { return it }
