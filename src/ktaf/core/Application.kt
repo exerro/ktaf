@@ -160,7 +160,7 @@ private fun run(app: Application) {
         // call the update callbacks
         app.onUpdate.trigger(UpdateEvent(dt / 1000f))
 
-        // call the ktaf.graphics.draw callbacks
+        // call the draw callbacks
         checkGLError { GL.finish() }
         app.onDraw.trigger(DrawEvent)
 

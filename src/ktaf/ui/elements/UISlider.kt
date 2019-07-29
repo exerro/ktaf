@@ -9,7 +9,6 @@ import ktaf.ui.DEFAULT_STATE
 import ktaf.ui.UIAnimatedProperty
 import ktaf.ui.UIProperty
 import ktaf.ui.elements.UISlider.Companion.PRESSED
-import ktaf.ui.layout.Border
 import ktaf.ui.layout.DummyLayout
 import ktaf.ui.layout.height
 import ktaf.ui.layout.width
@@ -132,7 +131,7 @@ private class SliderObject: UIPane() {
         onMousePress { state.push(PRESSED) }
         onMouseRelease { state.remove(PRESSED) }
 
-        colour.duration = Animation.QUICK
+        colour.animationDuration = Animation.QUICK
         colour.setSetter {
             this[DEFAULT_STATE](it)
             this[HOVER](it.lighten())

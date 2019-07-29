@@ -11,6 +11,8 @@ import ktaf.ui.layout.ViewLayout
 import ktaf.ui.layout.tl
 import ktaf.ui.node.UIContainer
 import ktaf.ui.node.UINode
+import ktaf.ui.node.drawChildren
+import ktaf.ui.node.fillBackground
 import ktaf.util.AABB
 
 open class UIView: UIContainer() {
@@ -50,9 +52,11 @@ open class UIView: UIContainer() {
             = active.get() ?.getInputHandler() ?: this.takeIf { handlesInput() }
 
     override fun draw(context: DrawContext2D, position: vec2, size: vec2) {
+        fillBackground(context, position, size, colour.get())
+
         context.push {
             context.scissor = AABB(position, position + size)
-            super.draw(context, position, size)
+            active.get() ?.let { drawChildren(listOf(it), context, position) }
         }
     }
 

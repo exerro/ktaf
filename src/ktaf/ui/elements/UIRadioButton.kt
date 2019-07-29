@@ -21,12 +21,12 @@ import kotlin.math.min
 
 class UIRadioButton: UINode(), Clickable {
     val group = KTAFValue<RadioButtonGroup?>(null)
-    val colour = UIAnimatedProperty(rgba(0f), this, "colour", duration = Animation.QUICK)
+    val colour = UIAnimatedProperty(rgba(0f), this, "colour", animationDuration = Animation.QUICK)
     val hoverColour = UIProperty(rgba(0f, 0.9f))
     val checkColour = UIProperty(rgba(0f, 0.9f))
     val checked = KTAFValue(false)
 
-    private val effectiveCheckColour = UIAnimatedProperty(rgba(0f), this, "effectiveCheckColour", duration = Animation.QUICK)
+    private val effectiveCheckColour = UIAnimatedProperty(rgba(0f), this, "effectiveCheckColour", animationDuration = Animation.QUICK)
     private val hovering = KTAFValue(false)
 
     override fun cursor(): GLFWCursor? = GLFWCursor.POINTER

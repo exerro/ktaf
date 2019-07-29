@@ -47,18 +47,20 @@ open class UIProperty<T>(value: T,
 class UIAnimatedProperty<T: Animateable<T>, out N: UINode>(value: T,
                                                            private val node: N,
                                                            private val property: String,
-                                                           var duration: Float = Animation.NORMAL,
-                                                           var easing: EasingFunction = Easing.SMOOTH,
+                                                           var animationDuration: Float = Animation.NORMAL,
+                                                           var animationEasing: EasingFunction = Easing.SMOOTH,
                                                            setter: UIProperty<T>.(T) -> Unit = { v -> stateValues.keys.map { this[it](v) } }
 ): UIProperty<T>(value, setter) {
+    val animationsEnabled = KTAFValue(true)
+
     override fun updateValue(value: T) {
         val scene = node.scene.get()
 
-        if (scene == null) {
+        if (scene == null || !animationsEnabled.get()) {
             super.updateValue(value)
         }
         else {
-            scene.animations.animate(node, property, this, value, duration, easing)
+            scene.animations.animate(node, property, this, value, animationDuration, animationEasing)
         }
     }
 }

@@ -21,8 +21,8 @@ import ktaf.util.Animation
 import kotlin.math.min
 
 abstract class UITextRenderer: UINode() {
-    val colour = UIAnimatedProperty(rgba(0f), this, "colour", duration = Animation.QUICK)
-    val textColour = UIAnimatedProperty(rgba(0f, 0.9f), this, "textColour", duration = Animation.QUICK)
+    val colour = UIAnimatedProperty(rgba(0f), this, "colour", animationDuration = Animation.QUICK)
+    val textColour = UIAnimatedProperty(rgba(0f, 0.9f), this, "textColour", animationDuration = Animation.QUICK)
     val text = UIProperty("")
     val font = UIProperty(Font.DEFAULT_FONT.scaleTo(16f))
     val alignment = UIAnimatedProperty(vec2(0f), this, "alignment")

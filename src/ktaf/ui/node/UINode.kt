@@ -133,7 +133,7 @@ abstract class UINode {
 //                .filterIsInstance<UIProperty<*>>()
 //                .forEach { propertyState(it) }
 
-        focused.connect { if (it) scene.get()?.focussedNode?.set(this) }
+        focused.connect { f -> scene.get()?.focussedNode?.set(this.takeIf { f }) }
         computedX.connect { computedPosition.set(vec2(it, computedY.get())) }
         computedY.connect { computedPosition.set(vec2(computedX.get(), it)) }
 
