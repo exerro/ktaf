@@ -31,7 +31,7 @@ class ListLayout(spacing: Spacing = Spacing.SPACE_AFTER): UILayout() {
 
         UILayout.positionChildren(children, offset) { y, child ->
             UILayout.alignw(child, vec2(0f, y), width, alignment.get())
-            y + child.computedHeightInternal + child.margin.get().height + spacing
+            y + child.computedHeight + child.margin.get().height + spacing
         }
     }
 }

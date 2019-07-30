@@ -54,8 +54,8 @@ open class UISlider(min: Float = 0f, max: Float = 1f): UIContainer() {
 
     private fun setX() { x(xMin.get() + xRatio.get() * (xMax.get() - xMin.get())) }
     private fun setY() { y(yMin.get() + yRatio.get() * (yMax.get() - yMin.get())) }
-    private fun positionSliderX() { slider.computedX.setValue(xRatio.get() * (computedWidth.get() - padding.get().width - slider.computedWidth.get())) }
-    private fun positionSliderY() { slider.computedY.setValue(yRatio.get() * (computedHeight.get() - padding.get().height - slider.computedHeight.get())) }
+    private fun positionSliderX() { slider.currentComputedX.setValue(xRatio.get() * (currentComputedWidth.get() - padding.get().width - slider.currentComputedWidth.get())) }
+    private fun positionSliderY() { slider.currentComputedY.setValue(yRatio.get() * (currentComputedHeight.get() - padding.get().height - slider.currentComputedHeight.get())) }
 
     init {
         propertyState(backgroundColour)
@@ -95,15 +95,15 @@ open class UISlider(min: Float = 0f, max: Float = 1f): UIContainer() {
             val dp = event.position - event.firstPosition
 
             if (direction.get() != UISliderDirection.VERTICAL && dp.x != 0f) {
-                val size = computedWidth.get() - padding.get().width - slider.computedWidth.get()
-                val pos = slider.computedX.get() + dp.x
+                val size = currentComputedWidth.get() - padding.get().width - slider.currentComputedWidth.get()
+                val pos = slider.currentComputedX.get() + dp.x
                 val ratio = max(0f, min(1f, pos / size))
                 xRatio(divisions(ratio, xSteps.get()))
             }
 
             if (direction.get() != UISliderDirection.HORIZONTAL && dp.y != 0f) {
-                val size = computedHeight.get() - padding.get().height - slider.computedHeight.get()
-                val pos = slider.computedY.get() + dp.y
+                val size = currentComputedHeight.get() - padding.get().height - slider.currentComputedHeight.get()
+                val pos = slider.currentComputedY.get() + dp.y
                 val ratio = max(0f, min(1f, pos / size))
                 yRatio(divisions(ratio, ySteps.get()))
             }
@@ -152,13 +152,13 @@ private class SliderLayout(
         val sliderHeight: KTAFValue<Float>
 ): DummyLayout() {
     override fun computeChildrenWidths(widthAllocatedForContent: Float?) {
-        children.forEach { it.computedWidth(
+        children.forEach { it.currentComputedWidth(
                 (widthAllocatedForContent.takeIf { direction.get() == UISliderDirection.VERTICAL } ?: sliderWidth.get())
         ) }
     }
 
     override fun computeChildrenHeights(width: Float, heightAllocatedForContent: Float?) {
-        children.forEach { it.computedHeight(
+        children.forEach { it.currentComputedHeight(
                 (heightAllocatedForContent.takeIf { direction.get() == UISliderDirection.HORIZONTAL } ?: sliderHeight.get())
         ) }
     }

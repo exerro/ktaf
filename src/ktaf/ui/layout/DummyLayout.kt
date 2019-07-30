@@ -8,8 +8,8 @@ open class DummyLayout: UILayout() {
     override fun position(width: Float, height: Float) {}
 
     override fun computeChildrenWidth(): Float
-            = children.map { it.computedX.get() + it.computedWidth.get() + it.margin.get().width } .fold(0f, ::max)
+            = children.map { it.currentComputedX.get() + it.currentComputedWidth.get() + it.margin.get().width } .fold(0f, ::max)
 
     override fun computeChildrenHeight(): Float
-            = children.map { it.computedY.get() + it.computedHeight.get() + it.margin.get().height } .fold(0f, ::max)
+            = children.map { it.currentComputedY.get() + it.currentComputedHeight.get() + it.margin.get().height } .fold(0f, ::max)
 }

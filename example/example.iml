@@ -10,5 +10,6 @@
     <orderEntry type="library" name="KotlinJavaRuntime (2)" level="project" />
     <orderEntry type="library" name="lwjgl" level="project" />
     <orderEntry type="library" name="lwjgl-kt" level="project" />
+    <orderEntry type="module" module-name="ktaf" />
   </component>
 </module>

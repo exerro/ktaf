@@ -25,7 +25,7 @@ class FlowLayout: UILayout() {
 
         // TODO: this process needs better documenting
         children.fold(0f) { x, child ->
-            val w = child.margin.get().width + child.computedWidthInternal
+            val w = child.margin.get().width + child.computedWidth
 
             if (x + w > width) {
                 rows.add(mutableListOf(child))
@@ -58,7 +58,7 @@ class FlowLayout: UILayout() {
 
             row.fold(xOffset) { x, child ->
                 UILayout.alignh(child, vec2(x, y), rowHeight, verticalAlignment.get())
-                x + xSpacing + child.margin.get().width + child.computedWidthInternal
+                x + xSpacing + child.margin.get().width + child.computedWidth
             }
 
             y + ySpacing + rowHeight

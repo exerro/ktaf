@@ -46,21 +46,21 @@ fun UILayout.finishPositioning(node: UIContainer) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 fun UILayout.Companion.alignw(node: UINode, offset: vec2, width: Float, alignment: Float) {
-    val x = (width - node.margin.get().width - node.computedWidthInternal) * alignment + offset.x
-    node.computedXInternal = node.margin.get().left + x
-    node.computedYInternal = node.margin.get().top + offset.y
+    val x = (width - node.margin.get().width - node.computedWidth) * alignment + offset.x
+    node.computedX = node.margin.get().left + x
+    node.computedY = node.margin.get().top + offset.y
 }
 
 fun UILayout.Companion.alignh(node: UINode, offset: vec2, height: Float, alignment: Float) {
-    val y = (height - node.margin.get().height - node.computedHeightInternal) * alignment + offset.y
-    node.computedXInternal = node.margin.get().left + offset.x
-    node.computedYInternal = node.margin.get().top + y
+    val y = (height - node.margin.get().height - node.computedHeight) * alignment + offset.y
+    node.computedX = node.margin.get().left + offset.x
+    node.computedY = node.margin.get().top + y
 }
 
 fun UILayout.Companion.align(node: UINode, offset: vec2, area: vec2, alignment: vec2) {
-    val (x, y) = (area - node.margin.get().size - vec2(node.computedWidthInternal, node.computedHeightInternal)) * alignment + offset
-    node.computedXInternal = node.margin.get().left + x
-    node.computedYInternal = node.margin.get().top + y
+    val (x, y) = (area - node.margin.get().size - vec2(node.computedWidth, node.computedHeight)) * alignment + offset
+    node.computedX = node.margin.get().left + x
+    node.computedY = node.margin.get().top + y
 }
 
 fun UILayout.Companion.fillChildrenWidths(children: List<UINode>, widthAllocatedForChildren: Float?) {
@@ -80,16 +80,16 @@ fun UILayout.Companion.setChildrenHeights(children: List<UINode>, heightAllocate
 }
 
 fun UILayout.Companion.maximumChildWidth(children: List<UINode>)
-        = children.map { it.computedWidthInternal + it.margin.get().width } .fold(0f, ::max)
+        = children.map { it.computedWidth + it.margin.get().width } .fold(0f, ::max)
 
 fun UILayout.Companion.maximumChildHeight(children: List<UINode>)
-        = children.map { it.computedHeightInternal + it.margin.get().height } .fold(0f, ::max)
+        = children.map { it.computedHeight + it.margin.get().height } .fold(0f, ::max)
 
 fun UILayout.Companion.sumChildrenWidth(children: List<UINode>)
-        = children.map { it.computedWidthInternal + it.margin.get().width } .sum()
+        = children.map { it.computedWidth + it.margin.get().width } .sum()
 
 fun UILayout.Companion.sumChildrenHeight(children: List<UINode>)
-        = children.map { it.computedHeightInternal + it.margin.get().height } .sum()
+        = children.map { it.computedHeight + it.margin.get().height } .sum()
 
 fun <T> UILayout.Companion.positionChildren(children: List<UINode>, start: T, fn: (T, UINode) -> T)
         = children.fold(start, fn)

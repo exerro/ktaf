@@ -5,7 +5,6 @@ import ktaf.graphics.DrawContext2D
 import ktaf.typeclass.minus
 import ktaf.ui.UIAnimatedProperty
 import ktaf.ui.layout.*
-import lwjglkt.GLFWCursor
 
 open class UIContainer(colour: RGBA = rgba(1f, 0f)): UINode() {
     // structure
@@ -23,8 +22,8 @@ open class UIContainer(colour: RGBA = rgba(1f, 0f)): UINode() {
         val node = this
 
         layout.get().position(
-                node.computedWidthInternal - node.padding.get().width,
-                node.computedHeightInternal - node.padding.get().height
+                node.computedWidth - node.padding.get().width,
+                node.computedHeight - node.padding.get().height
         )
     }
 
@@ -42,7 +41,7 @@ open class UIContainer(colour: RGBA = rgba(1f, 0f)): UINode() {
 
     // check children for input handlers before deferring to super
     override fun getMouseHandler(position: vec2): UINode?
-            = children.takeIf { position.x >= 0 && position.y >= 0 && position.x <= computedWidth.get() && position.y <= computedHeight.get() }
+            = children.takeIf { position.x >= 0 && position.y >= 0 && position.x <= currentComputedWidth.get() && position.y <= currentComputedHeight.get() }
             ?.reversed() ?.firstNotNull { it.getMouseHandler(position - padding.get().tl - it.computedPosition.get()) }
             ?: super.getMouseHandler(position)
 
@@ -72,7 +71,7 @@ open class UIContainer(colour: RGBA = rgba(1f, 0f)): UINode() {
         val heightAllocatedInnerPlusPadding = (height.get() ?: heightAllocated ?.let { it - margin.get().height })
         // compute the height of each child
         layout.get().computeChildrenHeights(
-                computedWidthInternal - padding.get().width,
+                computedWidth - padding.get().width,
                 heightAllocatedInnerPlusPadding ?.let { it - padding.get().height }
         )
         // update the node's height

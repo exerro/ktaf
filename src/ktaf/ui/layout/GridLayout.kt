@@ -25,7 +25,7 @@ class GridLayout(rows: Int = 2, columns: Int = 2): UILayout() {
         // break the children into rows
         val rows = children.chunked(columns.get())
         // compute the transpose of the rows and map child -> child width or 0
-        val columnWidths = (0 until columns.get()).map { column -> rows.map { it.getOrNull(column)?.computedWidthInternal ?: 0f } }
+        val columnWidths = (0 until columns.get()).map { column -> rows.map { it.getOrNull(column)?.computedWidth ?: 0f } }
         // return the sum of the maximum widths for each column plus appropriate spacing
         return columnWidths.map { it.fold(0f, ::max) } .sum() + spacing.get().x * (columns.get() - 1)
     }
@@ -33,7 +33,7 @@ class GridLayout(rows: Int = 2, columns: Int = 2): UILayout() {
     // return the sum of the largest heights of each row plus spacing
     override fun computeChildrenHeight(): Float {
         // compute the height of each node in each row
-        val rowHeights = children.chunked(columns.get()).map { it.map { node -> node.computedHeightInternal } }
+        val rowHeights = children.chunked(columns.get()).map { it.map { node -> node.computedHeight } }
         // return the sum of the maximum heights for each row plus appropriate spacing
         return rowHeights.map { it.fold(0f, ::max) } .sum() + spacing.get().y * (rows.get() - 1)
     }

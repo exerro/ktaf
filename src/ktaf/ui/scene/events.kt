@@ -22,8 +22,8 @@ fun UIScene.update(event: UpdateEvent) {
 
         it.update(event)
 
-        it.computedXInternal = 0f
-        it.computedYInternal = 0f
+        it.computedX = 0f
+        it.computedY = 0f
     }
 }
 

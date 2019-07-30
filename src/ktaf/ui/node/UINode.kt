@@ -25,10 +25,10 @@ abstract class UINode {
     // state
     val state = KTAFValue(listOf<UINodeState>()) // TODO: comment
     val focused = KTAFValue(false) // TODO: comment
-    val computedX = KTAFValue(0f)
-    val computedY = KTAFValue(0f)
-    val computedWidth = KTAFValue(0f)
-    val computedHeight = KTAFValue(0f)
+    val currentComputedX = KTAFValue(0f)
+    val currentComputedY = KTAFValue(0f)
+    val currentComputedWidth = KTAFValue(0f)
+    val currentComputedHeight = KTAFValue(0f)
     val computedPosition = KTAFValue(vec2(0f))
 
     // callbacks
@@ -68,7 +68,7 @@ abstract class UINode {
      */
     open fun computeWidth(widthAllocated: Float?) {
         // TODO: comment
-        computedWidthInternal = width.get()
+        computedWidth = width.get()
                 ?: widthAllocated.takeIf { fill.get() }
                 ?: computeContentWidth(widthAllocated)
     }
@@ -79,9 +79,9 @@ abstract class UINode {
      */
     open fun computeHeight(heightAllocated: Float?) {
         // TODO: comment
-        computedHeightInternal = height.get()
+        computedHeight = height.get()
                 ?: heightAllocated.takeIf { fill.get() }
-                ?: computeContentHeight(computedWidthInternal, heightAllocated)
+                ?: computeContentHeight(computedWidth, heightAllocated)
     }
 
     /** Return the width of the content of this node */
@@ -94,7 +94,7 @@ abstract class UINode {
 
     /** Return the mouse event handler for an event at the given location */
     open fun getMouseHandler(position: vec2): UINode?
-            = this.takeIf { position.x >= 0 && position.y >= 0 && position.x < computedWidth.get() && position.y < computedHeight.get() }
+            = this.takeIf { position.x >= 0 && position.y >= 0 && position.x < currentComputedWidth.get() && position.y < currentComputedHeight.get() }
 
     /** Return the keyboard event handler for an event */
     open fun getKeyboardHandler(key: GLFWKey, modifiers: Set<GLFWKeyModifier>): UINode?
@@ -134,8 +134,8 @@ abstract class UINode {
 //                .forEach { propertyState(it) }
 
         focused.connect { f -> scene.get()?.focussedNode?.set(this.takeIf { f }) }
-        computedX.connect { computedPosition.set(vec2(it, computedY.get())) }
-        computedY.connect { computedPosition.set(vec2(computedX.get(), it)) }
+        currentComputedX.connect { computedPosition.set(vec2(it, currentComputedY.get())) }
+        currentComputedY.connect { computedPosition.set(vec2(currentComputedX.get(), it)) }
 
         parent.connectComparator { old, new ->
             old?.children?.remove(this)
@@ -152,18 +152,21 @@ abstract class UINode {
     }
 
     // computed position helpers
-    internal var computedXInternal: Float by Delegates.observable(0f) { _, old, new -> if (old != new) {
-        scene.get()?.animations?.animate(this, ::computedX, new) ?: run { computedX(new) }
+    internal var computedX: Float by Delegates.observable(0f) { _, old, new -> if (old != new) {
+        scene.get() ?.animations ?.animate(this, ::currentComputedX, new) ?: run { currentComputedX(new) }
+        positioned = true
     } }
-    internal var computedYInternal: Float by Delegates.observable(0f) { _, old, new -> if (old != new) {
-        scene.get()?.animations?.animate(this, ::computedY, new) ?: run { computedY(new) }
+    internal var computedY: Float by Delegates.observable(0f) { _, old, new -> if (old != new) {
+        scene.get() ?.animations ?.animate(this, ::currentComputedY, new) ?: run { currentComputedY(new) }
+        positioned = true
     } }
-    internal var computedWidthInternal: Float by Delegates.observable(0f) { _, old, new -> if (old != new) {
-        scene.get()?.animations?.animate(this, ::computedWidth, new) ?: run { computedWidth(new) }
+    internal var computedWidth: Float by Delegates.observable(0f) { _, old, new -> if (old != new) {
+        scene.get()?.takeIf { positioned } ?.animations ?.animate(this, ::currentComputedWidth, new) ?: run { currentComputedWidth(new) }
     } }
-    internal var computedHeightInternal: Float by Delegates.observable(0f) { _, old, new -> if (old != new) {
-        scene.get()?.animations?.animate(this, ::computedHeight, new) ?: run { computedHeight(new) }
+    internal var computedHeight: Float by Delegates.observable(0f) { _, old, new -> if (old != new) {
+        scene.get()?.takeIf { positioned } ?.animations ?.animate(this, ::currentComputedHeight, new) ?: run { currentComputedHeight(new) }
     } }
+    internal var positioned: Boolean = false
 
     companion object {
         const val HOVER = "hover"

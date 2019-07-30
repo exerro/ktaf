@@ -43,7 +43,7 @@ open class UIView: UIContainer() {
 
     override fun getMouseHandler(position: vec2): UINode?
             = active.get() ?.let { it.getMouseHandler(position - padding.get().tl - it.computedPosition.get()) }
-            ?: this.takeIf { position.x >= 0 && position.y >= 0 && position.x < computedWidth.get() && position.y < computedHeight.get() }
+            ?: this.takeIf { position.x >= 0 && position.y >= 0 && position.x < currentComputedWidth.get() && position.y < currentComputedHeight.get() }
 
     override fun getKeyboardHandler(key: GLFWKey, modifiers: Set<GLFWKeyModifier>): UINode?
             = active.get() ?.getKeyboardHandler(key, modifiers) ?: this.takeIf { handlesKey(key, modifiers) }
@@ -52,11 +52,12 @@ open class UIView: UIContainer() {
             = active.get() ?.getInputHandler() ?: this.takeIf { handlesInput() }
 
     override fun draw(context: DrawContext2D, position: vec2, size: vec2) {
-        fillBackground(context, position, size, colour.get())
+//        fillBackground(context, position, size, colour.get())
 
         context.push {
             context.scissor = AABB(position, position + size)
-            active.get() ?.let { drawChildren(listOf(it), context, position) }
+            super.draw(context, position, size)
+//            active.get() ?.let { drawChildren(listOf(it), context, position) }
         }
     }
 

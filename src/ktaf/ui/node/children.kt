@@ -9,7 +9,7 @@ fun UINode.drawChildren(children: List<UINode>, context: DrawContext2D, position
     children.forEach {
         it.draw(context,
                 position + padding.get().tl + it.computedPosition.get(),
-                vec2(it.computedWidth.get(), it.computedHeight.get())
+                vec2(it.currentComputedWidth.get(), it.currentComputedHeight.get())
         )
     }
 }

@@ -33,6 +33,9 @@ fun lineWrapText(text: String, font: Font, width: Float): Pair<String, String?> 
     if (trimmedText.isEmpty())
         return trimmedText to null
 
+    if (font.widthOf(trimmedText) <= width)
+        return trimmedText to null
+
     val overflow = getOverflow(trimmedText, font, width)
     val wrapAt = max(1, findPreceedingWhitespace(trimmedText, overflow))
 

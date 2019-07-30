@@ -9,7 +9,7 @@ import ktaf.ui.UIUnFocusEvent
 import ktaf.ui.layout.tl
 
 fun UINode.absolutePosition(): vec2
-        = (parent.get()?.absolutePosition() ?: vec2(0f)) + (parent.get()?.padding?.get()?.tl ?: vec2(0f)) + vec2(computedX.get(), computedY.get())
+        = (parent.get()?.absolutePosition() ?: vec2(0f)) + (parent.get()?.padding?.get()?.tl ?: vec2(0f)) + vec2(currentComputedX.get(), currentComputedY.get())
 
 fun UINode.handleEvent(event: Event) {
     when (event) {

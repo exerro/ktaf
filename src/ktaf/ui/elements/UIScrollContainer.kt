@@ -49,14 +49,14 @@ open class UIScrollContainer: UIContainer() {
         scroll.connect { (x, y) -> scrollX(x); scrollY(y) }
 
         // update vertical scrollbar size on various triggers
-        content.computedHeight.connect { updateVerticalScrollbar() }
-        computedHeight.connect { updateVerticalScrollbar() }
-        scrollbarY.computedHeight.connect { updateVerticalScrollbar() }
+        content.currentComputedHeight.connect { updateVerticalScrollbar() }
+        currentComputedHeight.connect { updateVerticalScrollbar() }
+        scrollbarY.currentComputedHeight.connect { updateVerticalScrollbar() }
         scrollbarY.padding.connect { updateVerticalScrollbar() }
 
         layout(HDivLayout(0.px())) {
             alignment(vec2(0f))
-            scrollbarY.computedWidth.connect { sections[0](100.pc() - it.px()) }
+            scrollbarY.currentComputedWidth.connect { sections[0](100.pc() - it.px()) }
         }
 
         onMouseScroll { event ->
@@ -65,9 +65,9 @@ open class UIScrollContainer: UIContainer() {
     }
 
     private fun updateVerticalScrollbar() {
-        val ratio = computedHeight.get() / content.computedHeight.get()
-        scrollbarY.sliderHeight((scrollbarY.computedHeight.get() - scrollbarY.padding.get().height) * max(0.15f, min(1f, ratio)))
-        scrollbarY.yMax(max(0f, content.computedHeight.get() - computedHeight.get()))
+        val ratio = currentComputedHeight.get() / content.currentComputedHeight.get()
+        scrollbarY.sliderHeight((scrollbarY.currentComputedHeight.get() - scrollbarY.padding.get().height) * max(0.15f, min(1f, ratio)))
+        scrollbarY.yMax(max(0f, content.currentComputedHeight.get() - currentComputedHeight.get()))
     }
 }
 
