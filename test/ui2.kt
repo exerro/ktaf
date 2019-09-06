@@ -268,14 +268,16 @@ import ktaf.ui.scene.scene
 //    })
 //}
 
-fun main() = application("UI Test 2") {
-    val context = DrawContext2D(screen)
-    val scene = scene(display, context)
-    val node = scene.root(UIContainer()) {
-//        layout(FreeLayout())
-    }
+fun main() = application() {
+    display("UI Test 2") {
+        val context = DrawContext2D(screen)
+        val scene = scene(this, context)
+        val node = scene.root(UIContainer()) {
+            //        layout(FreeLayout())
+        }
 
 //    loadProjectsList(scene, node)
 
-    scene.attachCallbacks(this)
+        scene.attachCallbacks(this)
+    }
 }

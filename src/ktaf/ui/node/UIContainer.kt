@@ -28,9 +28,9 @@ open class UIContainer(colour: RGBA = rgba(1f, 0f)): UINode() {
     }
 
     // update children
-    override fun update(event: UpdateEvent) {
-        super.update(event)
-        children.forEach { it.update(event) }
+    override fun update(dt: Float) {
+        super.update(dt)
+        children.forEach { it.update(dt) }
     }
 
     // draw children

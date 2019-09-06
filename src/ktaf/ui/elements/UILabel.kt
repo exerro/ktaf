@@ -3,7 +3,7 @@ package ktaf.ui.elements
 import ktaf.core.*
 import ktaf.ui.layout.Border
 import ktaf.ui.typeclass.Clickable
-import lwjglkt.GLFWCursor
+import lwjglkt.glfw.GLFWCursor
 
 open class UILabel(text: String, target: Clickable? = null): UITextRenderer() {
     val target = KTAFValue(target)

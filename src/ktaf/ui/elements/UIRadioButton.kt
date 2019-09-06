@@ -16,7 +16,7 @@ import ktaf.ui.node.push
 import ktaf.ui.node.remove
 import ktaf.ui.typeclass.Clickable
 import ktaf.util.Animation
-import lwjglkt.GLFWCursor
+import lwjglkt.glfw.GLFWCursor
 import kotlin.math.min
 
 class UIRadioButton: UINode(), Clickable {

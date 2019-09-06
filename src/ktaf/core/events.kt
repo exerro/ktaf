@@ -18,9 +18,6 @@ abstract class KeyEvent(val key: GLFWKey, val modifiers: Set<GLFWKeyModifier>): 
 abstract class MouseEvent(val position: vec2): Event()
 abstract class MouseButtonEvent(position: vec2, val button: GLFWMouseButton): MouseEvent(position)
 
-class UpdateEvent(val dt: Float): Event()
-object DrawEvent: Event()
-
 class TextInputEvent(val input: String): Event()
 class KeyPressEvent(key: GLFWKey, modifiers: Set<GLFWKeyModifier>): KeyEvent(key, modifiers)
 class KeyReleaseEvent(key: GLFWKey, modifiers: Set<GLFWKeyModifier>): KeyEvent(key, modifiers)

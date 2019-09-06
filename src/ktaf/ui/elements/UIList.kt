@@ -16,6 +16,8 @@ class UIList<T>(
     val spacing = KTAFValue(Spacing.fixed(16f))
     val alignment = KTAFValue(0.5f)
 
+    constructor(items: List<T>, createItem: (T) -> UINode): this(KTAFList(items.toMutableList()), createItem)
+
     init {
         layout(listLayout)
 

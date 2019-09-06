@@ -8,9 +8,8 @@ import ktaf.ui.node.UIContainer
 import ktaf.ui.node.UINode
 import ktaf.ui.node.handleEvent
 import ktaf.util.Animations
-import lwjglkt.GLFWDisplay
 
-class UIScene(val display: GLFWDisplay, val context: DrawContext2D) {
+class UIScene(val display: Display, val context: DrawContext2D) {
     val root = KTAFValue<UIContainer?>(null)
     val focussedNode = KTAFValue<UINode?>(null)
     val animations = Animations()

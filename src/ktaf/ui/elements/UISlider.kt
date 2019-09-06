@@ -14,7 +14,7 @@ import ktaf.ui.layout.height
 import ktaf.ui.layout.width
 import ktaf.ui.node.*
 import ktaf.util.Animation
-import lwjglkt.GLFWCursor
+import lwjglkt.glfw.GLFWCursor
 import kotlin.math.floor
 import kotlin.math.max
 import kotlin.math.min

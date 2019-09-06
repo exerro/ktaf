@@ -6,7 +6,7 @@ import ktaf.ui.*
 import ktaf.ui.layout.Border
 import ktaf.ui.scene.UIScene
 import ktaf.util.animate
-import lwjglkt.GLFWCursor
+import lwjglkt.glfw.GLFWCursor
 import kotlin.properties.Delegates
 
 abstract class UINode {
@@ -52,7 +52,7 @@ abstract class UINode {
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     /** Update the node */
-    open fun update(event: UpdateEvent) {}
+    open fun update(dt: Float) {}
 
     /** Draw the node */
     abstract fun draw(context: DrawContext2D, position: vec2, size: vec2)

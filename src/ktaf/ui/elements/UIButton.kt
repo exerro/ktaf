@@ -5,7 +5,7 @@ import ktaf.ui.*
 import ktaf.ui.layout.Border
 import ktaf.ui.node.*
 import ktaf.ui.typeclass.Clickable
-import lwjglkt.GLFWCursor
+import lwjglkt.glfw.GLFWCursor
 
 open class UIButton(text: String): UITextRenderer(), Clickable {
     val onClick = EventHandlerList<Event>()

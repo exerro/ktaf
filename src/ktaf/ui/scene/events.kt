@@ -7,11 +7,10 @@ import ktaf.ui.layout.*
 import ktaf.ui.node.absolutePosition
 import ktaf.ui.node.handleEvent
 import ktaf.util.update
-import lwjglkt.GLFWCursor
-import lwjglkt.setCursor
+import lwjglkt.glfw.GLFWCursor
 
-fun UIScene.update(event: UpdateEvent) {
-    animations.update(event.dt)
+fun UIScene.update(dt: Float) {
+    animations.update(dt)
 
     root.get()?.let {
         it.layout.get().beginPositioning(it)
@@ -20,14 +19,14 @@ fun UIScene.update(event: UpdateEvent) {
         it.computePositionForChildren()
         it.layout.get().finishPositioning(it)
 
-        it.update(event)
+        it.update(dt)
 
         it.computedX = 0f
         it.computedY = 0f
     }
 }
 
-fun UIScene.draw(event: DrawEvent) {
+fun UIScene.draw() {
     display.setCursor(focussedNodeHover?.cursor() ?: GLFWCursor.DEFAULT)
 
     root.get()?.let {

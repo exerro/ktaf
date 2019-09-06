@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="observables">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib/observables.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

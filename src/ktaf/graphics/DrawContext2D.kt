@@ -65,7 +65,7 @@ class DrawContext2D(target: RenderTarget): DrawContext<DrawContext2DRenderer>(ta
         stateManager.activeState.transform *= mat3_scale(vec3(scale, scale, 1f)).mat4()
     }
 
-    public override fun getTransformation(): mat4 {
+    override fun getTransformation(): mat4 {
         val viewSize = scissor?.let { it.max - it.min } ?: target.size
 
         return mat4_identity *

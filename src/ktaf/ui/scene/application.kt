@@ -2,23 +2,22 @@ package ktaf.ui.scene
 
 import ktaf.core.*
 import ktaf.graphics.DrawContext2D
-import lwjglkt.GLFWDisplay
 
-fun scene(display: GLFWDisplay, context: DrawContext2D, init: UIScene.() -> Unit = {}): UIScene {
+fun scene(display: Display, context: DrawContext2D, init: UIScene.() -> Unit = {}): UIScene {
     val root = UIScene(display, context)
     init(root)
     return root
 }
 
-fun UIScene.attachCallbacks(application: Application) {
-    application.onUpdate.connect(this::update)
-    application.onDraw.connect(this::draw)
-    application.onMousePress.connect(this::mousePressed)
-    application.onMouseRelease.connect(this::mouseReleased)
-    application.onMouseScroll.connect(this::mouseScrolled)
-    application.onMouseMove.connect(this::mouseMoved)
-    application.onMouseDrag.connect(this::mouseDragged)
-    application.onKeyPress.connect(this::keyPressed)
-    application.onKeyRelease.connect(this::keyReleased)
-    application.onTextInput.connect(this::textInput)
+fun UIScene.attachCallbacks(display: Display) {
+    display.update.connect(this::update)
+    display.draw.connect(this::draw)
+    display.onMousePress.connect(this::mousePressed)
+    display.onMouseRelease.connect(this::mouseReleased)
+    display.onMouseScroll.connect(this::mouseScrolled)
+    display.onMouseMove.connect(this::mouseMoved)
+    display.onMouseDrag.connect(this::mouseDragged)
+    display.onKeyPress.connect(this::keyPressed)
+    display.onKeyRelease.connect(this::keyReleased)
+    display.onTextInput.connect(this::textInput)
 }

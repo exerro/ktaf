@@ -17,6 +17,7 @@ class KTAFList<T>(
 
     fun <R> connectAddedIndexed(fn: (Int, T) -> R): (Int, T) -> R {
         addedConnections.add(fn)
+        forEachIndexed { i, v -> fn(i, v) }
         return fn
     }
 
@@ -38,6 +39,7 @@ class KTAFList<T>(
     fun <R> connectChangedIndexed(fn: (Int, T) -> R): (Int, T) -> R {
         addedConnections.add(fn)
         removedConnections.add(fn)
+        forEachIndexed { i, v -> fn(i, v) }
         return fn
     }
 
@@ -49,6 +51,7 @@ class KTAFList<T>(
 
     fun <R> connectAdded(fn: (T) -> R): (T) -> R {
         addedConnections.add { _, item -> fn(item) }
+        forEach { fn(it) }
         return fn
     }
 
@@ -70,6 +73,7 @@ class KTAFList<T>(
     fun <R> connectChanged(fn: (T) -> R): (T) -> R {
         addedConnections.add { _, item -> fn(item) }
         removedConnections.add { _, item -> fn(item) }
+        forEach { fn(it) }
         return fn
     }
 

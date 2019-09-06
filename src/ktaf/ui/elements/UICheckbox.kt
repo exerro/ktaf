@@ -16,7 +16,7 @@ import ktaf.ui.node.push
 import ktaf.ui.node.remove
 import ktaf.ui.typeclass.Clickable
 import ktaf.util.Animation
-import lwjglkt.GLFWCursor
+import lwjglkt.glfw.GLFWCursor
 
 open class UICheckbox: UINode(), Clickable {
     val colour = UIAnimatedProperty(rgba(0f), this, "colour", animationDuration = Animation.QUICK)
