@@ -1,9 +1,9 @@
 package ktaf.graphics
 
+import geometry.vec2
 import ktaf.core.KTAFValue
 import ktaf.core.RatioValue
 import ktaf.core.constant
-import ktaf.core.vec2
 import lwjglkt.GL
 
 sealed class RenderTarget(

@@ -1,5 +1,6 @@
 package ktaf.ui.scene
 
+import geometry.*
 import ktaf.core.*
 import ktaf.graphics.DrawContext2D
 import ktaf.ui.UIFocusEvent

@@ -1,7 +1,7 @@
 package ktaf.ui.node
 
+import geometry.vec2
 import ktaf.core.RGBA
-import ktaf.core.vec2
 import ktaf.graphics.*
 import ktaf.util.wrapText
 import kotlin.math.max

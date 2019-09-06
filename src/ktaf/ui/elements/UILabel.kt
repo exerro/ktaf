@@ -1,5 +1,6 @@
 package ktaf.ui.elements
 
+import geometry.*
 import ktaf.core.*
 import ktaf.ui.layout.Border
 import ktaf.ui.typeclass.Clickable
@@ -11,8 +12,8 @@ open class UILabel(text: String, target: Clickable? = null): UITextRenderer() {
     override fun cursor(): GLFWCursor? = GLFWCursor.POINTER.takeIf { target.get() != null }
 
     init {
-        onKeyPress { this.target.get()?.click(it) }
-        onMouseClick { this.target.get()?.click(it) }
+        onKeyPress.connect { this.target.get()?.click(it) }
+        onMouseClick.connect { this.target.get()?.click(it) }
 
         colour(rgba(1f, 0f))
         textColour(rgba(0f))

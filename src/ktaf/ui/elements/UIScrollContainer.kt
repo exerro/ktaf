@@ -1,12 +1,12 @@
 package ktaf.ui.elements
 
+import geometry.minus
+import geometry.plus
+import geometry.vec2
 import ktaf.core.KTAFValue
 import ktaf.core.joinTo
-import ktaf.core.vec2
 import ktaf.graphics.DrawContext2D
-import ktaf.typeclass.minus
-import ktaf.typeclass.plus
-import ktaf.ui.UIAnimatedProperty
+import ktaf.ui.UIProperty
 import ktaf.ui.layout.HDivLayout
 import ktaf.ui.layout.height
 import ktaf.ui.layout.pc
@@ -23,7 +23,7 @@ open class UIScrollContainer: UIContainer() {
     //    val content = left.children.add(UIContainer())
     //    val scrollbarX = left.children.add(UISlider())
 
-    val scroll = UIAnimatedProperty(vec2(0f), this, "scrollX")
+    val scroll = UIProperty(vec2(0f))
     val content = children.add(UIScrollContainerContent(scroll)) {}
     val scrollbarY = children.add(UISlider()) { direction(UISliderDirection.VERTICAL) }
     val scrollX = KTAFValue(0f)
@@ -59,7 +59,7 @@ open class UIScrollContainer: UIContainer() {
             scrollbarY.currentComputedWidth.connect { sections[0](100.pc() - it.px()) }
         }
 
-        onMouseScroll { event ->
+        onMouseScroll.connect { event ->
             scrollY(scrollY.get() - event.direction.y * 40f)
         }
     }

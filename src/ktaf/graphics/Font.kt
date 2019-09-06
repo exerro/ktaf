@@ -1,6 +1,6 @@
 package ktaf.graphics
 
-import ktaf.core.vec2
+import geometry.vec2
 import lwjglkt.GLTexture2
 import lwjglkt.GLVAO
 

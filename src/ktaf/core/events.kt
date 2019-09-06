@@ -1,17 +1,6 @@
 package ktaf.core
 
-
-typealias EventHandler<T> = (T) -> Unit
-
-class EventHandlerList<T> {
-    private val handlers: MutableList<EventHandler<T>> = mutableListOf()
-
-    fun connect(handler: EventHandler<T>) { handlers.add(handler) }
-    fun disconnect(handler: EventHandler<T>) { handlers.remove(handler) }
-    fun trigger(event: T) { handlers.forEach { it(event) } }
-
-    operator fun invoke(handler: EventHandler<T>) { handlers.add(handler) }
-}
+import geometry.vec2
 
 abstract class Event
 abstract class KeyEvent(val key: GLFWKey, val modifiers: Set<GLFWKeyModifier>): Event()

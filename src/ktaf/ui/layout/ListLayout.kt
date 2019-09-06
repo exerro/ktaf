@@ -1,7 +1,7 @@
 package ktaf.ui.layout
 
+import geometry.vec2
 import ktaf.core.KTAFValue
-import ktaf.core.vec2
 
 class ListLayout(spacing: Spacing = Spacing.SPACE_AFTER): UILayout() {
     val alignment = KTAFValue(0.5f)

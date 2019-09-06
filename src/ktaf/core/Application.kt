@@ -1,5 +1,6 @@
 package ktaf.core
 
+import geometry.vec2
 import lwjglkt.GL
 import lwjglkt.GLClearBuffer
 import lwjglkt.checkGLError
@@ -8,8 +9,6 @@ import lwjglkt.glfw.GLFWkt
 import lwjglkt.glfw.init
 import lwjglkt.glfw.pollEvents
 import kotlin.system.exitProcess
-
-const val DISPLAY_FPS_READINGS = 10
 
 class WindowResizeEvent(val size: vec2): Event()
 

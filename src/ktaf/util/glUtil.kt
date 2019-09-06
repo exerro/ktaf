@@ -1,5 +1,6 @@
 package ktaf.util
 
+import geometry.*
 import ktaf.core.*
 import lwjglkt.createVAO
 

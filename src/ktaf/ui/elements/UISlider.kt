@@ -2,17 +2,20 @@
 
 package ktaf.ui.elements
 
+import geometry.minus
+import geometry.vec2
 import ktaf.core.*
 import ktaf.graphics.DrawContext2D
-import ktaf.typeclass.minus
 import ktaf.ui.DEFAULT_STATE
-import ktaf.ui.UIAnimatedProperty
 import ktaf.ui.UIProperty
 import ktaf.ui.elements.UISlider.Companion.PRESSED
 import ktaf.ui.layout.DummyLayout
 import ktaf.ui.layout.height
 import ktaf.ui.layout.width
-import ktaf.ui.node.*
+import ktaf.ui.node.UIContainer
+import ktaf.ui.node.fillBackground
+import ktaf.ui.node.push
+import ktaf.ui.node.remove
 import ktaf.util.Animation
 import lwjglkt.glfw.GLFWCursor
 import kotlin.math.floor
@@ -26,7 +29,7 @@ open class UISlider(min: Float = 0f, max: Float = 1f): UIContainer() {
     private val slider = children.add(SliderObject()) {}
 
     val direction = KTAFValue(UISliderDirection.HORIZONTAL)
-    val backgroundColour = UIAnimatedProperty(rgba(0f), this, "backgroundColour")
+    val backgroundColour = UIProperty(rgba(0f))
 
     val x = KTAFValue(0f)
     val y = KTAFValue(0f)
@@ -128,10 +131,10 @@ private class SliderObject: UIPane() {
     override fun cursor() = GLFWCursor.POINTER
 
     init {
-        onMousePress { state.push(PRESSED) }
-        onMouseRelease { state.remove(PRESSED) }
+        onMousePress.connect { state.push(PRESSED) }
+        onMouseRelease.connect { state.remove(PRESSED) }
 
-        colour.animationDuration = Animation.QUICK
+//        colour.animationDuration = Animation.QUICK
         colour.setSetter {
             this[DEFAULT_STATE](it)
             this[HOVER](it.lighten())

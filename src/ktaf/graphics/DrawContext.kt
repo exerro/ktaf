@@ -1,6 +1,6 @@
 package ktaf.graphics
 
-import ktaf.core.mat4
+import geometry.mat4
 import ktaf.core.uniform
 import lwjglkt.*
 

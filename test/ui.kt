@@ -32,7 +32,7 @@ fun main() = application {
                         height(30f)
                         hotkeys.add(Hotkey(GLFW.GLFW_KEY_0 + container.children.size))
 
-                        onClick { event ->
+                        clicked { event ->
                             when (event) {
                                 is MouseClickEvent -> parent(null)
                                 else -> this.height(Math.random().toFloat() * 20f + 20f)
@@ -64,7 +64,7 @@ fun main() = application {
                 button.run {
                     content.children.connectChanged { button.text("Add button ${content.children.size + 1}") }
                     hotkeys.add(Hotkey(GLFW.GLFW_KEY_A))
-                    onClick { content.addButton() }
+                    clicked { content.addButton() }
                 }
 
                 layout(AreaLayout()) {

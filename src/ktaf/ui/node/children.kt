@@ -1,8 +1,7 @@
 package ktaf.ui.node
 
-import ktaf.core.vec2
+import geometry.*
 import ktaf.graphics.DrawContext2D
-import ktaf.typeclass.plus
 import ktaf.ui.layout.tl
 
 fun UINode.drawChildren(children: List<UINode>, context: DrawContext2D, position: vec2) {

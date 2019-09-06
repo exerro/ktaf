@@ -1,5 +1,6 @@
 package ktaf.ui
 
+import geometry.vec2
 import ktaf.core.*
 import ktaf.ui.node.UINode
 

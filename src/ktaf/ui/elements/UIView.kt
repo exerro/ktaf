@@ -1,12 +1,10 @@
 package ktaf.ui.elements
 
+import geometry.*
 import ktaf.core.GLFWKey
 import ktaf.core.GLFWKeyModifier
 import ktaf.core.KTAFValue
-import ktaf.core.vec2
 import ktaf.graphics.DrawContext2D
-import ktaf.typeclass.minus
-import ktaf.typeclass.plus
 import ktaf.ui.layout.ViewLayout
 import ktaf.ui.layout.tl
 import ktaf.ui.node.UIContainer

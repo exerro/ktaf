@@ -1,9 +1,8 @@
 package ktaf.ui.elements
 
+import geometry.*
 import ktaf.core.KTAFList
 import ktaf.graphics.DrawContext2D
-import ktaf.core.vec2
-import ktaf.typeclass.plus
 import ktaf.ui.node.UINode
 import ktaf.util.AABB
 

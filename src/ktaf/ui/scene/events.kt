@@ -1,7 +1,7 @@
 package ktaf.ui.scene
 
+import geometry.*
 import ktaf.core.*
-import ktaf.typeclass.minus
 import ktaf.ui.*
 import ktaf.ui.layout.*
 import ktaf.ui.node.absolutePosition

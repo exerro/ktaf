@@ -1,5 +1,6 @@
 package ktaf.graphics
 
+import geometry.*
 import lwjglkt.*
 import ktaf.core.*
 import kotlin.math.max

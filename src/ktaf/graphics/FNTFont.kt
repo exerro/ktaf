@@ -1,7 +1,7 @@
 package ktaf.graphics
 
+import geometry.*
 import ktaf.core.*
-import ktaf.typeclass.plus
 import lwjglkt.GLTexture2
 import lwjglkt.GLVAO
 import lwjglkt.createVAO

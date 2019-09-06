@@ -1,5 +1,6 @@
 package ktaf.graphics
 
+import geometry.*
 import ktaf.core.*
 import lwjglkt.*
 

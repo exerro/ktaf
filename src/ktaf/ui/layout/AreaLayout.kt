@@ -1,8 +1,7 @@
 package ktaf.ui.layout
 
+import geometry.*
 import ktaf.core.KTAFValue
-import ktaf.core.vec2
-import ktaf.typeclass.plus
 import ktaf.ui.node.UINode
 
 // TODO: this needs better documenting

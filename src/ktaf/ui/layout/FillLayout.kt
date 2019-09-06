@@ -1,7 +1,7 @@
 package ktaf.ui.layout
 
+import geometry.vec2
 import ktaf.core.KTAFValue
-import ktaf.core.vec2
 
 class FillLayout: UILayout() {
     val alignment = KTAFValue(vec2(0f))

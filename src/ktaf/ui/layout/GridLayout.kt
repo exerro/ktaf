@@ -1,7 +1,7 @@
 package ktaf.ui.layout
 
+import geometry.vec2
 import ktaf.core.KTAFValue
-import ktaf.core.vec2
 import kotlin.math.max
 
 class GridLayout(rows: Int = 2, columns: Int = 2): UILayout() {

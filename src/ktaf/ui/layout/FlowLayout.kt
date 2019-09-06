@@ -1,7 +1,7 @@
 package ktaf.ui.layout
 
+import geometry.vec2
 import ktaf.core.KTAFValue
-import ktaf.core.vec2
 import ktaf.ui.node.UINode
 
 class FlowLayout: UILayout() {

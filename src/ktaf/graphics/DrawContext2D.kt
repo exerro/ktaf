@@ -1,8 +1,7 @@
 package ktaf.graphics
 
+import geometry.*
 import ktaf.core.*
-import ktaf.typeclass.minus
-import ktaf.typeclass.plus
 import ktaf.util.*
 import lwjglkt.*
 
@@ -24,7 +23,7 @@ class DrawContext2D(target: RenderTarget): DrawContext<DrawContext2DRenderer>(ta
         set(scissor) { stateManager.activeState.scissor = scissor?.intersection(AABB(vec2(0f), target.size)) }
 
     val transform: mat4
-        get() = (scissor?.let { it.max - it.min } ?: target.size) .let { viewSize ->
+        get() = (scissor?.let { it.max - it.min } ?: target.size) .let { viewSize: vec2 ->
             mat4_identity *
                     mat3_scale(vec3(1f, -1f, 1f)).mat4() *
                     mat4_translate(vec3(-1f, -1f, 0f)) *

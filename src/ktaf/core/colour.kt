@@ -1,5 +1,7 @@
 package ktaf.core
 
+import geometry.*
+
 typealias RGB = vec3
 typealias RGBA = vec4
 

@@ -1,8 +1,8 @@
+
+import geometry.*
 import ktaf.core.Colour
 import ktaf.core.joinTo
 import ktaf.core.rgba
-import ktaf.core.vec2
-import ktaf.typeclass.minus
 import ktaf.ui.elements.*
 import ktaf.ui.layout.*
 import ktaf.ui.node.UIContainer
@@ -21,8 +21,8 @@ fun elementsDemo(): UINode {
         val label = children.add(UILabel("Label")) {}
 
         val button = children.add(UIButton("A button")) {
-            onMouseClick { text("Was clicked!") }
-            onClick { text("Was triggered!") }
+            onMouseClick.connect { text("Was clicked!") }
+            clicked.connect { text("Was triggered!") }
         }
 
         val mirror = children.add(UILabel("Will mirror the button")) {}
@@ -73,12 +73,12 @@ fun elementsDemo(): UINode {
 
             children.add(UIButton("A")) {
                 colour(Colour.purple)
-                onClick { l.sections[0](80.pc()) }
+                clicked.connect { l.sections[0](80.pc()) }
             }
 
             children.add(UIButton("B")) {
                 colour(Colour.green)
-                onClick { l.sections[0](20.pc()) }
+                clicked.connect { l.sections[0](20.pc()) }
             }
         }
 

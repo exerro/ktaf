@@ -1,7 +1,8 @@
 package ktaf.ui.node
 
+import geometry.plus
+import geometry.vec2
 import ktaf.core.*
-import ktaf.typeclass.plus
 import ktaf.ui.UIFocusEvent
 import ktaf.ui.UIMouseEnterEvent
 import ktaf.ui.UIMouseExitEvent
@@ -13,27 +14,27 @@ fun UINode.absolutePosition(): vec2
 
 fun UINode.handleEvent(event: Event) {
     when (event) {
-        is KeyEvent -> onKeyEvent.trigger(event)
-        is MouseEvent -> onMouseEvent.trigger(event)
+        is KeyEvent -> onKeyEvent.emit(event)
+        is MouseEvent -> onMouseEvent.emit(event)
     }
 
     when (event) {
-        is MouseButtonEvent -> onMouseButtonEvent.trigger(event)
+        is MouseButtonEvent -> onMouseButtonEvent.emit(event)
     }
 
     when (event) {
-        is UIMouseEnterEvent -> onMouseEnter.trigger(event)
-        is UIMouseExitEvent -> onMouseExit.trigger(event)
-        is MouseScrollEvent -> onMouseScroll.trigger(event)
-        is MouseMoveEvent -> onMouseMove.trigger(event)
-        is MouseDragEvent -> onMouseDrag.trigger(event)
-        is MousePressEvent -> onMousePress.trigger(event)
-        is MouseReleaseEvent -> onMouseRelease.trigger(event)
-        is MouseClickEvent -> onMouseClick.trigger(event)
-        is KeyPressEvent -> onKeyPress.trigger(event)
-        is KeyReleaseEvent -> onKeyRelease.trigger(event)
-        is TextInputEvent -> onTextInput.trigger(event)
-        is UIFocusEvent -> onFocus.trigger(event)
-        is UIUnFocusEvent -> onUnFocus.trigger(event)
+        is UIMouseEnterEvent -> onMouseEnter.emit(event)
+        is UIMouseExitEvent -> onMouseExit.emit(event)
+        is MouseScrollEvent -> onMouseScroll.emit(event)
+        is MouseMoveEvent -> onMouseMove.emit(event)
+        is MouseDragEvent -> onMouseDrag.emit(event)
+        is MousePressEvent -> onMousePress.emit(event)
+        is MouseReleaseEvent -> onMouseRelease.emit(event)
+        is MouseClickEvent -> onMouseClick.emit(event)
+        is KeyPressEvent -> onKeyPress.emit(event)
+        is KeyReleaseEvent -> onKeyRelease.emit(event)
+        is TextInputEvent -> onTextInput.emit(event)
+        is UIFocusEvent -> onFocus.emit(event)
+        is UIUnFocusEvent -> onUnFocus.emit(event)
     }
 }

@@ -1,9 +1,7 @@
 package ktaf.util
 
+import geometry.*
 import ktaf.core.KTAFValue
-import ktaf.core.vec2
-import ktaf.core.vec3
-import ktaf.core.vec4
 import ktaf.typeclass.*
 import kotlin.reflect.KProperty0
 

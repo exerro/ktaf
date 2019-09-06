@@ -1,9 +1,8 @@
 package ktaf.ui.elements
 
+import geometry.*
 import ktaf.core.*
 import ktaf.graphics.DrawContext2D
-import ktaf.typeclass.minus
-import ktaf.typeclass.plus
 import ktaf.ui.DEFAULT_STATE
 import ktaf.ui.UIAnimatedProperty
 import ktaf.ui.UIProperty
@@ -19,12 +18,12 @@ import ktaf.util.Animation
 import lwjglkt.glfw.GLFWCursor
 
 open class UICheckbox: UINode(), Clickable {
-    val colour = UIAnimatedProperty(rgba(0f), this, "colour", animationDuration = Animation.QUICK)
+    val colour = UIProperty(rgba(0f))
     val hoverColour = UIProperty(rgba(0f, 0.9f))
     val checkColour = UIProperty(rgba(0f, 0.9f))
     val checked = KTAFValue(false)
 
-    private val effectiveCheckColour = UIAnimatedProperty(rgba(0f), this, "effectiveCheckColour", animationDuration = Animation.QUICK)
+    private val effectiveCheckColour = UIProperty(rgba(0f))
     private val hovering = KTAFValue(false)
 
     override fun cursor(): GLFWCursor? = GLFWCursor.POINTER
@@ -46,10 +45,10 @@ open class UICheckbox: UINode(), Clickable {
         propertyState(checkColour)
         propertyState(hoverColour)
 
-        onKeyPress { click(it); }
-        onMouseClick { click(it); }
-        onMouseEnter { hovering(it.target) }
-        onMouseExit { hovering(false) }
+        onKeyPress.connect { click(it); }
+        onMouseClick.connect { click(it); }
+        onMouseEnter.connect { hovering(it.target) }
+        onMouseExit.connect { hovering(false) }
 
         checked.connect { if (it) state.push(CHECKED) else state.remove(CHECKED) }
 

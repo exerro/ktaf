@@ -23,7 +23,7 @@ fun main() = application { display("UI Graphics") {
             val content = children.add(UIView()) { horizontal() }
 
             fun addSection(title: String, node: UINode) {
-                buttons.children.add(UIButton(title)) { onClick { content.show(node) } }
+                buttons.children.add(UIButton(title)) { clicked.connect { content.show(node) } }
                 content.children.add(node)
             }
 
@@ -33,7 +33,7 @@ fun main() = application { display("UI Graphics") {
             content.hotkeys.add(Hotkey(GLFW.GLFW_KEY_LEFT))
             content.hotkeys.add(Hotkey(GLFW.GLFW_KEY_RIGHT))
 
-            content.onKeyPress {
+            content.onKeyPress.connect {
                 when (it.key) {
                     GLFW.GLFW_KEY_LEFT -> content.active.get()?.previousChild() ?.let { content.show(it) }
                     GLFW.GLFW_KEY_RIGHT -> content.active.get()?.nextChild() ?.let { content.show(it) }

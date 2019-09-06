@@ -1,8 +1,8 @@
 package ktaf.ui.layout
 
+import geometry.vec2
 import ktaf.core.KTAFList
 import ktaf.core.KTAFValue
-import ktaf.core.vec2
 
 class VDivLayout(spacing: Float, vararg sections: LayoutValue): UILayout() {
     constructor(vararg sections: LayoutValue): this(0f, *sections)

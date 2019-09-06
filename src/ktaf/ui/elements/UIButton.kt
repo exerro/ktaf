@@ -1,26 +1,28 @@
 package ktaf.ui.elements
 
+import geometry.*
 import ktaf.core.*
 import ktaf.ui.*
 import ktaf.ui.layout.Border
 import ktaf.ui.node.*
 import ktaf.ui.typeclass.Clickable
 import lwjglkt.glfw.GLFWCursor
+import observables.Signal
 
 open class UIButton(text: String): UITextRenderer(), Clickable {
-    val onClick = EventHandlerList<Event>()
+    val clicked = Signal<Event>()
 
     override fun cursor(): GLFWCursor? = GLFWCursor.POINTER
 
     override fun click(event: Event) {
-        onClick.trigger(event)
+        clicked.emit(event)
     }
 
     init {
-        onKeyPress { onClick.trigger(it) }
-        onMouseClick { onClick.trigger(it) }
-        onMousePress { state.push(PRESSED) }
-        onMouseRelease { state.remove(PRESSED) }
+        onKeyPress.connect { clicked.emit(it) }
+        onMouseClick.connect { clicked.emit(it) }
+        onMousePress.connect { state.push(PRESSED) }
+        onMouseRelease.connect { state.remove(PRESSED) }
 
         colour.setSetter {
             this[DEFAULT_STATE](it)

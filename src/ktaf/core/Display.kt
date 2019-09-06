@@ -1,5 +1,6 @@
 package ktaf.core
 
+import geometry.vec2
 import ktaf.graphics.RenderTarget
 import lwjglkt.glfw.GLFWCursor
 import lwjglkt.glfw.GLFWWindow
@@ -11,7 +12,9 @@ class Display internal constructor(title: String, width: Int, height: Int) {
     var fps = 0
         internal set
 
-    val resized = Signal<WindowResizeEvent>()
+    val glfwWindow = GLFWWindow(title, width, height)
+    val screen = RenderTarget.Screen(width, height)
+
     val onKeyEvent = Signal<KeyEvent>()
     val onKeyPress = Signal<KeyPressEvent>()
     val onKeyRelease = Signal<KeyReleaseEvent>()
@@ -21,13 +24,11 @@ class Display internal constructor(title: String, width: Int, height: Int) {
     val onMouseScroll = Signal<MouseScrollEvent>()
     val onMouseMove = Signal<MouseMoveEvent>()
     val onMouseDrag = Signal<MouseDragEvent>()
+    val resized = glfwWindow.resized
 
     val draw = UnitSignal()
     val update = Signal<Float>()
     val closed = UnitSignal()
-
-    val glfwWindow = GLFWWindow(title, width, height)
-    val screen = RenderTarget.Screen(width, height)
 
     fun update() {
         val t = System.currentTimeMillis()
@@ -55,7 +56,7 @@ class Display internal constructor(title: String, width: Int, height: Int) {
             screen.screenHeight(size.height)
             screen.maxX(RatioValue(size.width.toFloat(), 0f))
             screen.maxY(RatioValue(size.height.toFloat(), 0f))
-            resized.emit(WindowResizeEvent(vec2(size.width.toFloat(), size.height.toFloat())))
+            resized.emit(size)
         }
 
         glfwWindow.setKeyCallback { _, key, _, action, mods ->

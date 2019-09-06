@@ -13,5 +13,6 @@
     <orderEntry type="library" name="observables" level="project" />
     <orderEntry type="library" name="lwjgl-kt" level="project" />
     <orderEntry type="library" name="lwjgl" level="project" />
+    <orderEntry type="library" name="geometry-kt" level="project" />
   </component>
 </module>

@@ -1,3 +1,5 @@
+
+import geometry.*
 import ktaf.core.*
 import ktaf.ui.elements.*
 import ktaf.ui.layout.*
@@ -20,7 +22,7 @@ fun positionDemo(): UINode {
             fn(demo)
 
             button.colour(Colour.orange)
-            button.onClick { lower.show(display) }
+            button.clicked.connect { lower.show(display) }
         }
 
         addPositionDemo("List", ListLayout()) {
@@ -33,7 +35,7 @@ fun positionDemo(): UINode {
             } }
 
             content.children.connectAdded { fillMode.connect(it.fill::setter) }
-            content.children.connectAdded { it.onMouseClick { _ -> it.parent(null) } }
+            content.children.connectAdded { it.onMouseClick.connect { _ -> it.parent(null) } }
 
             content.children.connectRemoved { content.children.forEach { when (it) {
                 is UIButton -> it.text("Button ${content.children.indexOf(it) + 1}")
@@ -65,22 +67,22 @@ fun positionDemo(): UINode {
                 children.add(UIButton("Add item")) {
                     fill(false)
                     padding(Border(12f, 24f))
-                    onClick { content.children.add(UIButton("")) }
+                    clicked.connect { content.children.add(UIButton("")) }
                 }
 
                 children.add(UIButton("Resize items")) {
                     fill(false)
                     padding(Border(12f, 24f))
-                    onClick { content.children.forEach { it.height(Math.random().toFloat() * 48f + 32f) } }
-                    onClick { content.children.forEach { it.width(Math.random().toFloat() * 80f + 96f) } }
-                    onClick { fillMode(false) }
+                    clicked.connect { content.children.forEach { it.height(Math.random().toFloat() * 48f + 32f) } }
+                    clicked.connect { content.children.forEach { it.width(Math.random().toFloat() * 80f + 96f) } }
+                    clicked.connect { fillMode(false) }
                 }
 
                 children.add(UIButton("Toggle fill")) {
                     fill(false)
                     padding(Border(12f, 24f))
-                    onClick { fillMode(!fillMode.get()) }
-                    onClick { if (fillMode.get()) content.children.forEach { it.width(null) } }
+                    clicked.connect { fillMode(!fillMode.get()) }
+                    clicked.connect { if (fillMode.get()) content.children.forEach { it.width(null) } }
 
                     fillMode.connect { colour(if (it) Colour.green else Colour.red) }
                 }
@@ -98,7 +100,7 @@ fun positionDemo(): UINode {
             } }
 
             content.children.connectAdded { it.fill(false) }
-            content.children.connectAdded { it.onMouseClick { _ -> it.parent(null) } }
+            content.children.connectAdded { it.onMouseClick.connect { _ -> it.parent(null) } }
 
             content.children.connectRemoved { content.children.forEach { when (it) {
                 is UIButton -> it.text("Button ${content.children.indexOf(it) + 1}")
@@ -140,14 +142,14 @@ fun positionDemo(): UINode {
                 children.add(UIButton("Add item")) {
                     fill(false)
                     padding(Border(12f, 24f))
-                    onClick { content.children.add(UIButton("")) }
+                    clicked.connect { content.children.add(UIButton("")) }
                 }
 
                 children.add(UIButton("Resize items")) {
                     fill(false)
                     padding(Border(12f, 24f))
-                    onClick { content.children.forEach { it.height(Math.random().toFloat() * 64f + 32f) } }
-                    onClick { content.children.forEach { it.width(Math.random().toFloat() * 128f + 96f) } }
+                    clicked.connect { content.children.forEach { it.height(Math.random().toFloat() * 64f + 32f) } }
+                    clicked.connect { content.children.forEach { it.width(Math.random().toFloat() * 128f + 96f) } }
                 }
 
 //                children.add(UIButton("Toggle fill")) {
@@ -170,7 +172,7 @@ fun positionDemo(): UINode {
             } }
 
             content.children.connectAdded { fillMode.connect(it.fill::setter) }
-            content.children.connectAdded { it.onMouseClick { _ -> it.parent(null) } }
+            content.children.connectAdded { it.onMouseClick.connect { _ -> it.parent(null) } }
 
             content.children.connectRemoved { content.children.forEach { when (it) {
                 is UIButton -> it.text("Button ${content.children.indexOf(it) + 1}")
@@ -208,10 +210,10 @@ fun positionDemo(): UINode {
                 padding(Border(12f))
                 colour(rgba(0.8f))
 
-                children.add(UIButton("Add row")) { onClick { gridLayout.rows(gridLayout.rows.get() + 1) } }
-                children.add(UIButton("Add column")) { onClick { gridLayout.columns(gridLayout.columns.get() + 1) } }
-                children.add(UIButton("Remove row")) { onClick { gridLayout.rows(max(1, gridLayout.rows.get() - 1)) } }
-                children.add(UIButton("Remove column")) { onClick { gridLayout.columns(max(1, gridLayout.columns.get() - 1)) } }
+                children.add(UIButton("Add row")) { clicked.connect { gridLayout.rows(gridLayout.rows.get() + 1) } }
+                children.add(UIButton("Add column")) { clicked.connect { gridLayout.columns(gridLayout.columns.get() + 1) } }
+                children.add(UIButton("Remove row")) { clicked.connect { gridLayout.rows(max(1, gridLayout.rows.get() - 1)) } }
+                children.add(UIButton("Remove column")) { clicked.connect { gridLayout.columns(max(1, gridLayout.columns.get() - 1)) } }
 
                 layout(FlowLayout()) {
                     horizontalSpacing(Spacing.fixed(16f))
@@ -232,23 +234,23 @@ fun positionDemo(): UINode {
                 children.add(UIButton("Add item")) {
                     fill(false)
                     padding(Border(12f, 24f))
-                    onClick { content.children.add(UIButton("")) }
+                    clicked.connect { content.children.add(UIButton("")) }
                 }
 
                 children.add(UIButton("Resize items")) {
                     fill(false)
                     padding(Border(12f, 24f))
-                    onClick { content.children.forEach { it.height(Math.random().toFloat() * 64f + 32f) } }
-                    onClick { content.children.forEach { it.width(Math.random().toFloat() * 64f + 80f) } }
-                    onClick { fillMode(false) }
+                    clicked.connect { content.children.forEach { it.height(Math.random().toFloat() * 64f + 32f) } }
+                    clicked.connect { content.children.forEach { it.width(Math.random().toFloat() * 64f + 80f) } }
+                    clicked.connect { fillMode(false) }
                 }
 
                 children.add(UIButton("Toggle fill")) {
                     fill(false)
                     padding(Border(12f, 24f))
-                    onClick { fillMode(!fillMode.get()) }
-                    onClick { if (fillMode.get()) content.children.forEach { it.width(null) } }
-                    onClick { if (fillMode.get()) content.children.forEach { it.height(null) } }
+                    clicked.connect { fillMode(!fillMode.get()) }
+                    clicked.connect { if (fillMode.get()) content.children.forEach { it.width(null) } }
+                    clicked.connect { if (fillMode.get()) content.children.forEach { it.height(null) } }
 
                     fillMode.connect { colour(if (it) Colour.green else Colour.red) }
                 }
@@ -306,12 +308,12 @@ private fun spacingControls(label: String, spacing: KTAFValue<Spacing>): UIConta
             padding(Border(8f))
             colour(rgba(0.9f))
 
-            children.add(UIButton("SPACE_AFTER")) { onClick { spacing(Spacing.SPACE_AFTER) } }
-            children.add(UIButton("SPACE_AROUND")) { onClick { spacing(Spacing.SPACE_AROUND) } }
-            children.add(UIButton("SPACE_BEFORE")) { onClick { spacing(Spacing.SPACE_BEFORE) } }
-            children.add(UIButton("SPACE_BETWEEN")) { onClick { spacing(Spacing.SPACE_BETWEEN) } }
-            children.add(UIButton("SPACE_WRAP")) { onClick { spacing(Spacing.SPACE_WRAP) } }
-            children.add(UIButton("SPACE_EVENLY")) { onClick { spacing(Spacing.SPACE_EVENLY) } }
+            children.add(UIButton("SPACE_AFTER")) { clicked.connect { spacing(Spacing.SPACE_AFTER) } }
+            children.add(UIButton("SPACE_AROUND")) { clicked.connect { spacing(Spacing.SPACE_AROUND) } }
+            children.add(UIButton("SPACE_BEFORE")) { clicked.connect { spacing(Spacing.SPACE_BEFORE) } }
+            children.add(UIButton("SPACE_BETWEEN")) { clicked.connect { spacing(Spacing.SPACE_BETWEEN) } }
+            children.add(UIButton("SPACE_WRAP")) { clicked.connect { spacing(Spacing.SPACE_WRAP) } }
+            children.add(UIButton("SPACE_EVENLY")) { clicked.connect { spacing(Spacing.SPACE_EVENLY) } }
 
             layout(FlowLayout()) {
                 horizontalSpacing(Spacing.fixed(16f))

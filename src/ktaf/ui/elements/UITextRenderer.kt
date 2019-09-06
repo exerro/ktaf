@@ -1,13 +1,12 @@
 package ktaf.ui.elements
 
+import geometry.minus
+import geometry.plus
+import geometry.vec2
 import ktaf.core.rgba
-import ktaf.core.vec2
 import ktaf.graphics.DrawContext2D
 import ktaf.graphics.Font
 import ktaf.graphics.rectangle
-import ktaf.typeclass.minus
-import ktaf.typeclass.plus
-import ktaf.ui.UIAnimatedProperty
 import ktaf.ui.UIProperty
 import ktaf.ui.layout.height
 import ktaf.ui.layout.size
@@ -17,15 +16,14 @@ import ktaf.ui.node.UINode
 import ktaf.ui.node.drawText
 import ktaf.ui.node.textHeight
 import ktaf.ui.node.textWidth
-import ktaf.util.Animation
 import kotlin.math.min
 
 abstract class UITextRenderer: UINode() {
-    val colour = UIAnimatedProperty(rgba(0f), this, "colour", animationDuration = Animation.QUICK)
-    val textColour = UIAnimatedProperty(rgba(0f, 0.9f), this, "textColour", animationDuration = Animation.QUICK)
+    val colour = UIProperty(rgba(0f))
+    val textColour = UIProperty(rgba(0f, 0.9f))
     val text = UIProperty("")
     val font = UIProperty(Font.DEFAULT_FONT.scaleTo(16f))
-    val alignment = UIAnimatedProperty(vec2(0f), this, "alignment")
+    val alignment = UIProperty(vec2(0f))
     val wrap = UIProperty(true)
 
     override fun computeContentWidth(width: Float?): Float {

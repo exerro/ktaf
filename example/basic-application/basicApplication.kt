@@ -1,3 +1,4 @@
+import geometry.vec2
 import ktaf.core.*
 import ktaf.graphics.DrawContext2D
 import ktaf.graphics.rectangle

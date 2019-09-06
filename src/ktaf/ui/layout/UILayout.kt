@@ -1,9 +1,6 @@
 package ktaf.ui.layout
 
-import ktaf.core.times
-import ktaf.core.vec2
-import ktaf.typeclass.minus
-import ktaf.typeclass.plus
+import geometry.*
 import ktaf.ui.node.UIContainer
 import ktaf.ui.node.UINode
 import ktaf.ui.node.orderedChildren

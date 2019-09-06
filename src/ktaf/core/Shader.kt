@@ -1,5 +1,8 @@
 package ktaf.core
 
+import geometry.vec2
+import geometry.vec3
+import geometry.vec4
 import kotlin.reflect.full.createInstance
 
 abstract class ShaderVariableType(val name: String)

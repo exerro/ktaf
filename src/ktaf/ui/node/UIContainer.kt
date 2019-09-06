@@ -1,16 +1,18 @@
 package ktaf.ui.node
 
+import geometry.minus
+import geometry.vec2
 import ktaf.core.*
 import ktaf.graphics.DrawContext2D
-import ktaf.typeclass.minus
 import ktaf.ui.UIAnimatedProperty
+import ktaf.ui.UIProperty
 import ktaf.ui.layout.*
 
 open class UIContainer(colour: RGBA = rgba(1f, 0f)): UINode() {
     // structure
     val children = KTAFList<UINode>()
     val ordering = KTAFValue(Ordering())
-    val colour = UIAnimatedProperty(colour, this, "colour")
+    val colour = UIProperty(colour)
 
     // configuration
     val layout = KTAFValue<UILayout>(FillLayout())

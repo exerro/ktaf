@@ -1,5 +1,6 @@
 package ktaf.ui.node
 
+import geometry.*
 import ktaf.core.*
 import ktaf.graphics.DrawContext2D
 import ktaf.ui.*
@@ -7,6 +8,7 @@ import ktaf.ui.layout.Border
 import ktaf.ui.scene.UIScene
 import ktaf.util.animate
 import lwjglkt.glfw.GLFWCursor
+import observables.Signal
 import kotlin.properties.Delegates
 
 abstract class UINode {
@@ -32,22 +34,22 @@ abstract class UINode {
     val computedPosition = KTAFValue(vec2(0f))
 
     // callbacks
-    val onFocus = EventHandlerList<UIFocusEvent>()
-    val onUnFocus = EventHandlerList<UIUnFocusEvent>()
-    val onMouseEvent = EventHandlerList<MouseEvent>()
-    val onMouseButtonEvent = EventHandlerList<MouseButtonEvent>()
-    val onMouseEnter = EventHandlerList<UIMouseEnterEvent>()
-    val onMouseExit = EventHandlerList<UIMouseExitEvent>()
-    val onMousePress = EventHandlerList<MousePressEvent>()
-    val onMouseRelease = EventHandlerList<MouseReleaseEvent>()
-    val onMouseClick = EventHandlerList<MouseClickEvent>()
-    val onMouseScroll = EventHandlerList<MouseScrollEvent>()
-    val onMouseMove = EventHandlerList<MouseMoveEvent>()
-    val onMouseDrag = EventHandlerList<MouseDragEvent>()
-    val onKeyEvent = EventHandlerList<KeyEvent>()
-    val onKeyPress = EventHandlerList<KeyPressEvent>()
-    val onKeyRelease = EventHandlerList<KeyReleaseEvent>()
-    val onTextInput = EventHandlerList<TextInputEvent>()
+    val onFocus = Signal<UIFocusEvent>()
+    val onUnFocus = Signal<UIUnFocusEvent>()
+    val onMouseEvent = Signal<MouseEvent>()
+    val onMouseButtonEvent = Signal<MouseButtonEvent>()
+    val onMouseEnter = Signal<UIMouseEnterEvent>()
+    val onMouseExit = Signal<UIMouseExitEvent>()
+    val onMousePress = Signal<MousePressEvent>()
+    val onMouseRelease = Signal<MouseReleaseEvent>()
+    val onMouseClick = Signal<MouseClickEvent>()
+    val onMouseScroll = Signal<MouseScrollEvent>()
+    val onMouseMove = Signal<MouseMoveEvent>()
+    val onMouseDrag = Signal<MouseDragEvent>()
+    val onKeyEvent = Signal<KeyEvent>()
+    val onKeyPress = Signal<KeyPressEvent>()
+    val onKeyRelease = Signal<KeyReleaseEvent>()
+    val onTextInput = Signal<TextInputEvent>()
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -142,8 +144,8 @@ abstract class UINode {
             if (new?.children?.contains(this) != true) new?.children?.add(this)
         }
 
-        onMouseEnter { state.push(HOVER) }
-        onMouseExit { state.remove(HOVER) }
+        onMouseEnter.connect { state.push(HOVER) }
+        onMouseExit.connect { state.remove(HOVER) }
     }
 
     /** Register a property as a state-dependent property, making state changes to update this property */
