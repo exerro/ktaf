@@ -5,7 +5,7 @@ package ktaf.ui.elements
 import geometry.minus
 import geometry.vec2
 import ktaf.core.*
-import ktaf.graphics.DrawContext2D
+import ktaf.graphics.DrawCtx
 import ktaf.ui.DEFAULT_STATE
 import ktaf.ui.UIProperty
 import ktaf.ui.elements.UISlider.Companion.PRESSED
@@ -16,7 +16,6 @@ import ktaf.ui.node.UIContainer
 import ktaf.ui.node.fillBackground
 import ktaf.ui.node.push
 import ktaf.ui.node.remove
-import ktaf.util.Animation
 import lwjglkt.glfw.GLFWCursor
 import kotlin.math.floor
 import kotlin.math.max
@@ -47,7 +46,7 @@ open class UISlider(min: Float = 0f, max: Float = 1f): UIContainer() {
     val sliderHeight = UIProperty(0f)
     val sliderColour = slider.colour
 
-    override fun draw(context: DrawContext2D, position: vec2, size: vec2) {
+    override fun draw(context: DrawCtx, position: vec2, size: vec2) {
         fillBackground(context, position, size, backgroundColour.get())
         super.draw(context, position, size)
     }

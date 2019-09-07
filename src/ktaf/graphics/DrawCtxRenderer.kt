@@ -52,7 +52,8 @@ class DrawCtxRenderer internal constructor(
     fun circle(centre: vec2, radius: Float, mode: GLDrawMode = GLDrawMode.GL_TRIANGLES) {
         val points = vaoCache.calculateCirclePointCount(radius)
         vao(vaoCache.circleVAO(points), 3 * (points + 1),
-                transform=mat4_translate(centre.vec3(0f)) * mat3_scale(radius).mat4())
+                transform=mat4_translate(centre.vec3(0f)) * mat3_scale(radius).mat4(),
+                mode=mode)
     }
 
     fun write(text: String, position: vec2 = vec2(0f), font: Font = Font.DEFAULT_FONT) {

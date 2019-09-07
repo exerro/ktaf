@@ -1,19 +1,17 @@
 
 import ktaf.core.MouseClickEvent
 import ktaf.core.application
-import ktaf.graphics.DrawContext2D
 import ktaf.ui.Hotkey
 import ktaf.ui.elements.UIButton
-import ktaf.ui.node.UIContainer
 import ktaf.ui.layout.*
+import ktaf.ui.node.UIContainer
 import ktaf.ui.scene.attachCallbacks
 import ktaf.ui.scene.scene
 import org.lwjgl.glfw.GLFW
 
 fun main() = application {
     display("Display") {
-        val context = DrawContext2D(screen)
-        val scene = scene(this, context) {
+        val scene = scene(this, context2D) {
             root.set(UIContainer()) {
                 val content = children.add(UIContainer()) {
                     padding(Border(16f, 0f))

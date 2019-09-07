@@ -1,17 +1,15 @@
 package ktaf.ui.elements
 
-import geometry.*
+import geometry.minus
+import geometry.vec2
 import ktaf.core.GLFWKey
 import ktaf.core.GLFWKeyModifier
 import ktaf.core.KTAFValue
-import ktaf.graphics.DrawContext2D
+import ktaf.graphics.DrawCtx
 import ktaf.ui.layout.ViewLayout
 import ktaf.ui.layout.tl
 import ktaf.ui.node.UIContainer
 import ktaf.ui.node.UINode
-import ktaf.ui.node.drawChildren
-import ktaf.ui.node.fillBackground
-import ktaf.util.AABB
 
 open class UIView: UIContainer() {
     val active = KTAFValue(null as UINode?)
@@ -49,11 +47,12 @@ open class UIView: UIContainer() {
     override fun getInputHandler(): UINode?
             = active.get() ?.getInputHandler() ?: this.takeIf { handlesInput() }
 
-    override fun draw(context: DrawContext2D, position: vec2, size: vec2) {
+    override fun draw(context: DrawCtx, position: vec2, size: vec2) {
 //        fillBackground(context, position, size, colour.get())
 
         context.push {
-            context.scissor = AABB(position, position + size)
+            // TODO: implement scissor
+            // context.scissor = AABB(position, position + size)
             super.draw(context, position, size)
 //            active.get() ?.let { drawChildren(listOf(it), context, position) }
         }

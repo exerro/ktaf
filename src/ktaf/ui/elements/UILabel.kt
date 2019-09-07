@@ -1,7 +1,8 @@
 package ktaf.ui.elements
 
-import geometry.*
-import ktaf.core.*
+import geometry.vec2
+import ktaf.core.KTAFValue
+import ktaf.core.rgba
 import ktaf.ui.layout.Border
 import ktaf.ui.typeclass.Clickable
 import lwjglkt.glfw.GLFWCursor

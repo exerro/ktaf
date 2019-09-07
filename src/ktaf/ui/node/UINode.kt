@@ -1,8 +1,8 @@
 package ktaf.ui.node
 
-import geometry.*
+import geometry.vec2
 import ktaf.core.*
-import ktaf.graphics.DrawContext2D
+import ktaf.graphics.DrawCtx
 import ktaf.ui.*
 import ktaf.ui.layout.Border
 import ktaf.ui.scene.UIScene
@@ -57,7 +57,7 @@ abstract class UINode {
     open fun update(dt: Float) {}
 
     /** Draw the node */
-    abstract fun draw(context: DrawContext2D, position: vec2, size: vec2)
+    abstract fun draw(context: DrawCtx, position: vec2, size: vec2)
 
     /** Return the cursor to show when hovering over this node */
     open fun cursor(): GLFWCursor? = GLFWCursor.DEFAULT

@@ -1,10 +1,14 @@
 package ktaf.ui.elements
 
-import geometry.*
-import ktaf.core.*
-import ktaf.ui.*
+import geometry.vec2
+import ktaf.core.Colour
+import ktaf.core.Event
+import ktaf.core.darken
+import ktaf.core.lighten
+import ktaf.ui.DEFAULT_STATE
 import ktaf.ui.layout.Border
-import ktaf.ui.node.*
+import ktaf.ui.node.push
+import ktaf.ui.node.remove
 import ktaf.ui.typeclass.Clickable
 import lwjglkt.glfw.GLFWCursor
 import observables.Signal

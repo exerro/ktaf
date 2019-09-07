@@ -132,11 +132,12 @@ fun elementsDemo(): UINode {
                     padding(Border(0f, 8f))
                     layout(HDivLayout(100.pc() - 20.px()))
 
-                    val label = children.add(UILabel(ch.toString())) {
+                    val l = children.add(UILabel(ch.toString())) {
                         padding(Border(4f, 8f))
                         textColour(rgba(1f))
                     }
-                    label.target(children.add(UIRadioButton()) {
+
+                    l.target(children.add(UIRadioButton()) {
                         group(group)
                         colour(rgba(0.78f))
                     })

@@ -5,7 +5,7 @@ import geometry.plus
 import geometry.vec2
 import ktaf.core.KTAFValue
 import ktaf.core.joinTo
-import ktaf.graphics.DrawContext2D
+import ktaf.graphics.DrawCtx
 import ktaf.ui.UIProperty
 import ktaf.ui.layout.HDivLayout
 import ktaf.ui.layout.height
@@ -13,7 +13,6 @@ import ktaf.ui.layout.pc
 import ktaf.ui.layout.px
 import ktaf.ui.node.UIContainer
 import ktaf.ui.node.UINode
-import ktaf.util.AABB
 import kotlin.math.max
 import kotlin.math.min
 
@@ -29,9 +28,10 @@ open class UIScrollContainer: UIContainer() {
     val scrollX = KTAFValue(0f)
     val scrollY = KTAFValue(0f)
 
-    override fun draw(context: DrawContext2D, position: vec2, size: vec2) {
+    override fun draw(context: DrawCtx, position: vec2, size: vec2) {
         context.push {
-            context.scissor = AABB(position, position + size)
+            // TODO: implement scissor
+            // context.scissor = AABB(position, position + size)
             super.draw(context, position, size)
         }
     }
@@ -72,7 +72,7 @@ open class UIScrollContainer: UIContainer() {
 }
 
 class UIScrollContainerContent(private val scroll: KTAFValue<vec2>): UIContainer() {
-    override fun draw(context: DrawContext2D, position: vec2, size: vec2) {
+    override fun draw(context: DrawCtx, position: vec2, size: vec2) {
         super.draw(context, position - scroll.get(), size)
     }
 

@@ -2,12 +2,23 @@ import geometry.vec2
 import ktaf.core.RGBA
 import ktaf.core.application
 import ktaf.graphics.*
+import lwjglkt.GL
+import lwjglkt.GLBLendFunction
+import lwjglkt.GLOption
+import lwjglkt.postFragmentShaderState
 import kotlin.math.sin
 
 fun main() = application {
     display("Main") {
-        val context = DrawContext2D(screen)
+        val context = context2D
 //    val texture = loadTextureFile2D("img.jpg")
+
+        // enable blending
+        GL.enable(GLOption.GL_BLEND)
+
+        postFragmentShaderState {
+            blendFunction(GLBLendFunction.GL_SRC_ALPHA, GLBLendFunction.GL_ONE_MINUS_SRC_ALPHA)
+        }
 
         draw.connect {
             val font = FNTFont.DEFAULT_FONT
@@ -15,10 +26,10 @@ fun main() = application {
             val height = font.height
 
             context.draw {
-                context.colour = RGBA(1f, 1f, 1f)
+                context.colour(RGBA(1f, 1f, 1f))
                 rectangle(vec2(10f), vec2(width, height))
-                context.colour = RGBA(1f, 0f, 1f, sin(time) * 0.5f + 0.5f)
-                write("Hello g", font, vec2(10f))
+                context.colour(RGBA(1f, 0f, 1f, sin(time) * 0.5f + 0.5f))
+                write("Hello g", vec2(10f), font)
             }
         }
 

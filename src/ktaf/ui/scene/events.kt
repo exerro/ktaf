@@ -7,6 +7,7 @@ import ktaf.ui.layout.*
 import ktaf.ui.node.absolutePosition
 import ktaf.ui.node.handleEvent
 import ktaf.util.update
+import lwjglkt.*
 import lwjglkt.glfw.GLFWCursor
 
 fun UIScene.update(dt: Float) {
@@ -14,8 +15,9 @@ fun UIScene.update(dt: Float) {
 
     root.get()?.let {
         it.layout.get().beginPositioning(it)
-        it.computeWidth(context.target.width.toFloat())
-        it.computeHeight(context.target.height.toFloat())
+        // TODO: replace with framebuffer size
+        it.computeWidth(display.glfwWindow.size.width.toFloat())
+        it.computeHeight(display.glfwWindow.size.height.toFloat())
         it.computePositionForChildren()
         it.layout.get().finishPositioning(it)
 
@@ -29,11 +31,23 @@ fun UIScene.update(dt: Float) {
 fun UIScene.draw() {
     display.setCursor(focussedNodeHover?.cursor() ?: GLFWCursor.DEFAULT)
 
+    GL.enable(GLOption.GL_BLEND)
+
+    rasterState {
+        defaults()
+    }
+
+    postFragmentShaderState {
+        defaults()
+        blendFunction(GLBLendFunction.GL_SRC_ALPHA, GLBLendFunction.GL_ONE_MINUS_SRC_ALPHA)
+    }
+
     root.get()?.let {
         it.draw(context, it.margin.get().tl,
                 vec2(
-                        context.target.width.toFloat() - it.margin.get().width,
-                        context.target.height.toFloat() - it.margin.get().height
+                        // TODO: replace with framebuffer size
+                        display.glfwWindow.size.width.toFloat() - it.margin.get().width,
+                        display.glfwWindow.size.height.toFloat() - it.margin.get().height
                 )
         )
     }

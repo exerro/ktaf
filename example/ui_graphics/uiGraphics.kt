@@ -1,13 +1,12 @@
 import ktaf.core.application
-import ktaf.graphics.DrawContext2D
 import ktaf.ui.Hotkey
 import ktaf.ui.elements.UIButton
-import ktaf.ui.node.UIContainer
 import ktaf.ui.elements.UIView
 import ktaf.ui.layout.AreaLayout
 import ktaf.ui.layout.HDivLayout
 import ktaf.ui.layout.UILayout
 import ktaf.ui.layout.px
+import ktaf.ui.node.UIContainer
 import ktaf.ui.node.UINode
 import ktaf.ui.node.nextChild
 import ktaf.ui.node.previousChild
@@ -16,8 +15,7 @@ import ktaf.ui.scene.scene
 import org.lwjgl.glfw.GLFW
 
 fun main() = application { display("UI Graphics") {
-    val context = DrawContext2D(screen)
-    val scene = scene(this, context) {
+    val scene = scene(this, context2D) {
         root(UIContainer()) {
             val buttons = children.add(UIContainer()) { layout(HDivLayout()) }
             val content = children.add(UIView()) { horizontal() }

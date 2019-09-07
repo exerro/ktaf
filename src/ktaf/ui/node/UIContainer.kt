@@ -3,8 +3,7 @@ package ktaf.ui.node
 import geometry.minus
 import geometry.vec2
 import ktaf.core.*
-import ktaf.graphics.DrawContext2D
-import ktaf.ui.UIAnimatedProperty
+import ktaf.graphics.DrawCtx
 import ktaf.ui.UIProperty
 import ktaf.ui.layout.*
 
@@ -36,7 +35,7 @@ open class UIContainer(colour: RGBA = rgba(1f, 0f)): UINode() {
     }
 
     // draw children
-    override fun draw(context: DrawContext2D, position: vec2, size: vec2) {
+    override fun draw(context: DrawCtx, position: vec2, size: vec2) {
         fillBackground(context, position, size, colour.get())
         drawChildren(children, context, position)
     }

@@ -4,9 +4,8 @@ import geometry.minus
 import geometry.plus
 import geometry.vec2
 import ktaf.core.rgba
-import ktaf.graphics.DrawContext2D
+import ktaf.graphics.DrawCtx
 import ktaf.graphics.Font
-import ktaf.graphics.rectangle
 import ktaf.ui.UIProperty
 import ktaf.ui.layout.height
 import ktaf.ui.layout.size
@@ -34,10 +33,9 @@ abstract class UITextRenderer: UINode() {
         return textHeight(text.get(), font.get(), wrap.get(), width) + padding.get().height
     }
 
-    override fun draw(context: DrawContext2D, position: vec2, size: vec2) {
+    override fun draw(context: DrawCtx, position: vec2, size: vec2) {
         context.draw {
-            context.colour = colour.get()
-            context.fill = true
+            context.colour(colour.get())
             rectangle(position, size)
         }
 

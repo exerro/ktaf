@@ -5,8 +5,7 @@ import geometry.minus
 import geometry.plus
 import geometry.vec2
 import ktaf.core.*
-import ktaf.graphics.DrawContext2D
-import ktaf.graphics.circle
+import ktaf.graphics.DrawCtx
 import ktaf.ui.DEFAULT_STATE
 import ktaf.ui.UIProperty
 import ktaf.ui.layout.Border
@@ -36,14 +35,12 @@ class UIRadioButton: UINode(), Clickable {
     override fun computeContentWidth(width: Float?): Float = DEFAULT_SIZE
     override fun computeContentHeight(width: Float, height: Float?): Float = width
 
-    override fun draw(context: DrawContext2D, position: vec2, size: vec2) {
+    override fun draw(context: DrawCtx, position: vec2, size: vec2) {
         context.draw {
-            context.fill = true
-
-            context.colour = colour.get()
+            context.colour(colour.get())
             circle(position + size / 2f, min(size.x, size.y) / 2)
 
-            context.colour = effectiveCheckColour.get()
+            context.colour(effectiveCheckColour.get())
             circle(position + padding.get().tl + (size - padding.get().size) / 2f, (size - padding.get().size).let { min(it.x, it.y) / 2 })
         }
     }

@@ -1,22 +1,22 @@
 package ktaf.ui.elements
 
-import geometry.*
-import ktaf.core.KTAFList
-import ktaf.graphics.DrawContext2D
+import geometry.vec2
+import ktaf.graphics.DrawCtx
 import ktaf.ui.node.UINode
-import ktaf.util.AABB
+import observables.BiSignal
 
 open class UICanvas: UINode() {
     override fun computeContentWidth(width: Float?): Float = 0f
     override fun computeContentHeight(width: Float, height: Float?): Float = 0f
 
-    val onDraw = KTAFList<UICanvas.(DrawContext2D, vec2) -> Unit>()
+    val onDraw = BiSignal<DrawCtx, vec2>()
 
-    override fun draw(context: DrawContext2D, position: vec2, size: vec2) {
+    override fun draw(context: DrawCtx, position: vec2, size: vec2) {
         context.push {
-            translate(position)
-            scissor = AABB(position, position + size)
-            onDraw.forEach { it(context, size) }
+            context.translate(position)
+            // TODO: implement scissors
+            // scissor = AABB(position, position + size)
+            onDraw.emit(context, size)
         }
     }
 }

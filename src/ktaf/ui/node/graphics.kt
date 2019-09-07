@@ -2,21 +2,22 @@ package ktaf.ui.node
 
 import geometry.vec2
 import ktaf.core.RGBA
-import ktaf.graphics.*
+import ktaf.graphics.DrawCtx
+import ktaf.graphics.Font
+import ktaf.graphics.widthOf
 import ktaf.util.wrapText
 import kotlin.math.max
 
-fun fillBackground(context: DrawContext2D, position: vec2, size: vec2,
+fun fillBackground(context: DrawCtx, position: vec2, size: vec2,
         colour: RGBA
 ) {
+    context.colour(colour)
     context.draw {
-        context.colour = colour
-        context.fill = true
         rectangle(position, size)
     }
 }
 
-fun drawText(context: DrawContext2D, position: vec2, size: vec2,
+fun drawText(context: DrawCtx, position: vec2, size: vec2,
         text: String,
         font: Font,
         wrap: Boolean,
@@ -27,10 +28,13 @@ fun drawText(context: DrawContext2D, position: vec2, size: vec2,
     var y = position.y + (size.y - lines.size * font.height) * alignment.y
 
     context.draw {
-        context.colour = colour
+        // TODO: what did this do? context(colour = colour)
+        //       replaced with the line below
+
+        context.colour(colour)
         lines.forEach { line ->
             val x = position.x + (size.x - font.widthOf(line)) * alignment.x
-            write(line, font, vec2(x, y))
+            write(line, vec2(x, y), font)
             y += font.height
         }
     }

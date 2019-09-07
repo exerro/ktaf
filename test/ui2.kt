@@ -1,5 +1,4 @@
 import ktaf.core.application
-import ktaf.graphics.DrawContext2D
 import ktaf.ui.node.UIContainer
 import ktaf.ui.scene.attachCallbacks
 import ktaf.ui.scene.scene
@@ -270,8 +269,7 @@ import ktaf.ui.scene.scene
 
 fun main() = application() {
     display("UI Test 2") {
-        val context = DrawContext2D(screen)
-        val scene = scene(this, context)
+        val scene = scene(this, context2D)
         val node = scene.root(UIContainer()) {
             //        layout(FreeLayout())
         }

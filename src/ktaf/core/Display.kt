@@ -1,6 +1,8 @@
 package ktaf.core
 
 import geometry.vec2
+import ktaf.graphics.DrawCtx
+import ktaf.graphics.Projection
 import ktaf.graphics.RenderTarget
 import lwjglkt.glfw.GLFWCursor
 import lwjglkt.glfw.GLFWWindow
@@ -30,6 +32,20 @@ class Display internal constructor(title: String, width: Int, height: Int) {
     val update = Signal<Float>()
     val closed = UnitSignal()
 
+    val context2D by lazy {
+        val context = DrawCtx()
+
+        // TODO: replace with framebufferSize
+        context.viewport(0, 0, glfwWindow.size.width, glfwWindow.size.height)
+        context.projection(Projection.screen())
+
+        glfwWindow.framebufferResized.connect { (w, h) ->
+            context.viewport(0, 0, w, h)
+        }
+
+        context
+    }
+
     fun update() {
         val t = System.currentTimeMillis()
         val dt = (t - lastUpdate) / 1000f
@@ -56,7 +72,6 @@ class Display internal constructor(title: String, width: Int, height: Int) {
             screen.screenHeight(size.height)
             screen.maxX(RatioValue(size.width.toFloat(), 0f))
             screen.maxY(RatioValue(size.height.toFloat(), 0f))
-            resized.emit(size)
         }
 
         glfwWindow.setKeyCallback { _, key, _, action, mods ->

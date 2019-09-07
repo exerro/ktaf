@@ -1,9 +1,9 @@
 package ktaf.ui.scene
 
-import ktaf.core.*
-import ktaf.graphics.DrawContext2D
+import ktaf.core.Display
+import ktaf.graphics.DrawCtx
 
-fun scene(display: Display, context: DrawContext2D, init: UIScene.() -> Unit = {}): UIScene {
+fun scene(display: Display, context: DrawCtx, init: UIScene.() -> Unit = {}): UIScene {
     val root = UIScene(display, context)
     init(root)
     return root

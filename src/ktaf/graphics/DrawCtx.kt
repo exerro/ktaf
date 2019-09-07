@@ -8,6 +8,7 @@ import kotlin.reflect.KMutableProperty0
 open class DrawCtx {
     fun push() { stateStack.push(DrawCtxState()) }
     fun pop() { stateStack.pop() }
+    fun push(fn: () -> Unit) { push(); fn(); pop() }
 
     fun pushShaders(vararg shaders: FragmentShader) {
         shaderStack.add(shaders.toList())
@@ -116,7 +117,7 @@ open class DrawCtx {
     private var viewportWidth = 100
     private var viewportHeight = 100
     private lateinit var lastShaderList: List<FragmentShader>
-    private lateinit var compiledShader: GLShaderProgram
+    private lateinit var compiledShader: GLShaderProgram // TODO: this should cache better
 
     init {
         compoundProperty<mat4>(::transformation, DrawCtxState::transformation, mat4::times)

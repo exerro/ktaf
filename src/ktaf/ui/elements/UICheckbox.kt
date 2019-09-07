@@ -1,10 +1,11 @@
 package ktaf.ui.elements
 
-import geometry.*
+import geometry.minus
+import geometry.plus
+import geometry.vec2
 import ktaf.core.*
-import ktaf.graphics.DrawContext2D
+import ktaf.graphics.DrawCtx
 import ktaf.ui.DEFAULT_STATE
-import ktaf.ui.UIAnimatedProperty
 import ktaf.ui.UIProperty
 import ktaf.ui.layout.Border
 import ktaf.ui.layout.size
@@ -14,7 +15,6 @@ import ktaf.ui.node.fillBackground
 import ktaf.ui.node.push
 import ktaf.ui.node.remove
 import ktaf.ui.typeclass.Clickable
-import ktaf.util.Animation
 import lwjglkt.glfw.GLFWCursor
 
 open class UICheckbox: UINode(), Clickable {
@@ -35,7 +35,7 @@ open class UICheckbox: UINode(), Clickable {
     override fun computeContentWidth(width: Float?): Float = DEFAULT_SIZE
     override fun computeContentHeight(width: Float, height: Float?): Float = width
 
-    override fun draw(context: DrawContext2D, position: vec2, size: vec2) {
+    override fun draw(context: DrawCtx, position: vec2, size: vec2) {
         fillBackground(context, position, size, colour.get())
         fillBackground(context, position + padding.get().tl, size - padding.get().size, effectiveCheckColour.get())
     }
