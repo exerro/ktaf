@@ -25,33 +25,17 @@ fun main() = application {
         ctx.viewport(0, 0, w, h)
         ctx.pushShaders(s1, s2)
 
-        val vao = createVAO {
-            genElementBuffer(listOf(0, 1, 2, 3, 2, 0))
-            genVertexPositionBuffer(listOf(
-                    vec3(0f, 1f, 0f),
-                    vec3(0f, 0f, 0f),
-                    vec3(1f, 0f, 0f),
-                    vec3(1f, 1f, 0f)
-            ))
-            genVertexNormalBuffer(List(4) { vec3(0f, 0f, 1f) })
-            genVertexUVBuffer(listOf(
-                    vec2(0f, 1f),
-                    vec2(0f, 0f),
-                    vec2(1f, 0f),
-                    vec2(1f, 1f)
-            ))
-            genVertexColourBuffer(4)
-        }
-
 //        ctx.translate(vec2_one * -0.5f)
         ctx.projection(Projection.screen())
+
+        update.connect { dt ->
+            ctx.rotateAbout(dt, vec2(60f))
+        }
 
         draw.connect {
             ctx.draw {
                 shader.uniform("factor", sin(time) / 2 + 0.5f)
-                vao(vao, 6, rgba(1f, 0f, 1f, 1f),
-                        transform = mat4_translate(vec3(100f, 100f, 0f)) *
-                mat3_scale(30f).mat4())
+                rectangle(vec2_one * 50f, vec2_one * 30f)
             }
         }
     }

@@ -23,6 +23,12 @@ open class DrawCtx {
     fun scale(scale: Float) { scale(vec2_one * scale) }
     fun colour(colour: RGBA) { stateStack.push(stateStack.pop().setColour(colour)) }
 
+    fun rotateAbout(angle: Float, centre: vec2) {
+        translate(centre)
+        rotate(angle)
+        translate(-centre)
+    }
+
     fun projection(projection: Projection) { this.projection = projection }
 
     fun viewport(x: Int, y: Int, width: Int, height: Int) {
@@ -35,12 +41,13 @@ open class DrawCtx {
     fun draw(fn: DrawCtxRenderer.() -> Unit) {
         val shader = shader()
         val projectionMatrix = projection.matrix(viewportWidth, viewportHeight)
+        val renderer = DrawCtxRenderer(this, shader, vaoCache)
 
         GL.viewport(viewportX, viewportY, viewportWidth, viewportHeight)
 
         shader.useIn {
             shader.uniform("projection", projectionMatrix)
-            fn(DrawCtxRenderer(this@DrawCtx, shader))
+            fn(renderer)
         }
     }
 
@@ -100,6 +107,7 @@ open class DrawCtx {
     internal var colour: RGBA = rgba(1f)
         private set
 
+    private val vaoCache = DrawCtxVAOCache()
     private var stateStack = StateStack<DrawCtxState>()
     private var shaderStack: MutableList<List<FragmentShader2D>> = mutableListOf()
     private var projection: Projection = Projection.identity()
