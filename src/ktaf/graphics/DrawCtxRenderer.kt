@@ -28,4 +28,24 @@ class DrawCtxRenderer internal constructor(
                         mat3_scale(size.vec3(0f)).mat4(),
                 mode=mode)
     }
+
+    fun line(a: vec2, b: vec2, size: Float = 1f) {
+        val hs = size / 2
+        val ab = (b - a).normalise()
+        val ba = -ab
+        val a1 = a + ba.rotate45CW()  * hs
+        val a2 = a + ba.rotate45CCW() * hs
+        val b1 = b + ab.rotate45CW()  * hs
+        val b2 = b + ab.rotate45CCW() * hs
+
+        vaoCache.flatNormals(4, vaoCache.quadVAONormals)
+        vaoCache.quadVAOPositions.subData(0, floatArrayOf(
+                a1.x, a1.y, 0f,
+                a2.x, a2.y, 0f,
+                b1.x, b1.y, 0f,
+                b2.x, b2.y, 0f
+        ))
+
+        vao(vaoCache.quadVAO, 6)
+    }
 }

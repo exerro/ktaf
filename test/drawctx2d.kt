@@ -1,41 +1,43 @@
-import geometry.*
-import ktaf.core.*
-import ktaf.graphics.*
-import lwjglkt.createVAO
+import geometry.times
+import geometry.vec2
+import geometry.vec2_one
+import ktaf.core.application
+import ktaf.core.uniform
+import ktaf.graphics.DrawCtx
+import ktaf.graphics.Projection
+import lwjglkt.GL
+import lwjglkt.GLOption
+import kotlin.math.max
 import kotlin.math.sin
 
 fun main() = application {
     display("Window") {
         val ctx = DrawCtx()
+        var pos = vec2(100f, 200f)
+        var size = 2f
 
-        val s1 = FragmentShader2D.create("""
-            ktaf_fragment_colour = ktaf_colour * vec4(1, 1, 0, 1);
-        """.trimIndent())
-
-        val s2 = FragmentShader2D.create("""
-            ktaf_fragment_colour = ktaf_colour + vec4(0, factor, 0, 1);
-        """.trimIndent(), ShaderUniform("factor", "float"))
-
-        glfwWindow.framebufferResized.connect {
-            val (w, h) = glfwWindow.framebufferSize
+        glfwWindow.framebufferResized.connect { (w, h) ->
             ctx.viewport(0, 0, w, h)
         }
 
-        val (w, h) = glfwWindow.size
-        ctx.viewport(0, 0, w, h)
-        ctx.pushShaders(s1, s2)
-
-//        ctx.translate(vec2_one * -0.5f)
-        ctx.projection(Projection.screen())
-
-        update.connect { dt ->
-            ctx.rotateAbout(dt, vec2(60f))
+        onMouseMove.connect { event ->
+            pos = event.position
         }
+
+        onMouseScroll.connect { event ->
+            size += event.direction.y
+            size = max(1f, size)
+        }
+
+        ctx.viewport(0, 0, glfwWindow.size.width, glfwWindow.size.height)
+        ctx.projection(Projection.screen())
 
         draw.connect {
             ctx.draw {
                 shader.uniform("factor", sin(time) / 2 + 0.5f)
                 rectangle(vec2_one * 50f, vec2_one * 30f)
+
+                line(vec2(10f, 100f), pos, size)
             }
         }
     }
