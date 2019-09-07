@@ -48,4 +48,30 @@ class DrawCtxRenderer internal constructor(
 
         vao(vaoCache.quadVAO, 6)
     }
+
+    fun circle(centre: vec2, radius: Float, mode: GLDrawMode = GLDrawMode.GL_TRIANGLES) {
+        val points = vaoCache.calculateCirclePointCount(radius)
+        vao(vaoCache.circleVAO(points), 3 * (points + 1),
+                transform=mat4_translate(centre.vec3(0f)) * mat3_scale(radius).mat4())
+    }
+
+    fun write(text: String, position: vec2 = vec2(0f), font: Font = Font.DEFAULT_FONT) {
+        if (text == "") return
+
+        var x = position.x
+        val y = position.y + (font.lineHeight - font.baseline) * font.scale
+
+        (text.zip(text.drop(1)) + listOf(text.last() to null)).forEach { (char, next) ->
+            val offset = font.getCharOffset(char)
+            val translation = vec3(x + offset.x * font.scale, y + offset.y * font.scale, 0f)
+            font.getTexture(char)?.use(0)
+            vao(font.getVAO(char), font.getVAOVertexCount(char),
+                    transform=mat4_translate(translation) * mat3_scale(vec3(font.scale)).mat4(),
+                    textured=font.getTexture(char) != null)
+            font.getTexture(char)?.stopUsing()
+            x += font.getCharAdvance(char) * font.scale
+            next ?.let { x += font.getKerning(char, next) * font.scale }
+        }
+    }
+
 }

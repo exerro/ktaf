@@ -9,7 +9,7 @@ open class DrawCtx {
     fun push() { stateStack.push(DrawCtxState()) }
     fun pop() { stateStack.pop() }
 
-    fun pushShaders(vararg shaders: FragmentShader2D) {
+    fun pushShaders(vararg shaders: FragmentShader) {
         shaderStack.add(shaders.toList())
     }
 
@@ -109,13 +109,13 @@ open class DrawCtx {
 
     private val vaoCache = DrawCtxVAOCache()
     private var stateStack = StateStack<DrawCtxState>()
-    private var shaderStack: MutableList<List<FragmentShader2D>> = mutableListOf()
+    private var shaderStack: MutableList<List<FragmentShader>> = mutableListOf()
     private var projection: Projection = Projection.identity()
     private var viewportX = 0
     private var viewportY = 0
     private var viewportWidth = 100
     private var viewportHeight = 100
-    private lateinit var lastShaderList: List<FragmentShader2D>
+    private lateinit var lastShaderList: List<FragmentShader>
     private lateinit var compiledShader: GLShaderProgram
 
     init {

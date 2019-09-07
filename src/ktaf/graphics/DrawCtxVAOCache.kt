@@ -1,11 +1,10 @@
 package ktaf.graphics
 
-import geometry.unpack
-import geometry.vec2
-import geometry.vec3
-import geometry.vec3_z
+import geometry.*
 import ktaf.core.*
 import lwjglkt.*
+import kotlin.math.PI
+import kotlin.math.max
 
 internal class DrawCtxVAOCache {
     val rectangleVAO by lazy {
@@ -87,6 +86,28 @@ internal class DrawCtxVAOCache {
         buffer.subData(0, normals.toFloatArray())
     }
 
+    fun circleVAO(numPoints: Int): GLVAO {
+        if (circleCache.size >= MAX_CACHE_SIZE) {
+            for ((k, _) in circleCache) {
+                circleCache.remove(k)
+                break
+            }
+        }
+
+        return circleCache.computeIfAbsent(numPoints) { createVAO {
+            val startPoint = listOf(vec3(0f))
+            val angles = (0 until numPoints).map { i -> i * PI.toFloat() * 2 / numPoints }
+            val points = angles.map { mat3_rotate(it, -vec3_z) * vec3_x }
+            genVertexPositionBuffer((startPoint + points))
+            genVertexNormalBuffer(List(numPoints + 1) { vec3(0f, 0f, 1f) })
+            genVertexColourBuffer(numPoints * 3)
+            genElementBuffer((1..numPoints).flatMap { i -> listOf(0, i, i % numPoints + 1) })
+        } }
+    }
+
+    fun calculateCirclePointCount(radius: Float)
+            = max(radius.toInt(), 3)
+
     private fun createVectorVBO(data: List<vec3>) = createVBO(GLBufferType.GL_ARRAY_BUFFER) {
         data(data.flatMap { it.unpack().toList() } .toFloatArray(), GLBufferUsage.GL_STATIC_DRAW)
     }
@@ -102,4 +123,8 @@ internal class DrawCtxVAOCache {
         enableVertexAttributeArray(attribute)
         attach(vbo)
     }
+
+    private val circleCache = LinkedHashMap<Int, GLVAO>()
 }
+
+private const val MAX_CACHE_SIZE = 15

@@ -2,21 +2,23 @@ package ktaf.graphics
 
 data class ShaderUniform(val name: String, val type: String)
 
-class FragmentShader2D internal constructor(internal val code: String, vararg uniforms: ShaderUniform) {
+class FragmentShader internal constructor(internal val code: String, vararg uniforms: ShaderUniform) {
     internal val uniforms = uniforms.toList()
 
     companion object {
-        fun create(code: String, vararg uniforms: ShaderUniform): FragmentShader2D {
-            return FragmentShader2D(code, *uniforms)
+        fun create(code: String, vararg uniforms: ShaderUniform): FragmentShader {
+            return FragmentShader(code, *uniforms)
         }
     }
 }
 
-fun List<FragmentShader2D>.compile(): String {
+fun List<FragmentShader>.compile(): String {
     var outputIndex = 0
     val uniforms = fold(listOf<ShaderUniform>()) { a, b -> a + b.uniforms }
+    val initialText = "$KTAF_COLOUR_OUT = $FRAGMENT_COLOUR_IN;\n" +
+            "if (useTexture) $KTAF_COLOUR_OUT *= texture(texture_sampler, $FRAGMENT_UV_IN);"
     val body = (1 .. size).joinToString("") { "vec4 ktaf_gen_colour$it;\n\t" } +
-    reversed().fold("$KTAF_COLOUR_OUT = $FRAGMENT_COLOUR_IN;") { prev, next ->
+    reversed().fold(initialText) { prev, next ->
         outputIndex++
         val colourVariable = "ktaf_gen_colour${outputIndex}"
         prev.replace(KTAF_COLOUR_OUT, colourVariable) + "\n\t" +
@@ -57,6 +59,9 @@ in vec4 $FRAGMENT_COLOUR_IN;
 in vec2 $FRAGMENT_UV_IN;
 
 out vec4 $FRAGMENT_COLOUR_OUT;
+
+uniform sampler2D texture_sampler;
+uniform bool useTexture;
     
 %UNIFORMS
 
