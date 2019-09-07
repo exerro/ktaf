@@ -1,6 +1,6 @@
+import geometry.vec2
 import ktaf.core.RGBA
 import ktaf.core.application
-import ktaf.core.vec2
 import ktaf.graphics.*
 import kotlin.math.sin
 
