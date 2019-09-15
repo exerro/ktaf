@@ -1,11 +1,11 @@
 package ktaf.graphics
 
 import geometry.*
-import ktaf.core.*
+import ktaf.util.createElementGLVAO
 import lwjglkt.GLTexture2
 import lwjglkt.GLVAO
-import lwjglkt.createVAO
-import lwjglkt.loadTexture2D
+import lwjglkt.gl.GLContext
+import lwjglkt.gl.loadTexture2D
 import org.lwjgl.BufferUtils
 import java.io.InputStream
 import java.nio.file.Files
@@ -46,11 +46,7 @@ class FNTFont internal constructor(
     override fun getVAOVertexCount(char: Char) = 6
     override fun getTexture(char: Char): GLTexture2? = charTextures[char]
 
-    companion object {
-        val DEFAULT_FONT by lazy {
-            load(FNTFont::class.java.getResourceAsStream("/ktaf/font/open-sans/OpenSans-Regular.fnt"))
-        }
-    }
+    companion object
 }
 
 class FNTFontPreloader(
@@ -167,28 +163,21 @@ fun FNTFont.Companion.preload(content: String): FNTFontPreloader {
 fun FNTFont.Companion.preloadFile(file: String): FNTFontPreloader
         = preload(String(Files.readAllBytes(Paths.get(file))))
 
-fun FNTFont.Companion.load(preloader: FNTFontPreloader): FNTFont {
-//    internal val lineHeight: Float,
-//    internal val baseline: Float,
-//    internal val pages: Map<Int, String>,
-//    internal val charSizes: MutableMap<Char, ktaf.core.vec2>,
-//    internal val charOffsets: MutableMap<Char, ktaf.core.vec2>,
-//    internal val charUVs: MutableMap<Char, List<ktaf.core.vec2>>,
-//    internal val charAdvances: MutableMap<Char, Float>,
-//    internal val charPages: MutableMap<Char, Int>
+fun FNTFont.Companion.load(context: GLContext, preloader: FNTFontPreloader): FNTFont {
     val vaos = preloader.charUVs.map { (char, uvs) ->
-        char to createVAO {
-            genVertexPositionBuffer(listOf(
-                    vec2(0f, 0f),
-                    vec2(0f, 1f),
-                    vec2(1f, 1f),
-                    vec2(1f, 0f)
-            ).map { it * preloader.charSizes[char]!! } .map { (x, y) -> vec3(x, y, 0f) })
-            genVertexNormalBuffer(List(4) { vec3(0f, 0f, 1f) })
-            genVertexUVBuffer(uvs)
-            genVertexColourBuffer(4)
-            genElementBuffer(listOf(0, 1, 2, 0, 2, 3))
-        }
+        char to createElementGLVAO(
+                context,
+                listOf(0, 1, 2, 0, 2, 3),
+                listOf(
+                        vec2(0f, 0f),
+                        vec2(0f, 1f),
+                        vec2(1f, 1f),
+                        vec2(1f, 0f)
+                ).map { it * preloader.charSizes[char]!! } .map { (x, y) -> vec3(x, y, 0f) },
+                List(4) { vec3(0f, 0f, 1f) },
+                uvs,
+                true
+        )
     } .toMap()
 
     val textureObjects = preloader.pages.map { (page, file) ->
@@ -197,7 +186,7 @@ fun FNTFont.Companion.load(preloader: FNTFontPreloader): FNTFont {
         val byteBuffer = BufferUtils.createByteBuffer(byteArray.size)
         byteBuffer.put(byteArray)
         byteBuffer.flip()
-        page to loadTexture2D(byteBuffer)
+        page to context.loadTexture2D(byteBuffer)
     } .toMap()
 
     val textures = preloader.charPages.map { (char, page) ->
@@ -217,11 +206,11 @@ fun FNTFont.Companion.load(preloader: FNTFontPreloader): FNTFont {
     )
 }
 
-fun FNTFont.Companion.load(content: String): FNTFont
-        = load(preload(content))
+fun FNTFont.Companion.load(context: GLContext, content: String): FNTFont
+        = load(context, preload(content))
 
-fun FNTFont.Companion.load(input: InputStream): FNTFont
-        = load(String(input.readAllBytes()))
+fun FNTFont.Companion.load(context: GLContext, input: InputStream): FNTFont
+        = load(context, String(input.readAllBytes()))
 
-fun FNTFont.Companion.loadFile(file: String): FNTFont
-        = load(preloadFile(file))
+fun FNTFont.Companion.loadFile(context: GLContext, file: String): FNTFont
+        = load(context, preloadFile(file))

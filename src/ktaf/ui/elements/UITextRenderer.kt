@@ -21,7 +21,7 @@ abstract class UITextRenderer: UINode() {
     val colour = UIProperty(rgba(0f))
     val textColour = UIProperty(rgba(0f, 0.9f))
     val text = UIProperty("")
-    val font = UIProperty(Font.DEFAULT_FONT.scaleTo(16f))
+    val font = UIProperty(null as Font?)
     val alignment = UIProperty(vec2(0f))
     val wrap = UIProperty(true)
 
@@ -59,7 +59,7 @@ abstract class UITextRenderer: UINode() {
         colour(rgba(1f, 0f))
         textColour(rgba(1f))
         text("")
-        font(Font.DEFAULT_FONT.scaleTo(16f))
+        font(null)
         alignment(vec2(0f))
         wrap(true)
     }

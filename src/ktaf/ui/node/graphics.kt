@@ -19,7 +19,7 @@ fun fillBackground(context: DrawCtx, position: vec2, size: vec2,
 
 fun drawText(context: DrawCtx, position: vec2, size: vec2,
         text: String,
-        font: Font,
+        font: Font?,
         wrap: Boolean,
         alignment: vec2,
         colour: RGBA

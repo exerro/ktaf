@@ -5,33 +5,50 @@ import geometry.vec3
 import geometry.vec4
 import kotlin.reflect.full.createInstance
 
+// README!
+// This is experimental and not meant to be used!
+// TODO: experimental shader compilation code
+
+@Deprecated("Experimental")
 abstract class ShaderVariableType(val name: String)
+@Deprecated("Experimental")
 data class ShaderVariable<VariableType: ShaderVariableType>(val type: VariableType, val name: String)
 
+@Deprecated("Experimental")
 object GLSLType {
+    @Deprecated("Experimental")
     abstract class numeric(name: String): ShaderVariableType(name)
+    @Deprecated("Experimental")
     abstract class vector(name: String): numeric(name)
+    @Deprecated("Experimental")
     object float: numeric("float")
+    @Deprecated("Experimental")
     object bool: ShaderVariableType("bool")
+    @Deprecated("Experimental")
     object int: numeric("int")
+    @Deprecated("Experimental")
     object vec2: vector("vec2") {
         val x = ShaderVariable(float, "x")
         val y = ShaderVariable(float, "y")
     }
+    @Deprecated("Experimental")
     object vec3: vector("vec3") {
         val x = ShaderVariable(float, "x")
         val y = ShaderVariable(float, "y")
         val z = ShaderVariable(float, "z")
     }
+    @Deprecated("Experimental")
     object vec4: vector("vec4") {
         val x = ShaderVariable(float, "x")
         val y = ShaderVariable(float, "y")
         val z = ShaderVariable(float, "z")
         val w = ShaderVariable(float, "w")
     }
+    @Deprecated("Experimental")
     object mat4: numeric("mat4")
 }
 
+@Deprecated("Experimental")
 sealed class ShaderGraphNode<out Out: ShaderVariableType>(
         val type: Out,
         val template: String = "",
@@ -53,33 +70,39 @@ sealed class ShaderGraphNode<out Out: ShaderVariableType>(
     }
 }
 
+@Deprecated("Experimental")
 class ShaderGraphVariableNode<VariableType: ShaderVariableType>(
         variable: ShaderVariable<VariableType>
 ): ShaderGraphNode<VariableType>(variable.type, "%result = ${variable.name}")
 
+@Deprecated("Experimental")
 class ShaderGraphConstantNode<ConstantType: ShaderVariableType>(
         type: ConstantType,
         val value: String
 ): ShaderGraphNode<ConstantType>(type, "%result = $value")
 
+@Deprecated("Experimental")
 class ShaderGraphOutputNode<VariableType: ShaderVariableType>(
         type: VariableType,
         value: ShaderGraphNode<VariableType>,
         val variable: ShaderVariable<VariableType>
 ): ShaderGraphNode<VariableType>(type, "${variable.name} = %1; %result = %1", value)
 
+@Deprecated("Experimental")
 open class ShaderGraphNaryOperation<Output: ShaderVariableType>(
         type: Output,
         operation: String,
         values: List<ShaderGraphNode<*>>
 ): ShaderGraphNode<Output>(type, "%result = $operation", roots = values.toSet())
 
+@Deprecated("Experimental")
 open class ShaderGraphUnaryOperation<Input: ShaderVariableType, Output: ShaderVariableType>(
         type: Output,
         operation: String,
         value: ShaderGraphNode<Input>
 ): ShaderGraphNaryOperation<Output>(type, operation, listOf(value))
 
+@Deprecated("Experimental")
 open class ShaderGraphBinaryOperation<I1: ShaderVariableType, I2: ShaderVariableType, Output: ShaderVariableType>(
         type: Output,
         operation: String,
@@ -87,6 +110,7 @@ open class ShaderGraphBinaryOperation<I1: ShaderVariableType, I2: ShaderVariable
         rvalue: ShaderGraphNode<I2>
 ): ShaderGraphNaryOperation<Output>(type, operation, listOf(lvalue, rvalue))
 
+@Deprecated("Experimental")
 open class ShaderGraphTernaryOperation<I1: ShaderVariableType, I2: ShaderVariableType, I3: ShaderVariableType, Output: ShaderVariableType>(
         type: Output,
         operation: String,
@@ -95,6 +119,7 @@ open class ShaderGraphTernaryOperation<I1: ShaderVariableType, I2: ShaderVariabl
         t3: ShaderGraphNode<I3>
 ): ShaderGraphNaryOperation<Output>(type, operation, listOf(t1, t2, t3))
 
+@Deprecated("Experimental")
 open class ShaderGraphIf<Output: ShaderVariableType, I1: Output, I2: Output>(
         type: Output,
         condition: ShaderGraphNode<GLSLType.bool>,
@@ -119,6 +144,7 @@ open class ShaderGraphIf<Output: ShaderVariableType, I1: Output, I2: Output>(
     }
 }
 
+@Deprecated("Experimental")
 class ShaderGraph(
         vararg val nodes: ShaderGraphNode<*>
 ) {
@@ -173,6 +199,7 @@ class ShaderGraph(
     }
 }
 
+@Deprecated("Experimental")
 class ShaderGraphNodeBuilder(fn: ShaderGraphNodeBuilder.() -> ShaderGraphNode<*>) {
     val node = fn(this)
 
@@ -205,6 +232,7 @@ class ShaderGraphNodeBuilder(fn: ShaderGraphNodeBuilder.() -> ShaderGraphNode<*>
     fun ShaderGraphNode<GLSLType.float>.vec4() = ShaderGraphUnaryOperation(GLSLType.vec4, "vec4(%1, %1, %1, %1)", this)
 }
 
+@Deprecated("Experimental")
 class ShaderGraphBuilder(fn: ShaderGraphBuilder.() -> Unit) {
     val nodes = mutableListOf<ShaderGraphNode<*>>()
 
@@ -217,6 +245,7 @@ class ShaderGraphBuilder(fn: ShaderGraphBuilder.() -> Unit) {
     fun toShaderGraph(): ShaderGraph = ShaderGraph(*nodes.toTypedArray())
 }
 
+@Deprecated("Experimental")
 class Shader {
     var vertex = ShaderGraph()
     var fragment = ShaderGraph()
@@ -226,6 +255,7 @@ class Shader {
     }
 }
 
+@Deprecated("Experimental")
 class NameGenerator {
     private var id = 0
     fun generate() = "__${id++}"

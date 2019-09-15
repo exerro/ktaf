@@ -4,7 +4,12 @@ import geometry.*
 import ktaf.core.RGBA
 import ktaf.core.rgba
 import ktaf.core.uniform
-import lwjglkt.*
+import lwjglkt.GLShaderProgram
+import lwjglkt.GLVAO
+import lwjglkt.gl.GLDrawMode
+import lwjglkt.gl.bindIn
+import lwjglkt.stopUsing
+import lwjglkt.use
 
 class DrawCtxRenderer internal constructor(
         private val ctx: DrawCtx,
@@ -17,7 +22,7 @@ class DrawCtxRenderer internal constructor(
         shader.uniform("useTexture", textured)
 
         vao.bindIn {
-            GL.drawElements(mode, vertexCount, 0)
+            ctx.glContext.drawElements(mode, vertexCount, 0)
         }
     }
 
@@ -56,7 +61,7 @@ class DrawCtxRenderer internal constructor(
                 mode=mode)
     }
 
-    fun write(text: String, position: vec2 = vec2(0f), font: Font = Font.DEFAULT_FONT) {
+    fun write(text: String, position: vec2 = vec2(0f), font: Font = vaoCache.DEFAULT_FONT) {
         if (text == "") return
 
         var x = position.x

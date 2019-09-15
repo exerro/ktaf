@@ -1,10 +1,9 @@
 package ktaf.core
 
 import geometry.vec2
-import lwjglkt.GL
-import lwjglkt.GLClearBuffer
-import lwjglkt.checkGLError
 import lwjglkt.freeUnreferencedGLObjects
+import lwjglkt.gl.GLClearBuffer
+import lwjglkt.gl.makeCurrent
 import lwjglkt.glfw.GLFWkt
 import lwjglkt.glfw.init
 import lwjglkt.glfw.pollEvents
@@ -38,10 +37,10 @@ class Application internal constructor() {
 
             frameDisplays.forEach {
                 // set the clear colour to black and clear the framebuffer, then call the draw callbacks
-                it.glfwWindow.makeContextCurrent {
-                    checkGLError { GL.finish() }
-                    GL.clearColour(0.0f, 0.0f, 0.0f, 0.0f)
-                    GL.clear(GLClearBuffer.GL_COLOR_BUFFER_BIT, GLClearBuffer.GL_DEPTH_BUFFER_BIT)
+                it.glfwWindow.glContext.makeCurrent {
+                    finish()
+                    clearColour(0.0f, 0.0f, 0.0f, 0.0f)
+                    clear(GLClearBuffer.GL_COLOR_BUFFER_BIT, GLClearBuffer.GL_DEPTH_BUFFER_BIT)
                     it.draw.emit()
                 }
 
@@ -88,7 +87,7 @@ private class DisplayConstructor(
 ) {
     fun create(): Display {
         val display = Display(title, width, height)
-        display.glfwWindow.makeContextCurrent { fn(display) }
+        display.glfwWindow.glContext.makeCurrent { fn(display) }
         return display
     }
 }

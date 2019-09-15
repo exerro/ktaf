@@ -1,89 +1,100 @@
 package ktaf.core
 
 import geometry.*
-import java.nio.file.Files
-import java.nio.file.Paths
 import lwjglkt.*
+import lwjglkt.gl.GLContext
+import lwjglkt.gl.bindIn
+import lwjglkt.gl.createVBO
 
 const val VERTEX_POSITION_ATTRIBUTE = 0
 const val VERTEX_UV_ATTRIBUTE = 1
 const val VERTEX_NORMAL_ATTRIBUTE = 2
 const val VERTEX_COLOUR_ATTRIBUTE = 3
 
+fun GLContext.elementBuffer(elements: List<Int>): GLVBO {
+    return createVBO(GLBufferType.GL_ELEMENT_ARRAY_BUFFER) {
+        data(elements.toIntArray())
+    }
+}
+
+fun GLContext.vec3vbo(data: List<vec3>): GLVBO {
+    return createVBO(GLBufferType.GL_ARRAY_BUFFER) {
+        data(data.flatMap(vec3::unpack).toFloatArray())
+    }
+}
+
+fun GLContext.colourBuffer(size: Int): GLVBO {
+    return createVBO(GLBufferType.GL_ARRAY_BUFFER) {
+        data(FloatArray(size * 3) { 1f })
+    }
+}
+
+fun GLContext.vec2vbo(data: List<vec2>): GLVBO {
+    return createVBO(GLBufferType.GL_ARRAY_BUFFER) {
+        data(data.flatMap(vec2::unpack).toFloatArray())
+    }
+}
+
+fun GLVAO.bindElementBuffer(buffer: GLVBO) = bindIn {
+    buffer.bind()
+    attach(buffer)
+    // buffer.unbind()
+}
+
+fun GLVAO.bindPositionBuffer(
+        buffer: GLVBO,
+        usage: GLBufferUsage = GLBufferUsage.GL_STATIC_DRAW
+) = bindIn {
+    buffer.bindIn {
+        vertexAttributePointer(
+                VERTEX_POSITION_ATTRIBUTE, GLNumComponents.THREE,
+                GLAttribPointerType.GL_FLOAT, false, 0, 0)
+    }
+    enableVertexAttributeArray(VERTEX_POSITION_ATTRIBUTE)
+    attach(buffer)
+}
+
+fun GLVAO.bindNormalBuffer(
+        buffer: GLVBO,
+        usage: GLBufferUsage = GLBufferUsage.GL_STATIC_DRAW
+) = bindIn {
+    buffer.bindIn {
+        vertexAttributePointer(
+                VERTEX_NORMAL_ATTRIBUTE, GLNumComponents.THREE,
+                GLAttribPointerType.GL_FLOAT, false, 0, 0)
+    }
+    enableVertexAttributeArray(VERTEX_NORMAL_ATTRIBUTE)
+    attach(buffer)
+}
+
+fun GLVAO.bindColourBuffer(
+        buffer: GLVBO,
+        usage: GLBufferUsage = GLBufferUsage.GL_STATIC_DRAW
+) = bindIn {
+    buffer.bindIn {
+        vertexAttributePointer(
+                VERTEX_COLOUR_ATTRIBUTE, GLNumComponents.THREE,
+                GLAttribPointerType.GL_FLOAT, false, 0, 0)
+    }
+    enableVertexAttributeArray(VERTEX_COLOUR_ATTRIBUTE)
+    attach(buffer)
+}
+
+fun GLVAO.bindUVBuffer(
+        buffer: GLVBO,
+        usage: GLBufferUsage = GLBufferUsage.GL_STATIC_DRAW
+) = bindIn {
+    buffer.bindIn {
+        vertexAttributePointer(
+                VERTEX_UV_ATTRIBUTE, GLNumComponents.TWO,
+                GLAttribPointerType.GL_FLOAT, false, 0, 0)
+    }
+    enableVertexAttributeArray(VERTEX_UV_ATTRIBUTE)
+    attach(buffer)
+}
+
 val GLTexture2.size: vec2
     get() = vec2(width.toFloat(), height.toFloat())
-
-fun GLVAO.genElementBuffer(elements: List<Int>, usage: GLBufferUsage = GLBufferUsage.GL_STATIC_DRAW)
-        = bindIn {
-              val vbo = createVBO(GLBufferType.GL_ELEMENT_ARRAY_BUFFER) {
-                  data(elements.toIntArray(), usage)
-                  this.bind()
-              }
-              attach(vbo)
-          }
-
-fun GLVAO.genAttributeFloatBuffer(
-        data: List<vec3>,
-        attribute: Int,
-        dataSize: GLNumComponents,
-        usage: GLBufferUsage = GLBufferUsage.GL_STATIC_DRAW
-): GLVBO = bindIn {
-    val vbo = createVBO(GLBufferType.GL_ARRAY_BUFFER) {
-        bindIn { vertexAttributePointer(attribute, dataSize, GLAttribPointerType.GL_FLOAT, false, 0, 0) }
-        enableVertexAttributeArray(attribute)
-        data(data.flatMap { it.unpack().toList() } .toFloatArray(), usage)
-    }
-    attach(vbo)
-}
-
-fun GLVAO.genVertexPositionBuffer(data: List<vec3>, usage: GLBufferUsage = GLBufferUsage.GL_STATIC_DRAW): GLVBO = genAttributeFloatBuffer(
-        data,
-        VERTEX_POSITION_ATTRIBUTE,
-        GLNumComponents.THREE,
-        usage
-)
-
-fun GLVAO.genVertexUVBuffer(data: List<vec2>, usage: GLBufferUsage = GLBufferUsage.GL_STATIC_DRAW): GLVBO = bindIn {
-    val vbo = createVBO(GLBufferType.GL_ARRAY_BUFFER) {
-        bindIn { vertexAttributePointer(VERTEX_UV_ATTRIBUTE, GLNumComponents.TWO, GLAttribPointerType.GL_FLOAT, false, 0, 0) }
-        enableVertexAttributeArray(VERTEX_UV_ATTRIBUTE)
-        data(data.flatMap { it.unpack().toList() } .toFloatArray(), usage)
-    }
-    attach(vbo)
-}
-
-fun GLVAO.genVertexNormalBuffer(data: List<vec3>, usage: GLBufferUsage = GLBufferUsage.GL_STATIC_DRAW): GLVBO = genAttributeFloatBuffer(
-        data,
-        VERTEX_NORMAL_ATTRIBUTE,
-        GLNumComponents.THREE,
-        usage
-)
-
-fun GLVAO.genVertexColourBuffer(data: List<vec3>, usage: GLBufferUsage = GLBufferUsage.GL_STATIC_DRAW): GLVBO = genAttributeFloatBuffer(
-        data,
-        VERTEX_COLOUR_ATTRIBUTE,
-        GLNumComponents.THREE,
-        usage
-)
-
-fun GLVAO.genVertexColourBuffer(size: Int, usage: GLBufferUsage = GLBufferUsage.GL_STATIC_DRAW): GLVBO = genAttributeFloatBuffer(
-        List(size) { vec3(1f) },
-        VERTEX_COLOUR_ATTRIBUTE,
-        GLNumComponents.THREE,
-        usage
-)
-
-fun GLShaderProgram.shader(type: GLShaderType, source: String): GLShader {
-    val shader = createGLShader(type) {
-        source(source)
-        compile()
-    }
-    attach(shader)
-    return shader
-}
-
-fun GLShaderProgram.shaderFile(type: GLShaderType, sourceFile: String): GLShader
-        = shader(type, String(Files.readAllBytes(Paths.get(sourceFile))))
 
 fun GLShaderProgram.uniform(uniform: String, value: Boolean) { uniform1i(uniformLocation(uniform), if (value) 1 else 0) }
 fun GLShaderProgram.uniform(uniform: String, value: Int    ) { uniform1i(uniformLocation(uniform), value) }

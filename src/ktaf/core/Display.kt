@@ -3,7 +3,6 @@ package ktaf.core
 import geometry.vec2
 import ktaf.graphics.DrawCtx
 import ktaf.graphics.Projection
-import ktaf.graphics.RenderTarget
 import lwjglkt.glfw.GLFWCursor
 import lwjglkt.glfw.GLFWWindow
 import observables.Signal
@@ -15,7 +14,6 @@ class Display internal constructor(title: String, width: Int, height: Int) {
         internal set
 
     val glfwWindow = GLFWWindow(title, width, height)
-    val screen = RenderTarget.Screen(width, height)
 
     val onKeyEvent = Signal<KeyEvent>()
     val onKeyPress = Signal<KeyPressEvent>()
@@ -33,7 +31,7 @@ class Display internal constructor(title: String, width: Int, height: Int) {
     val closed = UnitSignal()
 
     val context2D by lazy {
-        val context = DrawCtx()
+        val context = DrawCtx(glfwWindow.glContext)
 
         // TODO: replace with framebufferSize
         context.viewport(0, 0, glfwWindow.size.width, glfwWindow.size.height)
@@ -66,14 +64,6 @@ class Display internal constructor(title: String, width: Int, height: Int) {
     internal var lastUpdate = System.currentTimeMillis()
 
     init {
-        // on window resize, update the GL viewport and call a resized callback, if set
-        glfwWindow.resized.connect { size ->
-            screen.screenWidth(size.width)
-            screen.screenHeight(size.height)
-            screen.maxX(RatioValue(size.width.toFloat(), 0f))
-            screen.maxY(RatioValue(size.height.toFloat(), 0f))
-        }
-
         glfwWindow.setKeyCallback { _, key, _, action, mods ->
             if (action == GLFW.GLFW_PRESS) {
                 onKeyPress.emit(KeyPressEvent(key, keyModifiers(mods)))

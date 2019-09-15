@@ -2,10 +2,18 @@ package ktaf.graphics
 
 import geometry.*
 import ktaf.core.*
-import lwjglkt.*
+import lwjglkt.GLShader
+import lwjglkt.GLShaderProgram
+import lwjglkt.GLShaderType
+import lwjglkt.gl.GLContext
+import lwjglkt.gl.createGLShader
+import lwjglkt.gl.createGLShaderProgram
+import lwjglkt.gl.useIn
 import kotlin.reflect.KMutableProperty0
 
-open class DrawCtx {
+open class DrawCtx(
+        val glContext: GLContext
+) {
     fun push() { stateStack.push(DrawCtxState()) }
     fun pop() { stateStack.pop() }
     fun push(fn: () -> Unit) { push(); fn(); pop() }
@@ -44,7 +52,7 @@ open class DrawCtx {
         val projectionMatrix = projection.matrix(viewportWidth, viewportHeight)
         val renderer = DrawCtxRenderer(this, shader, vaoCache)
 
-        GL.viewport(viewportX, viewportY, viewportWidth, viewportHeight)
+        glContext.viewport(viewportX, viewportY, viewportWidth, viewportHeight)
 
         shader.useIn {
             shader.uniform("projection", projectionMatrix)
@@ -75,9 +83,9 @@ open class DrawCtx {
         if (!::lastShaderList.isInitialized || lastShaderList != shaderList) {
             if (::compiledShader.isInitialized) compiledShader.free()
 
-            compiledShader = createGLShaderProgram {
+            compiledShader = glContext.createGLShaderProgram {
                 val vertex = vertexShader()
-                val fragment = createGLShader(GLShaderType.GL_FRAGMENT_SHADER) {
+                val fragment = glContext.createGLShader(GLShaderType.GL_FRAGMENT_SHADER) {
                     source(shaderList.compile())
                     compile()
                 }
@@ -98,7 +106,7 @@ open class DrawCtx {
 
     /** Create the default vertex shader.
      *  Must be called while in an OpenGL context. */
-    private fun vertexShader(): GLShader = createGLShader(GLShaderType.GL_VERTEX_SHADER) {
+    private fun vertexShader(): GLShader = glContext.createGLShader(GLShaderType.GL_VERTEX_SHADER) {
         source(VERTEX_SHADER_SOURCE)
         compile()
     }
@@ -108,7 +116,7 @@ open class DrawCtx {
     internal var colour: RGBA = rgba(1f)
         private set
 
-    private val vaoCache = DrawCtxVAOCache()
+    private val vaoCache = DrawCtxVAOCache(glContext)
     private var stateStack = StateStack<DrawCtxState>()
     private var shaderStack: MutableList<List<FragmentShader>> = mutableListOf()
     private var projection: Projection = Projection.identity()

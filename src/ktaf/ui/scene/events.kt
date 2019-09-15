@@ -31,13 +31,13 @@ fun UIScene.update(dt: Float) {
 fun UIScene.draw() {
     display.setCursor(focussedNodeHover?.cursor() ?: GLFWCursor.DEFAULT)
 
-    GL.enable(GLOption.GL_BLEND)
+    context.glContext.enable(GLOption.GL_BLEND)
 
-    rasterState {
+    context.glContext.rasterState {
         defaults()
     }
 
-    postFragmentShaderState {
+    context.glContext.postFragmentShaderState {
         defaults()
         blendFunction(GLBLendFunction.GL_SRC_ALPHA, GLBLendFunction.GL_ONE_MINUS_SRC_ALPHA)
     }
