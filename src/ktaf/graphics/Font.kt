@@ -1,8 +1,8 @@
 package ktaf.graphics
 
 import geometry.vec2
-import lwjglkt.GLTexture2
-import lwjglkt.GLVAO
+import lwjglkt.gl.GLTexture2
+import lwjglkt.gl.GLVAO
 
 abstract class Font(val scale: Float) {
     val height: Float get() = scale * lineHeight

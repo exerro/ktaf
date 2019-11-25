@@ -1,101 +1,76 @@
 package ktaf.core
 
-import geometry.vec2
-import lwjglkt.freeUnreferencedGLObjects
-import lwjglkt.gl.GLClearBuffer
-import lwjglkt.gl.makeCurrent
-import lwjglkt.glfw.GLFWkt
-import lwjglkt.glfw.init
-import lwjglkt.glfw.pollEvents
-import kotlin.system.exitProcess
+import lwjglkt.LWJGLKTContext
+import lwjglkt.gl.enum.GLClearBuffer
+import lwjglkt.glfw.GLFWInitialisationHint
+import lwjglkt.glfw.GLFWWindowBuilder
+import lwjglkt.lwjglktInit
 
-class WindowResizeEvent(val size: vec2): Event()
+class Application internal constructor(
+        private val ctx: LWJGLKTContext
+) {
+    var running = false
+        private set
 
-class Application internal constructor() {
-    val time get() = (System.currentTimeMillis() - startTime) / 1000f
-
-    fun display(title: String, width: Int = 1080, height: Int = 720, fn: Display.() -> Unit) {
-        synchronized(displaysToCreate) {
-            displaysToCreate.add(DisplayConstructor(title, width, height, fn))
+    fun display(title: String, width: Int, height: Int, fn: (Window) -> Unit) {
+        synchronized(windowsToCreate) {
+            windowsToCreate.add(GLFWWindowBuilder(ctx.glfw, title, width, height) to fn)
         }
     }
+
+    fun stop() {
+        running = false
+    }
+
+    ////////////////////////////////////////////////////////////////////////////
 
     internal fun run() {
-        while (true) {
-            // create any queued displays
-            createNewDisplays()
+        running = true
 
-            // take a copy of the current displays
-            val frameDisplays = synchronized(displays) { displays.map { it } }
+        while (running) {
+            val wtc = synchronized(windowsToCreate) {
+                val toCreate = windowsToCreate.map { it }
+                windowsToCreate.clear()
+                toCreate
+            }
 
-            // if all the displays have been closed, quit
-            if (frameDisplays.isEmpty())
-                break
+            wtc.forEach { (builder, fn) ->
+                val window = Window(ctx.glfw.createWindow(builder))
+                windows.add(window)
+                fn(window)
+            }
 
-            // update all the displays
-            frameDisplays.forEach(Display::update)
+            val toClose = windows.filter { it.glfwWindow.shouldClose() }
+            toClose.forEach { it.glfwWindow.destroy() }
+            toClose.forEach { it.closed.emit() }
+            windows.removeAll(toClose)
+            if (windows.isEmpty()) stop()
 
-            frameDisplays.forEach {
-                // set the clear colour to black and clear the framebuffer, then call the draw callbacks
+            val t = System.currentTimeMillis()
+
+            windows.forEach {
                 it.glfwWindow.glContext.makeCurrent {
-                    finish()
-                    clearColour(0.0f, 0.0f, 0.0f, 0.0f)
-                    clear(GLClearBuffer.GL_COLOR_BUFFER_BIT, GLClearBuffer.GL_DEPTH_BUFFER_BIT)
-                    it.draw.emit()
+                    it.glfwWindow.glContext.gl.finish()
+                    it.glfwWindow.glContext.gl.clearColour(0f, 0f, 0f, 0f)
+                    it.glfwWindow.glContext.gl.clear(GLClearBuffer.GL_COLOR_BUFFER_BIT, GLClearBuffer.GL_DEPTH_BUFFER_BIT)
                 }
-
-                // swap the color buffers to present the content to the screen
+                it.update.emit((t - it.lastUpdateTime) / 1000f)
+                it.draw.emit()
                 it.glfwWindow.swapBuffers()
+                it.lastUpdateTime = t
             }
 
-            // poll for window events
-            GLFWkt.pollEvents()
-
-            // TODO: this will likely break with multiple contexts
-            freeUnreferencedGLObjects()
-
-            // remove displays that should close
-            frameDisplays.forEach {
-                if (it.glfwWindow.shouldClose()) {
-                    synchronized(this.displays) { this.displays.remove(it) }
-                    it.glfwWindow.destroy()
-                }
-            }
+            ctx.glfw.pollEvents()
         }
     }
 
-    private fun createNewDisplays() {
-        val displays = synchronized(displaysToCreate) {
-            displaysToCreate.map { it } .also { displaysToCreate.clear() }
-        } .map(DisplayConstructor::create)
-
-        synchronized(this.displays) {
-            this.displays.addAll(displays)
-        }
-    }
-
-    private val displaysToCreate: MutableList<DisplayConstructor> = mutableListOf()
-    private val displays: MutableList<Display> = mutableListOf()
-    private val startTime = System.currentTimeMillis()
+    private val windowsToCreate: MutableList<Pair<GLFWWindowBuilder, (Window) -> Unit>> = mutableListOf()
+    private val windows: MutableList<Window> = mutableListOf()
 }
 
-private class DisplayConstructor(
-        private val title: String,
-        private val width: Int,
-        private val height: Int,
-        private val fn: Display.() -> Unit
-) {
-    fun create(): Display {
-        val display = Display(title, width, height)
-        display.glfwWindow.glContext.makeCurrent { fn(display) }
-        return display
-    }
-}
-
-fun application(load: (Application).() -> Unit) {
-    GLFWkt.init()
-    val app = Application()
-    load(app)
+fun application(vararg hints: GLFWInitialisationHint, fn: Application.() -> Unit) {
+    val ctx = lwjglktInit(*hints)
+    val app = Application(ctx)
+    fn(app)
     app.run()
-    exitProcess(0)
 }

@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="geometry-kt">
-    <CLASSES>
-      <root url="jar://$PROJECT_DIR$/lib/geometry-kt.jar!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>

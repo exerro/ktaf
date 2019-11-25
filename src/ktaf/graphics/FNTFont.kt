@@ -2,10 +2,10 @@ package ktaf.graphics
 
 import geometry.*
 import ktaf.util.createElementGLVAO
-import lwjglkt.GLTexture2
-import lwjglkt.GLVAO
 import lwjglkt.gl.GLContext
-import lwjglkt.gl.loadTexture2D
+import lwjglkt.gl.GLTexture2
+import lwjglkt.gl.GLVAO
+import lwjglkt.util.loadTexture2D
 import org.lwjgl.BufferUtils
 import java.io.InputStream
 import java.nio.file.Files
@@ -163,7 +163,15 @@ fun FNTFont.Companion.preload(content: String): FNTFontPreloader {
 fun FNTFont.Companion.preloadFile(file: String): FNTFontPreloader
         = preload(String(Files.readAllBytes(Paths.get(file))))
 
+fun FNTFont.Companion.preloadResource(resource: String): FNTFontPreloader {
+    val stream = FNTFont::class.java.classLoader.getResourceAsStream(resource)
+            ?: error("Failed to open resource '$resource'")
+    return preload(String(stream.readBytes()))
+}
+
 fun FNTFont.Companion.load(context: GLContext, preloader: FNTFontPreloader): FNTFont {
+    context.makeCurrent()
+
     val vaos = preloader.charUVs.map { (char, uvs) ->
         char to createElementGLVAO(
                 context,
@@ -192,6 +200,8 @@ fun FNTFont.Companion.load(context: GLContext, preloader: FNTFontPreloader): FNT
     val textures = preloader.charPages.map { (char, page) ->
         char to textureObjects[page]!!
     } .toMap()
+
+    context.unmakeCurrent()
 
     return FNTFont(
             1f,

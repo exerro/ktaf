@@ -2,10 +2,13 @@ package ktaf.util
 
 import geometry.vec2
 import geometry.vec3
-import ktaf.core.*
-import lwjglkt.GLVAO
+import ktaf.core_old.elementBuffer
+import ktaf.core_old.vec2vbo
+import ktaf.core_old.vec3vbo
 import lwjglkt.gl.GLContext
+import lwjglkt.gl.GLVAO
 import lwjglkt.gl.createVAO
+import lwjglkt.util.*
 
 fun createElementGLVAO(context: GLContext, elements: List<Int>, vertices: List<vec3>, normals: List<vec3>, uvs: List<vec2>, colours: List<vec3>): GLVAO {
     val elementBuffer = context.elementBuffer(elements)
@@ -28,7 +31,7 @@ fun createElementGLVAO(context: GLContext, elements: List<Int>, vertices: List<v
     val positionBuffer = context.vec3vbo(vertices)
     val normalBuffer = context.vec3vbo(normals)
     val uvBuffer = context.vec2vbo(uvs)
-    val colourBuffer = if (colours) context.colourBuffer(vertices.size) else null
+    val colourBuffer = if (colours) context.createColourBuffer(vertices.size) else null
 
     return context.createVAO {
         bindElementBuffer(elementBuffer)
@@ -43,7 +46,7 @@ fun createElementGLVAO(context: GLContext, elements: List<Int>, vertices: List<v
     val elementBuffer = context.elementBuffer(elements)
     val positionBuffer = context.vec3vbo(vertices)
     val normalBuffer = context.vec3vbo(normals)
-    val colourBuffer = if (colours) context.colourBuffer(vertices.size) else null
+    val colourBuffer = if (colours) context.createColourBuffer(vertices.size) else null
 
     return context.createVAO {
         bindElementBuffer(elementBuffer)

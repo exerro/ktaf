@@ -9,6 +9,5 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="KotlinJavaRuntime" level="project" />
     <orderEntry type="module" module-name="ktaf" />
-    <orderEntry type="library" name="geometry-kt" level="project" />
   </component>
 </module>
