@@ -1,17 +1,16 @@
 package ktaf.graphics
 
 import geometry.vec2
-import ktaf.core.debug
-import ktaf.property.Value
-import ktaf.property.mutable
+import ktaf.data.Value
+import ktaf.data.property.mutableProperty
 import lwjglkt.gl.GLContext
 
 open class DrawContext(
         protected val glContext: GLContext,
         private val screenSize: Value<vec2>
 ) {
-    val viewportPosition = mutable(vec2(0f))
-    val viewportSize = mutable(vec2(1f))
+    val viewportPosition = mutableProperty(vec2(0f))
+    val viewportSize = mutableProperty(vec2(1f))
 
     open fun begin() {
         val x = viewportPosition.value.x.toInt()

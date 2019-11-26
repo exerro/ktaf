@@ -1,7 +1,8 @@
 import geometry.vec2
 import ktaf.core.application
 import ktaf.graphics.rgba
-import ktaf.property.const
+import ktaf.data.property.const
+import ktaf.util.compareTo
 
 fun main() = application {
     display("Display", 1080, 720) { window ->

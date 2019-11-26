@@ -5,6 +5,7 @@ import lwjglkt.gl.enum.GLClearBuffer
 import lwjglkt.glfw.GLFWInitialisationHint
 import lwjglkt.glfw.GLFWWindowBuilder
 import lwjglkt.lwjglktInit
+import kotlin.math.min
 
 class Application internal constructor(
         private val ctx: LWJGLKTContext
@@ -54,7 +55,7 @@ class Application internal constructor(
                     it.glfwWindow.glContext.gl.clearColour(0f, 0f, 0f, 0f)
                     it.glfwWindow.glContext.gl.clear(GLClearBuffer.GL_COLOR_BUFFER_BIT, GLClearBuffer.GL_DEPTH_BUFFER_BIT)
                 }
-                it.update.emit((t - it.lastUpdateTime) / 1000f)
+                it.update.emit(min(0.1f, (t - it.lastUpdateTime) / 1000f))
                 it.draw.emit()
                 it.glfwWindow.swapBuffers()
                 it.lastUpdateTime = t

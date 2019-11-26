@@ -3,8 +3,8 @@ package ktaf.graphics
 import geometry.*
 import ktaf.core_old.size
 import ktaf.core_old.uniform
-import ktaf.property.Value
-import ktaf.property.mutable
+import ktaf.data.Value
+import ktaf.data.property.mutableProperty
 import lwjglkt.gl.*
 import lwjglkt.gl.enum.*
 import lwjglkt.util.*
@@ -17,7 +17,7 @@ class DrawContext2D(
             FNTFont.preloadResource("font/open-sans/OpenSans-Regular.fnt"))
             .scaleTo(16f)
 
-    val colour = mutable(rgba(1f))
+    val colour = mutableProperty(rgba(1f))
 
     fun vao(count: Int, vao: GLVAO,
             transform: mat4 = mat4_identity,
