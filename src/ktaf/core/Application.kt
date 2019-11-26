@@ -5,6 +5,7 @@ import lwjglkt.gl.enum.GLClearBuffer
 import lwjglkt.glfw.GLFWInitialisationHint
 import lwjglkt.glfw.GLFWWindowBuilder
 import lwjglkt.lwjglktInit
+import observables.emit
 import kotlin.math.min
 
 class Application internal constructor(
@@ -49,16 +50,16 @@ class Application internal constructor(
 
             val t = System.currentTimeMillis()
 
-            windows.forEach {
-                it.glfwWindow.glContext.makeCurrent {
-                    it.glfwWindow.glContext.gl.finish()
-                    it.glfwWindow.glContext.gl.clearColour(0f, 0f, 0f, 0f)
-                    it.glfwWindow.glContext.gl.clear(GLClearBuffer.GL_COLOR_BUFFER_BIT, GLClearBuffer.GL_DEPTH_BUFFER_BIT)
+            windows.forEach { window ->
+                window.glfwWindow.glContext.makeCurrent {
+                    it.gl.finish()
+                    it.gl.clearColour(0f, 0f, 0f, 0f)
+                    it.gl.clear(GLClearBuffer.GL_COLOR_BUFFER_BIT, GLClearBuffer.GL_DEPTH_BUFFER_BIT)
                 }
-                it.update.emit(min(0.1f, (t - it.lastUpdateTime) / 1000f))
-                it.draw.emit()
-                it.glfwWindow.swapBuffers()
-                it.lastUpdateTime = t
+                window.update.emit(min(0.1f, (t - window.lastUpdateTime) / 1000f))
+                window.draw.emit()
+                window.glfwWindow.swapBuffers()
+                window.lastUpdateTime = t
             }
 
             ctx.glfw.pollEvents()

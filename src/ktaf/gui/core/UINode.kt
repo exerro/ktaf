@@ -1,7 +1,5 @@
 package ktaf.gui.core
 
-import geometry.plus
-import geometry.times
 import geometry.vec2
 import geometry.vec2_zero
 import ktaf.data.animation.Animation

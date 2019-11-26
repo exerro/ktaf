@@ -8,7 +8,9 @@ import lwjglkt.util.loadTextureFile2D
 
 fun main() = application {
     display("Hello world", 1080, 720) { window ->
-        val texture = window.glfwWindow.glContext.loadTextureFile2D("C:\\Users\\bened\\Pictures\\3e4.jpg")
+        val texture = window.glfwWindow.glContext.makeCurrent {
+            it.loadTextureFile2D("C:\\Users\\bened\\Pictures\\3e4.jpg")
+        }
 
         val scene = scene<UINode>(window.drawContext2D) {
             root = stack {
@@ -24,6 +26,12 @@ fun main() = application {
         }
 
         scene.attach(window)
+
+        window.events.framebufferResized.subscribe(scene) {
+            draw()
+            update(0.1f)
+            window.glfwWindow.swapBuffers()
+        }
 
 ////        val texture = window.glfwWindow.glContext.loadTextureFile2D("C:\\Users\\bened\\Pictures\\3e4.jpg")
 ////

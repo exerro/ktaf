@@ -1,7 +1,7 @@
 package ktaf.gui.elements
 
 import geometry.*
-import ktaf.core_old.size
+import ktaf.util.size
 import ktaf.data.property.mutableProperty
 import ktaf.graphics.Colour
 import ktaf.graphics.DrawContext2D

@@ -1,7 +1,5 @@
 package ktaf.gui.elements
 
-import geometry.minus
-import geometry.plus
 import geometry.vec2
 import ktaf.data.ObservableList
 import ktaf.gui.core.*

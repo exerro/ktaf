@@ -1,24 +1,24 @@
 package ktaf.core
 
 import geometry.vec2
-import ktaf.graphics.DrawContext2D
-import ktaf.data.property.OperationValue
 import ktaf.data.Value
+import ktaf.data.property.OperationValue
 import ktaf.data.property.mutableProperty
+import ktaf.graphics.DrawContext2D
 import ktaf.util.compareTo
 import lwjglkt.glfw.GLFWWindow
 import lwjglkt.glfw.Size
-import observables.Signal
-import observables.UnitSignal
+import observables.Subscribable
+import observables.UnitSubscribable
 
 class Window(
         val glfwWindow: GLFWWindow
 ) {
     private val sizeProperty = mutableProperty(glfwWindow.size.toVec2())
 
-    val update = Signal<Float>()
-    val draw = UnitSignal()
-    val closed = UnitSignal()
+    val update = Subscribable<Float>()
+    val draw = UnitSubscribable()
+    val closed = UnitSubscribable()
     val events = glfwWindow.events
     val size: Value<vec2> = sizeProperty
     val width: Value<Float> = OperationValue(size) { it.x }
@@ -29,7 +29,7 @@ class Window(
 
     init {
         drawContext2D.viewportSize <- size
-        events.resized.connect { sizeProperty.value = it.toVec2() }
+        events.resized.subscribe(this) { sizeProperty.value = it.toVec2() }
     }
 }
 

@@ -1,18 +1,14 @@
-package ktaf.core_old
+package ktaf.util
 
 import geometry.*
 import lwjglkt.gl.*
 import lwjglkt.gl.enum.GLBufferType
-import lwjglkt.util.createElementBuffer
 import lwjglkt.util.createVertexBuffer
 
-fun GLContext.elementBuffer(elements: List<Int>)
-        = createElementBuffer(elements.toIntArray())
-
-fun GLContext.vec3vbo(data: List<vec3>)
+fun GLCurrentContext.vec3vbo(data: List<vec3>)
         = createVertexBuffer(data.flatMap(vec3::unpack).toFloatArray())
 
-fun GLContext.vec2vbo(data: List<vec2>): GLVBO {
+fun GLCurrentContext.vec2vbo(data: List<vec2>): GLVBO {
     return createVBO(GLBufferType.GL_ARRAY_BUFFER) {
         data(data.flatMap(vec2::unpack).toFloatArray())
     }

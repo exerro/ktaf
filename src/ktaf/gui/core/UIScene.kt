@@ -27,8 +27,12 @@ class UIScene<Root: UINode>(
     }
 
     fun attach(window: Window) {
-        window.draw.connect(this::draw)
-        window.update.connect(this::update)
+        // this is important to stop the scene from being garbage collected
+        // if the scene is garbage collected then the callbacks below will be
+        // removed and everything will disappear
+        val scene = this
+        window.draw.subscribe(this) { scene.draw() }
+        window.update.subscribe(this) { scene.update(it) }
     }
 
     override fun calculateChildrenWidths(availableWidth: Float) {

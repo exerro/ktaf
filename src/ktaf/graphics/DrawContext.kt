@@ -4,6 +4,7 @@ import geometry.vec2
 import ktaf.data.Value
 import ktaf.data.property.mutableProperty
 import lwjglkt.gl.GLContext
+import lwjglkt.gl.GLCurrentContext
 
 open class DrawContext(
         protected val glContext: GLContext,
@@ -11,18 +12,18 @@ open class DrawContext(
 ) {
     val viewportPosition = mutableProperty(vec2(0f))
     val viewportSize = mutableProperty(vec2(1f))
+    lateinit var currentContext: GLCurrentContext
 
     open fun begin() {
         val x = viewportPosition.value.x.toInt()
         val y = (screenSize.value.y - viewportPosition.value.y - viewportSize.value.y).toInt()
         val w = viewportSize.value.x.toInt()
         val h = viewportSize.value.y.toInt()
-
-        glContext.makeCurrent()
-        glContext.gl.viewport(x, y, w, h)
+        currentContext = glContext.makeCurrent()
+        currentContext.gl.viewport(x, y, w, h)
     }
 
     open fun end() {
-        glContext.unmakeCurrent()
+        currentContext.free()
     }
 }

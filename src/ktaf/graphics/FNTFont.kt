@@ -1,6 +1,7 @@
 package ktaf.graphics
 
-import geometry.*
+import geometry.vec2
+import geometry.vec3
 import ktaf.util.createElementGLVAO
 import lwjglkt.gl.GLContext
 import lwjglkt.gl.GLTexture2
@@ -170,11 +171,10 @@ fun FNTFont.Companion.preloadResource(resource: String): FNTFontPreloader {
 }
 
 fun FNTFont.Companion.load(context: GLContext, preloader: FNTFontPreloader): FNTFont {
-    context.makeCurrent()
-
+    val current = context.makeCurrent()
     val vaos = preloader.charUVs.map { (char, uvs) ->
         char to createElementGLVAO(
-                context,
+                current,
                 listOf(0, 1, 2, 0, 2, 3),
                 listOf(
                         vec2(0f, 0f),
@@ -194,14 +194,14 @@ fun FNTFont.Companion.load(context: GLContext, preloader: FNTFontPreloader): FNT
         val byteBuffer = BufferUtils.createByteBuffer(byteArray.size)
         byteBuffer.put(byteArray)
         byteBuffer.flip()
-        page to context.loadTexture2D(byteBuffer)
+        page to current.loadTexture2D(byteBuffer)
     } .toMap()
 
     val textures = preloader.charPages.map { (char, page) ->
         char to textureObjects[page]!!
     } .toMap()
 
-    context.unmakeCurrent()
+    current.free()
 
     return FNTFont(
             1f,

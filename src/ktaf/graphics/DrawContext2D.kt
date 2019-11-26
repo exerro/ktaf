@@ -1,8 +1,8 @@
 package ktaf.graphics
 
 import geometry.*
-import ktaf.core_old.size
-import ktaf.core_old.uniform
+import ktaf.util.size
+import ktaf.util.uniform
 import ktaf.data.Value
 import ktaf.data.property.mutableProperty
 import lwjglkt.gl.*
@@ -33,7 +33,7 @@ class DrawContext2D(
 
         shader.useIn {
             vao.bindIn {
-                glContext.gl.drawElements(count)
+                currentContext.gl.drawElements(count)
             }
         }
 
@@ -66,7 +66,7 @@ class DrawContext2D(
 
         shader.useIn {
             triVAO.bindIn {
-                glContext.gl.drawArrays(3)
+                currentContext.gl.drawArrays(3)
             }
         }
     }
@@ -103,13 +103,13 @@ class DrawContext2D(
         shader.uniform("u_colour", colour.value)
         pointBuffer.subData(floatArrayOf(position.x, position.y, 0f))
 
-        glContext.gl.rasterState {
+        currentContext.gl.rasterState {
             pointSize(size)
         }
 
         shader.useIn {
             pointVAO.bindIn {
-                glContext.gl.drawArrays(GLDrawMode.GL_POINTS, 1)
+                currentContext.gl.drawArrays(GLDrawMode.GL_POINTS, 1)
             }
         }
     }
@@ -136,14 +136,14 @@ class DrawContext2D(
     override fun begin() {
         super.begin()
 
-        glContext.gl.enable(GLOption.GL_BLEND)
+        currentContext.gl.enable(GLOption.GL_BLEND)
 
-        glContext.gl.rasterState {
+        currentContext.gl.rasterState {
             defaults()
             cullFace(GLFace.GL_FRONT_AND_BACK)
         }
 
-        glContext.gl.postFragmentShaderState {
+        currentContext.gl.postFragmentShaderState {
             defaults()
             blendFunction(
                     GLBlendFunction.GL_SRC_ALPHA,
@@ -161,45 +161,61 @@ class DrawContext2D(
 
     ////////////////////////////////////////////////////////////////////////////
 
-    private val shader = glContext.createShaderProgram(
-            glContext.createShader(GLShaderType.GL_VERTEX_SHADER, VERTEX_SHADER_CODE),
-            glContext.createShader(GLShaderType.GL_FRAGMENT_SHADER, FRAGMENT_SHADER_CODE)
-    )
+    private val shader: GLShaderProgram
+    private val quadBuffer: GLVBO
+    private val triBuffer: GLVBO
+    private val pointBuffer: GLVBO
+    private val quadVAO: GLVAO
+    private val triVAO: GLVAO
+    private val pointVAO: GLVAO
 
-    private val quadBuffer = glContext.createVertexBuffer(
-            floatArrayOf(0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f))
+    ////////////////////////////////////////////////////////////////////////////
 
-    private val triBuffer = glContext.createVertexBuffer(
-            floatArrayOf(0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f))
+    init {
+        val current = glContext.makeCurrent()
 
-    private val pointBuffer = glContext.createVertexBuffer(
-            floatArrayOf(0f, 0f, 0f))
+        shader = current.createShaderProgram(
+                current.createShader(GLShaderType.GL_VERTEX_SHADER, VERTEX_SHADER_CODE),
+                current.createShader(GLShaderType.GL_FRAGMENT_SHADER, FRAGMENT_SHADER_CODE)
+        )
 
-    private val quadVAO = glContext.createVAO {
-        val uvs = glContext.createUVBuffer(floatArrayOf(0f, 0f, 0f, 1f, 1f, 1f, 1f, 0f))
-        val colours = glContext.createColourBuffer(4)
-        val elements = glContext.createElementBuffer(intArrayOf(0, 1, 2, 0, 2, 3))
+        quadBuffer = current.createVertexBuffer(
+                floatArrayOf(0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f))
 
-        bindPositionBuffer(quadBuffer)
-        bindUVBuffer(uvs)
-        bindColourBuffer(colours)
-        bindElementBuffer(elements)
-    }
+        triBuffer = current.createVertexBuffer(
+                floatArrayOf(0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f))
 
-    private val triVAO = glContext.createVAO {
-        val uvs = glContext.createUVBuffer(floatArrayOf(0f, 0f, 0f, 1f, 1f, 1f))
-        val colours = glContext.createColourBuffer(3)
+        pointBuffer = current.createVertexBuffer(
+                floatArrayOf(0f, 0f, 0f))
 
-        bindPositionBuffer(quadBuffer)
-        bindUVBuffer(uvs)
-        bindColourBuffer(colours)
-    }
+        quadVAO = current.createVAO {
+            val uvs = current.createUVBuffer(floatArrayOf(0f, 0f, 0f, 1f, 1f, 1f, 1f, 0f))
+            val colours = current.createColourBuffer(4)
+            val elements = current.createElementBuffer(intArrayOf(0, 1, 2, 0, 2, 3))
 
-    private val pointVAO = glContext.createVAO {
-        val colours = glContext.createColourBuffer(1)
+            bindPositionBuffer(quadBuffer)
+            bindUVBuffer(uvs)
+            bindColourBuffer(colours)
+            bindElementBuffer(elements)
+        }
 
-        bindPositionBuffer(quadBuffer)
-        bindColourBuffer(colours)
+        triVAO = current.createVAO {
+            val uvs = current.createUVBuffer(floatArrayOf(0f, 0f, 0f, 1f, 1f, 1f))
+            val colours = current.createColourBuffer(3)
+
+            bindPositionBuffer(quadBuffer)
+            bindUVBuffer(uvs)
+            bindColourBuffer(colours)
+        }
+
+        pointVAO = current.createVAO {
+            val colours = current.createColourBuffer(1)
+
+            bindPositionBuffer(quadBuffer)
+            bindColourBuffer(colours)
+        }
+
+        current.free()
     }
 }
 

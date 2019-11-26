@@ -1,6 +1,5 @@
 package ktaf.gui.core
 
-import geometry.plus
 import geometry.vec2
 import geometry.vec2_zero
 

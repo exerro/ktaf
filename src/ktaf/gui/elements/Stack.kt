@@ -1,8 +1,5 @@
 package ktaf.gui.elements
 
-import geometry.minus
-import geometry.plus
-import geometry.times
 import geometry.vec2
 import ktaf.gui.core.GUIBuilderContext
 import ktaf.gui.core.UIContainer

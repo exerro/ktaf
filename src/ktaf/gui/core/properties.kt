@@ -1,7 +1,5 @@
 package ktaf.gui.core
 
-import geometry.plus
-import geometry.times
 import ktaf.data.property.AnimatedProperty
 import ktaf.data.property.MutableProperty
 import ktaf.data.property.mutableProperty
