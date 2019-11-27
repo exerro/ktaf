@@ -4,11 +4,11 @@ import geometry.vec2
 import geometry.vec2_zero
 import ktaf.data.animation.Animation
 import ktaf.data.animation.EasingFunctions
-import ktaf.graphics.DrawContext2D
 import ktaf.data.property.AnimatedProperty
-import ktaf.data.property.const
 import ktaf.data.property.mutableProperty
-import ktaf.util.compareTo
+import ktaf.graphics.DrawContext2D
+import lwjglkt.glfw.*
+import observables.UnitSubscribable
 import kotlin.reflect.KProperty1
 import kotlin.reflect.KVisibility
 import kotlin.reflect.full.memberProperties
@@ -24,6 +24,8 @@ abstract class UINode {
     /** Whether the node should expand to fit space available or contract to fit
      *  its content. */
     val expand = mutableProperty(true)
+    /** The cursor for the node. */
+    val cursor = mutableProperty(GLFWCursor.DEFAULT)
 
     ////////////////////////////////////////////////////////////////////////////
 
@@ -54,10 +56,36 @@ abstract class UINode {
     var size: vec2 = vec2_zero
         private set
 
-    /** State of the node. */
-    var state = mutableProperty(State.Default)
-
     ////////////////////////////////////////////////////////////////////////////
+
+    /** Initialise the node, given the draw context it will be using. */
+    @Deprecated("This way of doing things is utterly stupid (think child added/removed)")
+    open fun initialise(drawContext: DrawContext2D) {}
+
+    /** Called when the mouse enters the node. */
+    open fun entered() {}
+
+    /** Called when the mouse exits the node. */
+    open fun exited() {}
+
+    /** Return a node to handle mouse events at the given position. */
+    open fun getMouseHandler(position: CursorPosition): UINode?
+            = this.takeIf { contains(position) }
+
+    /** Return a node to handle the key event. */
+    open fun getKeyHandler(event: KeyEvent): UINode? = null
+
+    /** Return a node to handle text input. */
+    open fun getInputHandler(): UINode? = null
+
+    /** Handle a mouse event. */
+    open fun handleMouseEvent(event: MouseEvent) {}
+
+    /** Handle a key event */
+    open fun handleKeyEvent(event: KeyEvent) {}
+
+    /** Handle a text input event. */
+    open fun handleInput(event: TextInputEvent) {}
 
     /** Return an optional width the node should fall to if not filling its
      *  parent and with no fixed width set.
@@ -184,4 +212,10 @@ abstract class UINode {
     private val entrance = Entrance.GROW
     private val ANIMATION_DURATION = 0.3f
     private val ANIMATION_EASING = EasingFunctions.smooth
+
+    ////////////////////////////////////////////////////////////////////////////
+
+    fun contains(cursor: CursorPosition)
+            = cursor.x >= position.x && cursor.y >= position.y &&
+              cursor.x < position.x + size.x && cursor.y < position.y + size.y
 }

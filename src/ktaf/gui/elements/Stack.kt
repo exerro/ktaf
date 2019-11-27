@@ -26,6 +26,8 @@ class Stack<Child: UINode>(children: List<Child>): UIContainer<Child>() {
 
     constructor(vararg children: Child): this(children.toList())
 
+    ////////////////////////////////////////////////////////////////////////////
+
     override fun getDefaultWidth()
             = children.map { it.calculatedSize.x } .fold(0f, ::max) + padding.value.width
 
@@ -50,6 +52,8 @@ class Stack<Child: UINode>(children: List<Child>): UIContainer<Child>() {
             child.position(p + (s - child.calculatedSize) * alignment.value)
         }
     }
+
+    ////////////////////////////////////////////////////////////////////////////
 
     init {
         children.forEach { addChild(it) }

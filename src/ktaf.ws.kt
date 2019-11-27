@@ -1,6 +1,12 @@
+import geometry.vec2_zero
 import ktaf.core.application
+import ktaf.data.ObservableList
+import ktaf.data.observableListOf
+import ktaf.data.percent
+import ktaf.data.px
 import ktaf.graphics.Colour
 import ktaf.gui.core.Padding
+import ktaf.gui.core.Spacing
 import ktaf.gui.core.UINode
 import ktaf.gui.core.scene
 import ktaf.gui.elements.*
@@ -12,26 +18,53 @@ fun main() = application {
             it.loadTextureFile2D("C:\\Users\\bened\\Pictures\\3e4.jpg")
         }
 
-        val scene = scene<UINode>(window.drawContext2D) {
+        val scene = scene<UINode>(window) {
             root = stack {
-                panel(Colour.blue)
-                vdiv {
-                    panel(Colour.red)
+                panel(Colour.yellow)
+                hdiv {
                     image(texture)
+                    vdiv(40.percent) {
+                        button("Click me", colour = Colour.orange) {
+                            clicked.subscribe(this) {
+                                text.value = "Hello world ${(Math.random() * 100).toInt()}"
+                            }
+                        }
+                        stack {
+                            panel(Colour.white)
+                            hdiv {
+                                vdiv {
+                                    panel(Colour.green)
+                                    panel(Colour.blue)
+                                    panel(Colour.purple)
+                                }
+                                vdiv {
+                                    panel(Colour.yellow)
+                                    panel(Colour.red)
+                                    panel(Colour.orange)
+                                }
 
-                    spacing.value = 200f
+                                padding.value = Padding(16f)
+                            }
+                        }
+                    }
+                    imageButton(texture) {
+                        stretch.value = false
+                        alignment.value = vec2_zero
+                    }
+                    list(observableListOf(0, 1, 2, 3, 4, 5)) {
+                        button("Button $it")
+                    } .apply {
+                        spacing.value = Spacing.EVEN
+                        padding.value = Padding(10f)
+                    }
+
+                    spacing.value = 10f
                     padding.value = Padding(100f, 50f)
                 }
             }
         }
 
-        scene.attach(window)
-
-        window.events.framebufferResized.subscribe(scene) {
-            draw()
-            update(0.1f)
-            window.glfwWindow.swapBuffers()
-        }
+        scene.attach()
 
 ////        val texture = window.glfwWindow.glContext.loadTextureFile2D("C:\\Users\\bened\\Pictures\\3e4.jpg")
 ////

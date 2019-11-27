@@ -1,6 +1,8 @@
 package ktaf.graphics
 
 import geometry.*
+import kotlin.math.max
+import kotlin.math.min
 
 typealias RGB = vec3
 typealias RGBA = vec4
@@ -18,16 +20,16 @@ fun RGB.rgba(a: Float = 1f) = rgba(x, y, z, a)
 fun RGBA.rgb() = rgb(x, y, z)
 fun RGBA.alpha(a: Float) = rgba(x, y, z, a)
 
-fun RGBA.darken() = this * 0.9f
-fun RGBA.lighten() = this / 0.9f
+fun RGBA.darken() = vec3().length().let { this * max(it - 0.07f, 0f) / it }
+fun RGBA.lighten() = vec3().length().let { this * min(it + 0.07f, 1f) / it }
 
 object Colour {
     val white: RGBA = rgba(1f)
     val black: RGBA = rgba(0f)
 
-    val blue:   RGBA = rgb(0.27f, 0.54f, 0.81f).normalise(1.00f).rgba()
+    val blue:   RGBA = rgb(0.27f, 0.54f, 0.81f).normalise(1.08f).rgba()
     val orange: RGBA = rgb(0.80f, 0.45f, 0.20f).normalise(1.13f).rgba()
-    val red:    RGBA = rgb(1.00f, 0.23f, 0.23f).normalise(1.00f).rgba()
+    val red:    RGBA = rgb(1.00f, 0.23f, 0.23f).normalise(0.94f).rgba()
     val green:  RGBA = rgb(0.05f, 0.65f, 0.27f).normalise(0.82f).rgba()
     val purple: RGBA = rgb(0.40f, 0.20f, 0.60f).normalise(1.05f).rgba()
     val yellow: RGBA = rgb(0.90f, 0.84f, 0.00f).normalise(1.26f).rgba()

@@ -2,6 +2,8 @@ package ktaf.data
 
 import observables.Signal
 
+fun <T> observableListOf(vararg items: T) = ObservableList(items.toList())
+
 class ObservableList<T> internal constructor(
         private val items: MutableList<T>,
         val onItemAdded: Signal<Int>,
@@ -50,8 +52,4 @@ class ObservableList<T> internal constructor(
 
     override fun set(index: Int, element: T)
             = removeAt(index).also { add(index, element) }
-
-    companion object {
-        fun <T> of(vararg items: T) = ObservableList(items.toList())
-    }
 }

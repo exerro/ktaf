@@ -26,6 +26,8 @@ class HDiv(
 
     constructor(vararg partitions: Ratio): this(partitions.map { ratioAnimatedProperty(it) })
 
+    ////////////////////////////////////////////////////////////////////////////
+
     override fun getDefaultWidth() = childrenWidthTotal + paddingAndSpacing
     override fun getDefaultHeight(width: Float) = childrenHeightMaximum + padding.value.height
 

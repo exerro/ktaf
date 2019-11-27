@@ -27,6 +27,8 @@ class VDiv(
 
     constructor(vararg partitions: Ratio): this(partitions.map { ratioAnimatedProperty(it) })
 
+    ////////////////////////////////////////////////////////////////////////////
+
     override fun getDefaultWidth() = childrenWidthMaximum + padding.value.width
     override fun getDefaultHeight(width: Float) = childrenHeightTotal + paddingAndSpacing
 
@@ -63,6 +65,8 @@ class VDiv(
 
         p.take(children.size) + (1 .. rem).map { total / rem }
     }
+
+    ////////////////////////////////////////////////////////////////////////////
 
     init {
         partitions.forEach(this::addAnimatedProperty)

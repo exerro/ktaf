@@ -20,6 +20,8 @@ fun GUIBuilderContext.panel(colour: RGBA = Colour.white, fn: Panel.() -> Unit = 
 class Panel(colour: RGBA = Colour.white) : UINode() {
     val colour: AnimatedProperty<RGBA> = colourProperty(colour)
 
+    ////////////////////////////////////////////////////////////////////////////
+
     override fun getDefaultWidth(): Float? = null
     override fun getDefaultHeight(width: Float): Float? = null
 

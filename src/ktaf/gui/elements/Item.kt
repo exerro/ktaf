@@ -23,6 +23,8 @@ class Item<T, Child: UINode>(
         children[0].position(calculatedPosition)
     }
 
+    ////////////////////////////////////////////////////////////////////////////
+
     init {
         addChild(fn(item.value))
 

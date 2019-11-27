@@ -19,12 +19,16 @@ class ListNode<T, Child: UINode>(
         private val fn: GUIBuilderContext.(T) -> Child
 ): UIParent<Child>() {
     val alignment = alignment1DProperty(0.5f)
+    val spacing = spacingProperty()
+
+    ////////////////////////////////////////////////////////////////////////////
 
     override fun getDefaultWidth()
             = children.map { it.calculatedSize.x } .fold(0f, ::max)
 
     override fun getDefaultHeight(width: Float)
-            = children.map { it.calculatedSize.y } .sum()
+            = children.map { it.calculatedSize.y } .sum() +
+              spacing.value.minimum(children.size)
 
     override fun calculateChildrenWidths(availableWidth: Float) {
         val w = (width.value ?: availableWidth) - padding.value.width
@@ -36,16 +40,20 @@ class ListNode<T, Child: UINode>(
     }
 
     override fun positionChildren() {
-        var p = calculatedPosition + padding.value.topLeft
         val s = calculatedSize - padding.value.size
+        val childrenHeights = childrenHeightTotal
+        val (offset, spacing) = spacing.value.apply(s.y - childrenHeights, children.size)
+        var p = calculatedPosition + padding.value.topLeft + vec2(0f, offset)
         val w = s.x
 
         children.forEach { child ->
             // TODO: fix relative position value
             child.position(p + vec2((w - child.calculatedSize.x) * alignment.value, 0f))
-            p += vec2(0f, child.calculatedSize.y)
+            p += vec2(0f, child.calculatedSize.y + spacing)
         }
     }
+
+    ////////////////////////////////////////////////////////////////////////////
 
     init {
         items.forEach { addChild(fn(GUIBuilder, it)) }
