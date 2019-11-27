@@ -10,7 +10,7 @@ import ktaf.gui.core.UIContainer
 import ktaf.gui.core.UINode
 import ktaf.gui.core.alignment2DProperty
 
-fun UIContainer<UINode>.hdiv(vararg partitions: Ratio, fn: HDiv.() -> Unit = {})
+fun UIContainer.hdiv(vararg partitions: Ratio, fn: HDiv.() -> Unit = {})
         = addChild(HDiv(*partitions)).also(fn)
 
 fun GUIBuilderContext.hdiv(vararg partitions: Ratio, fn: HDiv.() -> Unit = {})
@@ -20,7 +20,7 @@ fun GUIBuilderContext.hdiv(vararg partitions: Ratio, fn: HDiv.() -> Unit = {})
 
 class HDiv(
         val partitions: List<AnimatedProperty<Ratio>>
-): UIContainer<UINode>() {
+): UIContainer() {
     val alignment = alignment2DProperty(vec2_zero)
     val spacing = mutableProperty(0f)
 

@@ -4,10 +4,10 @@ import ktaf.data.Value
 import ktaf.gui.core.UINode
 import ktaf.gui.core.UIParent
 
-class Item<T, Child: UINode>(
+class Item<T>(
         val item: Value<T>,
-        private val fn: (T) -> Child
-): UIParent<Child>() {
+        private val fn: (T) -> UINode
+): UIParent() {
     override fun getDefaultWidth() = children[0].getDefaultWidth()
     override fun getDefaultHeight(width: Float) = children[0].getDefaultHeight(width)
 

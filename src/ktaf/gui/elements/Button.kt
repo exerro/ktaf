@@ -7,7 +7,7 @@ import ktaf.gui.core.*
 import lwjglkt.glfw.*
 import observables.Subscribable
 
-fun UIContainer<UINode>.button(text: String, colour: RGBA = Colour.blue, textColour: RGBA = Colour.white, fn: Button.() -> Unit = {})
+fun UIContainer.button(text: String, colour: RGBA = Colour.blue, textColour: RGBA = Colour.white, fn: Button.() -> Unit = {})
         = addChild(Button(text, colour, textColour)).also(fn)
 
 fun GUIBuilderContext.button(text: String, colour: RGBA = Colour.blue, textColour: RGBA = Colour.white, fn: Button.() -> Unit = {})
@@ -44,31 +44,26 @@ class Button(
     } }
 
     override fun getDefaultWidth(): Float
-            = (font.value ?: fallbackFont).widthOf(text.value) + padding.value.width
+            = (font.value ?: drawContext.DEFAULT_FONT).widthOf(text.value) + padding.value.width
 
     override fun getDefaultHeight(width: Float): Float
-            = (font.value ?: fallbackFont).height + padding.value.height
+            = (font.value ?: drawContext.DEFAULT_FONT).height + padding.value.height
 
-    override fun initialise(drawContext: DrawContext2D) {
-        fallbackFont = drawContext.DEFAULT_FONT
-    }
-
-    override fun draw(context: DrawContext2D) {
-        val font = font.value ?: fallbackFont
+    override fun draw() {
+        val font = font.value ?: drawContext.DEFAULT_FONT
         val space = size - padding.value.size - vec2(font.widthOf(text.value), font.height)
         val colour = colour.value
                 .let { if (hovering && !pressed) it.darken() else it }
                 .let { if (pressed) it.lighten() else it }
 
-        context.colour.value = colour
-        context.rectangle(position, size)
-        context.colour.value = textColour.value
-        context.write(text.value, position + padding.value.topLeft + space * alignment.value)
+        drawContext.colour.value = colour
+        drawContext.rectangle(position, size)
+        drawContext.colour.value = textColour.value
+        drawContext.write(text.value, position + padding.value.topLeft + space * alignment.value, font)
     }
 
     ////////////////////////////////////////////////////////////////////////////
 
-    private lateinit var fallbackFont: Font
     private var hovering = false
     private var pressed = false
 

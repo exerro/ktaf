@@ -8,7 +8,6 @@ import ktaf.data.property.AnimatedProperty
 import ktaf.data.property.mutableProperty
 import ktaf.graphics.DrawContext2D
 import lwjglkt.glfw.*
-import observables.UnitSubscribable
 import kotlin.reflect.KProperty1
 import kotlin.reflect.KVisibility
 import kotlin.reflect.full.memberProperties
@@ -29,16 +28,6 @@ abstract class UINode {
 
     ////////////////////////////////////////////////////////////////////////////
 
-    /** Indicate that this node should expand to fill any space available, and
-     *  not use its default size. */
-    fun expand() { expand.value = true }
-
-    /** Indicate that this node should fall back to its default size where
-     *  possible, and not expand to fill any space available. */
-    fun contract() { expand.value = false }
-
-    ////////////////////////////////////////////////////////////////////////////
-
     /** Calculated position of the node, relative to (0, 0), calculated
      *  automatically. */
     var calculatedPosition: vec2 = vec2_zero
@@ -56,11 +45,17 @@ abstract class UINode {
     var size: vec2 = vec2_zero
         private set
 
-    ////////////////////////////////////////////////////////////////////////////
+    // TODO: idea:
+    //       maybe the parent shouldn't be retrievable from the child
+    //       if so, this property becomes useful only for parents when adding
+    //       children (removing them from their old parent), which in hindsight
+    //       is a bloody dumb feature (have a flag for parented and don't add in
+    //       that case)
+    /** The node's parent, if it exists. */
+    var parent: UIParent? = null
+        internal set
 
-    /** Initialise the node, given the draw context it will be using. */
-    @Deprecated("This way of doing things is utterly stupid (think child added/removed)")
-    open fun initialise(drawContext: DrawContext2D) {}
+    ////////////////////////////////////////////////////////////////////////////
 
     /** Called when the mouse enters the node. */
     open fun entered() {}
@@ -106,7 +101,7 @@ abstract class UINode {
     abstract fun getDefaultHeight(width: Float): Float?
 
     /** Draw the node. */
-    abstract fun draw(context: DrawContext2D)
+    abstract fun draw()
 
     /** Update the node and its animations. */
     open fun update(dt: Float) {
@@ -122,6 +117,10 @@ abstract class UINode {
     }
 
     ////////////////////////////////////////////////////////////////////////////
+
+    /** The draw context of the scene or parent this node is a child of. */
+    protected lateinit var drawContext: DrawContext2D
+        private set
 
     /** Register a property to be updated when the node updates.
      *
@@ -160,6 +159,12 @@ abstract class UINode {
 
         calculatedSize = vec2(calculatedWidth, calculatedHeight)
     }
+
+    internal open fun setDrawContext(context: DrawContext2D) {
+        drawContext = context
+    }
+
+    internal fun hasDrawContext() = ::drawContext.isInitialized
 
     ////////////////////////////////////////////////////////////////////////////
 

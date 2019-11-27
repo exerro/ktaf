@@ -11,9 +11,10 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" exported="" name="lwjgl-kt-dev" level="application" />
-    <orderEntry type="library" name="lwjgl" level="application" />
-    <orderEntry type="library" exported="" name="observables" level="application" />
-    <orderEntry type="library" exported="" name="geometry-kt" level="application" />
+    <orderEntry type="library" name="KotlinJavaRuntime" level="project" />
+    <orderEntry type="library" exported="" name="lib/geometry-kt" level="application" />
+    <orderEntry type="library" exported="" name="lib/lwjgl-kt" level="application" />
+    <orderEntry type="library" exported="" name="lib/observables" level="application" />
+    <orderEntry type="library" name="open/lwjgl" level="application" />
   </component>
 </module>

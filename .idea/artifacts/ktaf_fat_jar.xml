@@ -1,13 +1,16 @@
 <component name="ArtifactManager">
-  <artifact type="jar" build-on-make="true" name="ktaf-dev:jar">
-    <output-path>$PROJECT_DIR$/../../dev_out</output-path>
-    <root id="archive" name="ktaf-dev.jar">
+  <artifact type="jar" name="ktaf-fat:jar">
+    <output-path>$PROJECT_DIR$/../../out/fat</output-path>
+    <root id="archive" name="ktaf.jar">
       <element id="module-output" name="ktaf" />
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/kotlin-stdlib.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/kotlin-reflect.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/kotlin-test.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/kotlin-stdlib-jdk7.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/kotlin-stdlib-jdk8.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/../../dev_out/lwjgl-kt.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/geometry-kt.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/observables.jar" path-in-jar="/" />
     </root>
   </artifact>
 </component>

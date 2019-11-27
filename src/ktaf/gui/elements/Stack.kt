@@ -7,24 +7,24 @@ import ktaf.gui.core.UINode
 import ktaf.gui.core.alignment2DProperty
 import java.lang.Float.max
 
-fun UIContainer<UINode>.stack(vararg children: UINode, fn: Stack<UINode>.() -> Unit = {})
+fun UIContainer.stack(vararg children: UINode, fn: Stack.() -> Unit = {})
         = addChild(Stack(*children)).also(fn)
 
-fun GUIBuilderContext.stack(vararg children: UINode, fn: Stack<UINode>.() -> Unit = {})
+fun GUIBuilderContext.stack(vararg children: UINode, fn: Stack.() -> Unit = {})
         = Stack(*children).also(fn)
 
-fun <Child: UINode> UIContainer<UINode>.stack(child: Child, vararg children: Child, fn: Stack<Child>.() -> Unit = {})
+fun <Child: UINode> UIContainer.stack(child: Child, vararg children: Child, fn: Stack.() -> Unit = {})
         = addChild(Stack(*children)).also(fn)
 
-fun <Child: UINode> GUIBuilderContext.stack(child: Child, vararg children: Child, fn: Stack<Child>.() -> Unit = {})
+fun <Child: UINode> GUIBuilderContext.stack(child: Child, vararg children: Child, fn: Stack.() -> Unit = {})
         = Stack(*children).also(fn)
 
 //////////////////////////////////////////////////////////////////////////////////////////
 
-class Stack<Child: UINode>(children: List<Child>): UIContainer<Child>() {
+class Stack(children: List<UINode>): UIContainer() {
     val alignment = alignment2DProperty(vec2(0.5f, 0.5f))
 
-    constructor(vararg children: Child): this(children.toList())
+    constructor(vararg children: UINode): this(children.toList())
 
     ////////////////////////////////////////////////////////////////////////////
 

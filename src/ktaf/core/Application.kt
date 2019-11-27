@@ -14,7 +14,7 @@ class Application internal constructor(
     var running = false
         private set
 
-    fun display(title: String, width: Int, height: Int, fn: (Window) -> Unit) {
+    fun window(title: String, width: Int, height: Int, fn: (Window) -> Unit) {
         synchronized(windowsToCreate) {
             windowsToCreate.add(GLFWWindowBuilder(ctx.glfw, title, width, height) to fn)
         }

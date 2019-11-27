@@ -9,7 +9,7 @@ import ktaf.gui.core.UIContainer
 import ktaf.gui.core.UINode
 import ktaf.gui.core.colourProperty
 
-fun UIContainer<UINode>.panel(colour: RGBA = Colour.white, fn: Panel.() -> Unit = {})
+fun UIContainer.panel(colour: RGBA = Colour.white, fn: Panel.() -> Unit = {})
         = addChild(Panel(colour)).also(fn)
 
 fun GUIBuilderContext.panel(colour: RGBA = Colour.white, fn: Panel.() -> Unit = {})
@@ -25,8 +25,8 @@ class Panel(colour: RGBA = Colour.white) : UINode() {
     override fun getDefaultWidth(): Float? = null
     override fun getDefaultHeight(width: Float): Float? = null
 
-    override fun draw(context: DrawContext2D) {
-        context.colour.value = colour.value
-        context.rectangle(position, size)
+    override fun draw() {
+        drawContext.colour.value = colour.value
+        drawContext.rectangle(position, size)
     }
 }

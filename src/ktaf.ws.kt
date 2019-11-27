@@ -1,9 +1,7 @@
 import geometry.vec2_zero
 import ktaf.core.application
-import ktaf.data.ObservableList
 import ktaf.data.observableListOf
 import ktaf.data.percent
-import ktaf.data.px
 import ktaf.graphics.Colour
 import ktaf.gui.core.Padding
 import ktaf.gui.core.Spacing
@@ -13,7 +11,7 @@ import ktaf.gui.elements.*
 import lwjglkt.util.loadTextureFile2D
 
 fun main() = application {
-    display("Hello world", 1080, 720) { window ->
+    window("Hello world", 1080, 720) { window ->
         val texture = window.glfwWindow.glContext.makeCurrent {
             it.loadTextureFile2D("C:\\Users\\bened\\Pictures\\3e4.jpg")
         }
@@ -51,11 +49,31 @@ fun main() = application {
                         stretch.value = false
                         alignment.value = vec2_zero
                     }
-                    list(observableListOf(0, 1, 2, 3, 4, 5)) {
-                        button("Button $it")
-                    } .apply {
-                        spacing.value = Spacing.EVEN
-                        padding.value = Padding(10f)
+
+                    val items = observableListOf(1, 2, 3, 4, 5)
+                    var n = 6
+
+                    vdiv(90.percent) {
+                        list(items) { n ->
+                            button("Button $n") {
+                                font.value = window.drawContext2D.DEFAULT_FONT
+
+                                clicked.subscribe(this) {
+                                    items.remove(n)
+                                }
+                            }
+                        }.apply {
+                            spacing.value = Spacing.BETWEEN
+                            padding.value = Padding(10f)
+                        }
+
+                        button("ADD A BUTTON") {
+                            font.value = window.drawContext2D.DEFAULT_FONT.scaleTo(20f)
+
+                            clicked.subscribe(this) {
+                                items.add(n++)
+                            }
+                        }
                     }
 
                     spacing.value = 10f

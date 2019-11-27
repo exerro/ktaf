@@ -5,19 +5,19 @@ import ktaf.data.ObservableList
 import ktaf.gui.core.*
 import kotlin.math.max
 
-fun <T, Child: UINode> UIContainer<UINode>.list(items: ObservableList<T>, fn: GUIBuilderContext.(T) -> Child)
+fun <T> UIContainer.list(items: ObservableList<T>, fn: GUIBuilderContext.(T) -> UINode)
         = addChild(ListNode(items, fn))
 
-fun <T, Child: UINode> GUIBuilderContext.list(items: ObservableList<T>, fn: GUIBuilderContext.(T) -> Child)
+fun <T> GUIBuilderContext.list(items: ObservableList<T>, fn: GUIBuilderContext.(T) -> UINode)
         = ListNode(items, fn)
 
 //////////////////////////////////////////////////////////////////////////////////////////
 
 // TODO: add spacing
-class ListNode<T, Child: UINode>(
+class ListNode<T>(
         val items: ObservableList<T>,
-        private val fn: GUIBuilderContext.(T) -> Child
-): UIParent<Child>() {
+        private val fn: GUIBuilderContext.(T) -> UINode
+): UIParent() {
     val alignment = alignment1DProperty(0.5f)
     val spacing = spacingProperty()
 

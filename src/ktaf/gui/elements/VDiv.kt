@@ -11,7 +11,7 @@ import ktaf.gui.core.UINode
 import ktaf.gui.core.alignment2DProperty
 import kotlin.math.max
 
-fun UIContainer<UINode>.vdiv(vararg partitions: Ratio, fn: VDiv.() -> Unit = {})
+fun UIContainer.vdiv(vararg partitions: Ratio, fn: VDiv.() -> Unit = {})
         = addChild(VDiv(*partitions)).also(fn)
 
 fun GUIBuilderContext.vdiv(vararg partitions: Ratio, fn: VDiv.() -> Unit = {})
@@ -21,7 +21,7 @@ fun GUIBuilderContext.vdiv(vararg partitions: Ratio, fn: VDiv.() -> Unit = {})
 
 class VDiv(
         val partitions: List<AnimatedProperty<Ratio>>
-): UIContainer<UINode>() {
+): UIContainer() {
     val alignment = alignment2DProperty(vec2_zero)
     val spacing = mutableProperty(0f)
 

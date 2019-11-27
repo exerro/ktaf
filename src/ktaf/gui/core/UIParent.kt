@@ -4,31 +4,41 @@ import geometry.vec2
 import ktaf.graphics.DrawContext2D
 import lwjglkt.glfw.CursorPosition
 import lwjglkt.glfw.KeyEvent
-import lwjglkt.glfw.MouseEvent
-import lwjglkt.glfw.TextInputEvent
 import kotlin.math.max
 
 /** A node containing a protected list of children. */
-abstract class UIParent<Child: UINode>: UINode(), Positioner {
-    protected open val children: List<Child> get() = internalChildren
+abstract class UIParent: UINode(), Positioner {
+    protected open val children: List<UINode> get() = internalChildren
 
-    protected open fun <T: Child> addChild(index: Int, child: T)
-            = internalChildren.add(index, child).also { child.positioned = false } .let { child }
+    protected open fun <T: UINode> addChild(index: Int, child: T): T {
+        child.parent?.removeChild(child)
+        internalChildren.add(index, child)
+        child.positioned = false
+        child.parent = this
+        if (hasDrawContext()) child.setDrawContext(drawContext)
+        return child
+    }
 
-    protected open fun <T: Child> addChild(child: T)
-            = internalChildren.add(child).also { child.positioned = false } .let { child }
+    protected open fun <T: UINode> addChild(child: T): T {
+        child.parent?.removeChild(child)
+        internalChildren.add(child)
+        child.positioned = false
+        child.parent = this
+        if (hasDrawContext()) child.setDrawContext(drawContext)
+        return child
+    }
 
-    protected open fun <T: Child> removeChild(child: T)
-            = internalChildren.remove(child) .let { child }
+    protected open fun <T: UINode> removeChild(child: T): T {
+        if (internalChildren.remove(child)) {
+            child.parent = null
+        }
+        return child
+    }
 
-    protected open fun clearChildren()
-            = internalChildren.clear()
+    protected open fun clearChildren(): Unit
+            = internalChildren.map { it }.forEach { removeChild(it) }
 
     ////////////////////////////////////////////////////////////////////////////
-
-    override fun initialise(drawContext: DrawContext2D) {
-        children.forEach { it.initialise(drawContext) }
-    }
 
     override fun getMouseHandler(position: CursorPosition): UINode? = children
             .reversed().stream()
@@ -63,8 +73,13 @@ abstract class UIParent<Child: UINode>: UINode(), Positioner {
         positionChildren()
     }
 
-    override fun draw(context: DrawContext2D) {
-        internalChildren.forEach { it.draw(context) }
+    override fun setDrawContext(context: DrawContext2D) {
+        super.setDrawContext(context)
+        children.forEach { it.setDrawContext(context) }
+    }
+
+    override fun draw() {
+        internalChildren.forEach { it.draw() }
     }
 
     override fun update(dt: Float) {
@@ -74,12 +89,12 @@ abstract class UIParent<Child: UINode>: UINode(), Positioner {
 
     ////////////////////////////////////////////////////////////////////////////
 
-    private val internalChildren: MutableList<Child> = mutableListOf()
+    private val internalChildren: MutableList<UINode> = mutableListOf()
 
     ////////////////////////////////////////////////////////////////////////////
 
     init {
-        expand()
+        expand.value = true
     }
 
     ////////////////////////////////////////////////////////////////////////////

@@ -33,7 +33,7 @@ class UIScene<Root: UINode>(
 
     fun draw() {
         drawContext.begin()
-        root.draw(drawContext)
+        root.draw()
         drawContext.end()
     }
 
@@ -108,7 +108,7 @@ class UIScene<Root: UINode>(
     private val drawContext = window.drawContext2D
 
     init {
-        root.initialise(drawContext)
+        root.setDrawContext(drawContext)
     }
 }
 
