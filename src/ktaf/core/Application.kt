@@ -6,6 +6,7 @@ import lwjglkt.glfw.GLFWInitialisationHint
 import lwjglkt.glfw.GLFWWindowBuilder
 import lwjglkt.lwjglktInit
 import observables.emit
+import java.util.concurrent.CyclicBarrier
 import kotlin.math.min
 
 class Application internal constructor(
@@ -22,6 +23,27 @@ class Application internal constructor(
 
     fun stop() {
         running = false
+    }
+
+    fun <T: Any> load(resource: ResourceLoader<T>): T {
+        resource.start()
+        return resource.get()
+    }
+
+    inline fun <reified T: Any> loadAsync(vararg resources: ResourceLoader<T>): List<T> {
+        val results = Array<T?>(resources.size) { null }
+        val barrier = CyclicBarrier(resources.size + 1)
+
+        resources.forEachIndexed { i, resource ->
+            resource.get {
+                results[i] = it
+                barrier.await()
+            }
+        }
+
+        barrier.await()
+
+        return results.map { it!! }
     }
 
     ////////////////////////////////////////////////////////////////////////////
