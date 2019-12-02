@@ -2,13 +2,13 @@ package ktaf.util
 
 import geometry.vec2
 import geometry.vec3
-import ktaf.core.*
-import lwjglkt.GLVAO
-import lwjglkt.gl.GLContext
+import lwjglkt.gl.GLCurrentContext
+import lwjglkt.gl.GLVAO
 import lwjglkt.gl.createVAO
+import lwjglkt.util.*
 
-fun createElementGLVAO(context: GLContext, elements: List<Int>, vertices: List<vec3>, normals: List<vec3>, uvs: List<vec2>, colours: List<vec3>): GLVAO {
-    val elementBuffer = context.elementBuffer(elements)
+fun createElementGLVAO(context: GLCurrentContext, elements: List<Int>, vertices: List<vec3>, normals: List<vec3>, uvs: List<vec2>, colours: List<vec3>): GLVAO {
+    val elementBuffer = context.createElementBuffer(elements.toIntArray())
     val positionBuffer = context.vec3vbo(vertices)
     val normalBuffer = context.vec3vbo(normals)
     val colourBuffer = context.vec3vbo(colours)
@@ -23,12 +23,12 @@ fun createElementGLVAO(context: GLContext, elements: List<Int>, vertices: List<v
     }
 }
 
-fun createElementGLVAO(context: GLContext, elements: List<Int>, vertices: List<vec3>, normals: List<vec3>, uvs: List<vec2>, colours: Boolean = true): GLVAO {
-    val elementBuffer = context.elementBuffer(elements)
+fun createElementGLVAO(context: GLCurrentContext, elements: List<Int>, vertices: List<vec3>, normals: List<vec3>, uvs: List<vec2>, colours: Boolean = true): GLVAO {
+    val elementBuffer = context.createElementBuffer(elements.toIntArray())
     val positionBuffer = context.vec3vbo(vertices)
     val normalBuffer = context.vec3vbo(normals)
     val uvBuffer = context.vec2vbo(uvs)
-    val colourBuffer = if (colours) context.colourBuffer(vertices.size) else null
+    val colourBuffer = if (colours) context.createColourBuffer(vertices.size) else null
 
     return context.createVAO {
         bindElementBuffer(elementBuffer)
@@ -39,11 +39,11 @@ fun createElementGLVAO(context: GLContext, elements: List<Int>, vertices: List<v
     }
 }
 
-fun createElementGLVAO(context: GLContext, elements: List<Int>, vertices: List<vec3>, normals: List<vec3>, colours: Boolean = true): GLVAO {
-    val elementBuffer = context.elementBuffer(elements)
+fun createElementGLVAO(context: GLCurrentContext, elements: List<Int>, vertices: List<vec3>, normals: List<vec3>, colours: Boolean = true): GLVAO {
+    val elementBuffer = context.createElementBuffer(elements.toIntArray())
     val positionBuffer = context.vec3vbo(vertices)
     val normalBuffer = context.vec3vbo(normals)
-    val colourBuffer = if (colours) context.colourBuffer(vertices.size) else null
+    val colourBuffer = if (colours) context.createColourBuffer(vertices.size) else null
 
     return context.createVAO {
         bindElementBuffer(elementBuffer)
