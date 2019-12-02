@@ -11,6 +11,8 @@ import kotlin.math.min
 class Application internal constructor(
         private val ctx: LWJGLKTContext
 ) {
+    val timer = Timer()
+
     var running = false
         private set
 
@@ -28,6 +30,7 @@ class Application internal constructor(
 
     internal fun run() {
         running = true
+        var lastUpdate = System.currentTimeMillis()
 
         while (running) {
             val wtc = synchronized(windowsToCreate) {
@@ -62,6 +65,11 @@ class Application internal constructor(
                     window.lastUpdateTime = t
                 }
             }
+
+            val t = System.currentTimeMillis()
+
+            timer.update((t - lastUpdate) / 1000f)
+            lastUpdate = t
 
             ctx.glfw.pollEvents()
         }

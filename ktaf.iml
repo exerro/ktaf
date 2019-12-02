@@ -7,7 +7,6 @@
       <sourceFolder url="file://$MODULE_DIR$/res" type="java-resource" />
       <excludeFolder url="file://$MODULE_DIR$/src/ktaf/graphics_old" />
       <excludeFolder url="file://$MODULE_DIR$/src/ktaf/old" />
-      <excludeFolder url="file://$MODULE_DIR$/src/ktaf/ui" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
