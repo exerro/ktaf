@@ -48,18 +48,19 @@ class Application internal constructor(
             windows.removeAll(toClose)
             if (windows.isEmpty()) stop()
 
-            val t = System.currentTimeMillis()
-
             windows.forEach { window ->
-                window.glfwWindow.glContext.makeCurrent {
-                    it.gl.finish()
-                    it.gl.clearColour(0f, 0f, 0f, 0f)
-                    it.gl.clear(GLClearBuffer.GL_COLOR_BUFFER_BIT, GLClearBuffer.GL_DEPTH_BUFFER_BIT)
+                window.glfwWindow.glContext.waitToMakeCurrent { current ->
+                    val t = System.currentTimeMillis()
+
+                    current.gl.finish()
+                    current.gl.clearColour(0f, 0f, 0f, 0f)
+                    current.gl.clear(GLClearBuffer.GL_COLOR_BUFFER_BIT, GLClearBuffer.GL_DEPTH_BUFFER_BIT)
+
+                    window.update.emit(min(0.1f, (t - window.lastUpdateTime) / 1000f))
+                    window.draw.emit()
+                    window.glfwWindow.swapBuffers()
+                    window.lastUpdateTime = t
                 }
-                window.update.emit(min(0.1f, (t - window.lastUpdateTime) / 1000f))
-                window.draw.emit()
-                window.glfwWindow.swapBuffers()
-                window.lastUpdateTime = t
             }
 
             ctx.glfw.pollEvents()

@@ -3,10 +3,10 @@ package ktaf.util
 import geometry.*
 import lwjglkt.gl.*
 import lwjglkt.gl.enum.GLBufferType
-import lwjglkt.util.createVertexBuffer
+import lwjglkt.util.createPositionBuffer
 
 fun GLCurrentContext.vec3vbo(data: List<vec3>)
-        = createVertexBuffer(data.flatMap(vec3::unpack).toFloatArray())
+        = createPositionBuffer(data.flatMap(vec3::unpack).toFloatArray())
 
 fun GLCurrentContext.vec2vbo(data: List<vec2>): GLVBO {
     return createVBO(GLBufferType.GL_ARRAY_BUFFER) {

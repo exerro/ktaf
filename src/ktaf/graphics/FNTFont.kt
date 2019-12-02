@@ -171,7 +171,7 @@ fun FNTFont.Companion.preloadResource(resource: String): FNTFontPreloader {
 }
 
 fun FNTFont.Companion.load(context: GLContext, preloader: FNTFontPreloader): FNTFont {
-    val current = context.makeCurrent()
+    val current = context.waitToMakeCurrent()
     val vaos = preloader.charUVs.map { (char, uvs) ->
         char to createElementGLVAO(
                 current,

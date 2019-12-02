@@ -172,20 +172,20 @@ class DrawContext2D(
     ////////////////////////////////////////////////////////////////////////////
 
     init {
-        val current = glContext.makeCurrent()
+        val current = glContext.waitToMakeCurrent()
 
         shader = current.createShaderProgram(
                 current.createShader(GLShaderType.GL_VERTEX_SHADER, VERTEX_SHADER_CODE),
                 current.createShader(GLShaderType.GL_FRAGMENT_SHADER, FRAGMENT_SHADER_CODE)
         )
 
-        quadBuffer = current.createVertexBuffer(
+        quadBuffer = current.createPositionBuffer(
                 floatArrayOf(0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f))
 
-        triBuffer = current.createVertexBuffer(
+        triBuffer = current.createPositionBuffer(
                 floatArrayOf(0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f))
 
-        pointBuffer = current.createVertexBuffer(
+        pointBuffer = current.createPositionBuffer(
                 floatArrayOf(0f, 0f, 0f))
 
         quadVAO = current.createVAO {

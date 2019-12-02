@@ -24,8 +24,9 @@ fun RGBA.darken() = vec3().length().let { this * max(it - 0.07f, 0f) / it }
 fun RGBA.lighten() = vec3().length().let { this * min(it + 0.07f, 1f) / it }
 
 object Colour {
-    val white: RGBA = rgba(1f)
-    val black: RGBA = rgba(0f)
+    val white: RGBA = rgba(1.0f)
+    val grey: RGBA  = rgba(0.4f)
+    val black: RGBA = rgba(0.0f)
 
     val blue:   RGBA = rgb(0.27f, 0.54f, 0.81f).normalise(1.08f).rgba()
     val orange: RGBA = rgb(0.80f, 0.45f, 0.20f).normalise(1.13f).rgba()

@@ -11,7 +11,7 @@ open class DrawContext(
         private val screenSize: Value<vec2>
 ) {
     val viewportPosition = mutableProperty(vec2(0f))
-    val viewportSize = mutableProperty(vec2(1f))
+    val viewportSize = mutableProperty(screenSize.value)
     lateinit var currentContext: GLCurrentContext
 
     open fun begin() {
@@ -19,7 +19,7 @@ open class DrawContext(
         val y = (screenSize.value.y - viewportPosition.value.y - viewportSize.value.y).toInt()
         val w = viewportSize.value.x.toInt()
         val h = viewportSize.value.y.toInt()
-        currentContext = glContext.makeCurrent()
+        currentContext = glContext.waitToMakeCurrent()
         currentContext.gl.viewport(x, y, w, h)
     }
 
