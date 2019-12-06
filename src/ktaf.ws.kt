@@ -37,7 +37,7 @@ fun main() = application {
             root = stack {
                 panel(Colour.yellow)
                 hdiv {
-                    image(texture)
+                    image(tex)
                     vdiv(40.percent) {
                         button("Click me", colour = Colour.orange) {
                             clicked.subscribe(this) {
