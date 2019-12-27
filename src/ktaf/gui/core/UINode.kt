@@ -13,7 +13,7 @@ import kotlin.reflect.KVisibility
 import kotlin.reflect.full.memberProperties
 
 /** A node in the GUI tree. */
-abstract class UINode {
+abstract class UINode: UINodeEvents, UINodePositioning {
     /** Specific width for the node. Leave as `null` for automatic sizing. */
     val width = mutableProperty<Float?>(null)
     /** Specific height for the node. Leave as `null` for automatic sizing. */
@@ -24,7 +24,7 @@ abstract class UINode {
      *  its content. */
     val expand = mutableProperty(true)
     /** The cursor for the node. */
-    val cursor = mutableProperty(GLFWCursor.DEFAULT)
+    val cursor = mutableProperty(GLFWCursor.DEFAULT) // TODO: this shouldn't be a property
 
     ////////////////////////////////////////////////////////////////////////////
 
@@ -39,29 +39,16 @@ abstract class UINode {
 
     /** The node's current position, relative to (0, 0), updated automatically. */
     var position: vec2 = vec2_zero
-        private set
+        internal set
 
     /** The node's current size, updated automatically. */
     var size: vec2 = vec2_zero
-        private set
+        internal set
 
-    // TODO: idea:
-    //       maybe the parent shouldn't be retrievable from the child
-    //       if so, this property becomes useful only for parents when adding
-    //       children (removing them from their old parent), which in hindsight
-    //       is a bloody dumb feature (have a flag for parented and don't add in
-    //       that case)
-    /** The node's parent, if it exists. */
-    var parent: UIParent? = null
+    var parented: Boolean = false
         internal set
 
     ////////////////////////////////////////////////////////////////////////////
-
-    /** Called when the mouse enters the node. */
-    open fun entered() {}
-
-    /** Called when the mouse exits the node. */
-    open fun exited() {}
 
     /** Return a node to handle mouse events at the given position. */
     open fun getMouseHandler(position: CursorPosition): UINode?
@@ -72,36 +59,6 @@ abstract class UINode {
 
     /** Return a node to handle text input. */
     open fun getInputHandler(): UINode? = null
-
-    /** Handle a mouse event. */
-    open fun handleMouseEvent(event: MouseEvent) {}
-
-    /** Handle a key event */
-    open fun handleKeyEvent(event: KeyEvent) {}
-
-    /** Handle a text input event. */
-    open fun handleInput(event: TextInputEvent) {}
-
-    /** Return an optional width the node should fall to if not filling its
-     *  parent and with no fixed width set.
-     *
-     *  Called from calculateWidth() if necessary.
-     *  Note: for parents, calculateChildrenWidths() will already have been
-     *        called, so child widths can be used here. */
-    abstract fun getDefaultWidth(): Float?
-
-    /** Return an optional height the node should fall to if not filling its
-     *  parent and with no fixed height set.
-     *
-     *  @param width: calculated width of the node.
-     *
-     *  Called from calculateHeight() if necessary.
-     *  Note: for parents, calculateChildrenHeights() will already have been
-     *        called, so child sizes can be used here. */
-    abstract fun getDefaultHeight(width: Float): Float?
-
-    /** Draw the node. */
-    abstract fun draw()
 
     /** Update the node and its animations. */
     open fun update(dt: Float) {
@@ -164,7 +121,16 @@ abstract class UINode {
         drawContext = context
     }
 
+    internal fun exitTo(position: vec2, size: vec2) {
+        calculatedPosition = position
+        calculatedSize = size
+        updatePositionAndSizeAnimations()
+    }
+
     internal fun hasDrawContext() = ::drawContext.isInitialized
+
+    internal var positioned = false
+    internal val animating get() = positionAnimation != null || sizeAnimation != null
 
     ////////////////////////////////////////////////////////////////////////////
 
@@ -179,12 +145,12 @@ abstract class UINode {
     }
 
     private fun enter() {
-        val (p0, p1) = entrance.position(calculatedPosition, calculatedSize)
-        val (s0, s1) = entrance.size(calculatedPosition, calculatedSize)
+        val p0 = entrance.position(calculatedPosition, calculatedSize)
+        val s0 = entrance.size(calculatedPosition, calculatedSize)
         position = p0
         size = s0
-        positionAnimation = updateAnimation(null, p0, p1)
-        sizeAnimation = updateAnimation(null, s0, s1)
+        positionAnimation = updateAnimation(null, p0, calculatedPosition)
+        sizeAnimation = updateAnimation(null, s0, calculatedSize)
         positioned = true
     }
 
@@ -207,14 +173,13 @@ abstract class UINode {
                 .toMutableList()
     }
 
-    internal var positioned = false
-
     private var calculatedWidth: Float = 0f
     private var positionAnimation: Animation<vec2>? = null
     private var sizeAnimation: Animation<vec2>? = null
 
     // TODO: make these properties
-    private val entrance = Entrance.GROW
+    private val entrance = Entrance.grow // Entrance.fromLeft()
+    internal val exit = Exit.shrink // Exit.toTop()
     private val ANIMATION_DURATION = 0.3f
     private val ANIMATION_EASING = EasingFunctions.smooth
 

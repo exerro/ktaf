@@ -11,26 +11,38 @@ abstract class UIParent: UINode(), Positioner {
     protected open val children: List<UINode> get() = internalChildren
 
     protected open fun <T: UINode> addChild(index: Int, child: T): T {
-        child.parent?.removeChild(child)
-        internalChildren.add(index, child)
-        child.positioned = false
-        child.parent = this
+        if (child.parented) return child // TODO: return null or something?
         if (hasDrawContext()) child.setDrawContext(drawContext)
+
+        internalChildren.add(index, child)
+        child.parented = true
+        child.positioned = false
+
         return child
     }
 
     protected open fun <T: UINode> addChild(child: T): T {
-        child.parent?.removeChild(child)
-        internalChildren.add(child)
-        child.positioned = false
-        child.parent = this
+        if (child.parented) return child // TODO: return null or something?
         if (hasDrawContext()) child.setDrawContext(drawContext)
+
+        internalChildren.add(child)
+        child.parented = true
+        child.positioned = false
+
         return child
     }
 
     protected open fun <T: UINode> removeChild(child: T): T {
         if (internalChildren.remove(child)) {
-            child.parent = null
+            val exit = child.exit
+            val p = exit.position?.invoke(child.calculatedPosition, child.calculatedSize)
+            val s = exit.size?.invoke(child.calculatedPosition, child.calculatedSize)
+
+            if (p != null && p != child.calculatedPosition || s != null && s != child.calculatedSize) {
+                child.exitTo(p ?: child.calculatedPosition, s ?: child.calculatedSize)
+                animatedChildrenExiting.add(child)
+            }
+            else child.parented = false
         }
         return child
     }
@@ -80,15 +92,21 @@ abstract class UIParent: UINode(), Positioner {
 
     override fun draw() {
         internalChildren.forEach { it.draw() }
+        animatedChildrenExiting.forEach { it.draw() }
     }
 
     override fun update(dt: Float) {
         super.update(dt)
         internalChildren.forEach { it.update(dt) }
+
+        animatedChildrenExiting.forEach { it.update(dt) }
+        animatedChildrenExiting.forEach { if (!it.animating) it.parented = false }
+        animatedChildrenExiting.removeAll { !it.animating }
     }
 
     ////////////////////////////////////////////////////////////////////////////
 
+    private val animatedChildrenExiting: MutableList<UINode> = mutableListOf()
     private val internalChildren: MutableList<UINode> = mutableListOf()
 
     ////////////////////////////////////////////////////////////////////////////

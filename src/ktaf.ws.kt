@@ -6,10 +6,7 @@ import ktaf.data.percent
 import ktaf.data.property.const
 import ktaf.graphics.Colour
 import ktaf.graphics.DrawContext2D
-import ktaf.gui.core.Padding
-import ktaf.gui.core.Spacing
-import ktaf.gui.core.UINode
-import ktaf.gui.core.scene
+import ktaf.gui.core.*
 import ktaf.gui.elements.*
 import lwjglkt.gl.bindIn
 import lwjglkt.util.loadTextureFile2D
@@ -73,6 +70,7 @@ fun main() = application {
                     vdiv(90.percent) {
                         list(items) { n ->
                             button("Button $n") {
+//                                entrance = Entrance.fromLeft()
                                 font.value = window.drawContext2D.DEFAULT_FONT
 
                                 clicked.subscribe(this) {
