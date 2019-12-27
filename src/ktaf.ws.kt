@@ -4,6 +4,7 @@ import ktaf.core.application
 import ktaf.data.observableListOf
 import ktaf.data.percent
 import ktaf.data.property.const
+import ktaf.data.px
 import ktaf.graphics.Colour
 import ktaf.graphics.DrawContext2D
 import ktaf.gui.core.*
@@ -67,7 +68,8 @@ fun main() = application {
                     val items = observableListOf(1, 2, 3, 4, 5)
                     var n = 6
 
-                    vdiv(90.percent) {
+                    vdiv(20.px, 90.percent) {
+                        slider(10f, 20f, 15f, 11)
                         list(items) { n ->
                             button("Button $n") {
 //                                entrance = Entrance.fromLeft()

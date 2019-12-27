@@ -71,6 +71,14 @@ class DrawContext2D(
         }
     }
 
+    fun crectangle(position: vec2, size: vec2) {
+        val (x0, y0) = position - size / 2f
+        val (x1, y1) = position + size / 2f
+
+        quadBuffer.subData(floatArrayOf(x0, y0, 0f, x0, y1, 0f, x1, y1, 0f, x1, y0, 0f))
+        vao(6, quadVAO)
+    }
+
     fun rectangle(position: vec2, size: vec2) {
         val (x0, y0) = position
         val (x1, y1) = position + size
