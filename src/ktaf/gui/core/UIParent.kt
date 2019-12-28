@@ -7,8 +7,9 @@ import lwjglkt.glfw.KeyEvent
 import kotlin.math.max
 
 /** A node containing a protected list of children. */
-abstract class UIParent: UINode(), Positioner {
+abstract class UIParent: UINode() {
     protected open val children: List<UINode> get() = internalChildren
+    protected abstract val layout: Layout
 
     protected open fun <T: UINode> addChild(index: Int, child: T): T {
         if (child.parented) return child // TODO: return null or something?
@@ -71,18 +72,22 @@ abstract class UIParent: UINode(), Positioner {
             .findFirst().orElse(null)
 
     override fun calculateWidth(availableWidth: Float) {
-        calculateChildrenWidths(availableWidth)
+        val w = (width.value ?: availableWidth) - padding.value.width
+        layout.calculateChildrenWidths(children, w)
         super.calculateWidth(availableWidth)
     }
 
     override fun calculateHeight(availableHeight: Float?) {
-        calculateChildrenHeights(availableHeight)
+        val h = height.value ?: availableHeight ?.let { it - padding.value.height }
+        layout.calculateChildrenHeights(children, h)
         super.calculateHeight(availableHeight)
     }
 
     override fun position(position: vec2) {
         super.position(position)
-        positionChildren()
+        layout.positionChildren(children,
+                calculatedPosition + padding.value.topLeft,
+                calculatedSize - padding.value.size)
     }
 
     override fun setDrawContext(context: DrawContext2D) {

@@ -1,14 +1,13 @@
 package ktaf.gui.elements
 
-import geometry.*
 import ktaf.data.Ratio
-import ktaf.data.property.AnimatedProperty
-import ktaf.data.property.mutableProperty
-import ktaf.data.ratioAnimatedProperty
+import ktaf.data.Value
+import ktaf.data.property.MutableProperty
+import ktaf.data.property.const
+import ktaf.gui.core.Alignment2D
 import ktaf.gui.core.GUIBuilderContext
 import ktaf.gui.core.UIContainer
-import ktaf.gui.core.UINode
-import ktaf.gui.core.alignment2DProperty
+import ktaf.gui.layouts.HorizontalDivideLayout
 
 fun UIContainer.hdiv(vararg partitions: Ratio, fn: HDiv.() -> Unit = {})
         = addChild(HDiv(*partitions)).also(fn)
@@ -19,58 +18,29 @@ fun GUIBuilderContext.hdiv(vararg partitions: Ratio, fn: HDiv.() -> Unit = {})
 //////////////////////////////////////////////////////////////////////////////////////////
 
 open class HDiv(
-        val partitions: List<AnimatedProperty<Ratio>>
+        partitions: List<Value<Ratio>>
 ): UIContainer() {
-    val alignment = alignment2DProperty(vec2_zero)
-    val spacing = mutableProperty(0f)
+    val alignment: MutableProperty<Alignment2D>
+    val spacing: MutableProperty<Float>
 
-    constructor(vararg partitions: Ratio): this(partitions.map { ratioAnimatedProperty(it) })
-
-    ////////////////////////////////////////////////////////////////////////////
-
-    override fun getDefaultWidth() = childrenWidthTotal + paddingAndSpacing
-    override fun getDefaultHeight(width: Float) = childrenHeightMaximum + padding.value.height
-
-    override fun calculateChildrenWidths(availableWidth: Float) {
-        val widths = calculateWidths((width.value ?: availableWidth) - paddingAndSpacing)
-        children.forEachIndexed { i, child -> child.calculateWidth(widths[i]) }
-    }
-
-    override fun calculateChildrenHeights(availableHeight: Float?) {
-        val h = (height.value ?: availableHeight) ?.let { it - padding.value.height }
-        children.forEach { it.calculateHeight(h) }
-    }
-
-    override fun positionChildren() {
-        val s = calculatedSize - vec2(paddingAndSpacing, padding.value.height)
-        val widths = calculateWidths(s.x)
-        var p = calculatedPosition + padding.value.topLeft
-        val sp = spacing.value
-        val h = s.y
-        val a = alignment.value
-
-        children.forEachIndexed { i, child ->
-            val w = widths[i]
-            child.position(p + (vec2(w, h) - child.calculatedSize) * a)
-            p += vec2(w + sp, 0f)
-        }
-    }
+    constructor(vararg partitions: Ratio): this(partitions.map { const(it) })
 
     ////////////////////////////////////////////////////////////////////////////
 
-    private fun calculateWidths(size: Float) = partitions.map { it.value.apply(size) } .let { p ->
-        val rem = children.size - partitions.size
-        val total = size - p.sum()
+    override fun getDefaultWidth()
+            = childrenWidthTotal + padding.value.width + spacing.value * (children.size - 1)
 
-        p.take(children.size) + (1 .. rem).map { total / rem }
-    }
+    override fun getDefaultHeight(width: Float)
+            = childrenHeightMaximum + padding.value.height
+
+    ////////////////////////////////////////////////////////////////////////////
+
+    override val layout: HorizontalDivideLayout
 
     init {
-        partitions.forEach(this::addAnimatedProperty)
+        val h = HorizontalDivideLayout(partitions)
+        layout = h
+        alignment = h.alignment
+        spacing = h.spacing
     }
-
-    ////////////////////////////////////////////////////////////////////////////
-
-    val paddingAndSpacing
-        get() = padding.value.width + spacing.value * (children.size - 1)
 }

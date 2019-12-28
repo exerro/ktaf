@@ -1,15 +1,13 @@
 package ktaf.gui.elements
 
-import geometry.*
 import ktaf.data.Ratio
-import ktaf.data.property.AnimatedProperty
-import ktaf.data.property.mutableProperty
+import ktaf.data.Value
+import ktaf.data.property.MutableProperty
 import ktaf.data.ratioAnimatedProperty
+import ktaf.gui.core.Alignment2D
 import ktaf.gui.core.GUIBuilderContext
 import ktaf.gui.core.UIContainer
-import ktaf.gui.core.UINode
-import ktaf.gui.core.alignment2DProperty
-import kotlin.math.max
+import ktaf.gui.layouts.VerticalDivideLayout
 
 fun UIContainer.vdiv(vararg partitions: Ratio, fn: VDiv.() -> Unit = {})
         = addChild(VDiv(*partitions)).also(fn)
@@ -20,60 +18,29 @@ fun GUIBuilderContext.vdiv(vararg partitions: Ratio, fn: VDiv.() -> Unit = {})
 //////////////////////////////////////////////////////////////////////////////////////////
 
 open class VDiv(
-        val partitions: List<AnimatedProperty<Ratio>>
+        partitions: List<Value<Ratio>>
 ): UIContainer() {
-    val alignment = alignment2DProperty(vec2_zero)
-    val spacing = mutableProperty(0f)
+    val alignment: MutableProperty<Alignment2D>
+    val spacing: MutableProperty<Float>
 
     constructor(vararg partitions: Ratio): this(partitions.map { ratioAnimatedProperty(it) })
 
     ////////////////////////////////////////////////////////////////////////////
 
-    override fun getDefaultWidth() = childrenWidthMaximum + padding.value.width
-    override fun getDefaultHeight(width: Float) = childrenHeightTotal + paddingAndSpacing
+    override fun getDefaultWidth()
+            = childrenWidthMaximum + padding.value.width
 
-    override fun calculateChildrenWidths(availableWidth: Float) {
-        val w = (width.value ?: availableWidth) - padding.value.width
-        children.forEach { it.calculateWidth(w) }
-    }
-
-    override fun calculateChildrenHeights(availableHeight: Float?) {
-        val heights = calculateHeights((height.value ?: availableHeight) ?.let { it - paddingAndSpacing} ?: 0f)
-        children.forEachIndexed { i, child -> child.calculateHeight(heights[i]) }
-    }
-
-    override fun positionChildren() {
-        val s = calculatedSize - vec2(padding.value.width, paddingAndSpacing)
-        val heights = calculateHeights(s.y)
-        var p = calculatedPosition + padding.value.topLeft
-        val sp = spacing.value
-        val w = s.x
-        val a = alignment.value
-
-        children.forEachIndexed { i, child ->
-            val h = heights[i]
-            child.position(p + (vec2(w, h) - child.calculatedSize) * a)
-            p += vec2(0f, h + sp)
-        }
-    }
+    override fun getDefaultHeight(width: Float)
+            = childrenHeightTotal + padding.value.height + spacing.value * (children.size - 1)
 
     ////////////////////////////////////////////////////////////////////////////
 
-    private fun calculateHeights(size: Float) = partitions.map { it.value.apply(size) } .let { p ->
-        val rem = children.size - partitions.size
-        val total = size - p.sum()
-
-        p.take(children.size) + (1 .. rem).map { total / rem }
-    }
-
-    ////////////////////////////////////////////////////////////////////////////
+    override val layout: VerticalDivideLayout
 
     init {
-        partitions.forEach(this::addAnimatedProperty)
+        val l = VerticalDivideLayout(partitions)
+        layout = l
+        alignment = l.alignment
+        spacing = l.spacing
     }
-
-    ////////////////////////////////////////////////////////////////////////////
-
-    val paddingAndSpacing
-        get() = padding.value.height + spacing.value * (children.size - 1)
 }

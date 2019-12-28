@@ -4,6 +4,7 @@ import ktaf.core.application
 import ktaf.data.observableListOf
 import ktaf.data.percent
 import ktaf.data.property.const
+import ktaf.data.property.mutableProperty
 import ktaf.data.px
 import ktaf.graphics.Colour
 import ktaf.graphics.DrawContext2D
@@ -61,25 +62,24 @@ fun main() = application {
                                 padding.value = Padding(16f)
                                 spacing.value = vec2(10f)
                             }
-//                            hdiv {
-//                                vdiv {
-//                                    panel(Colour.green)
-//                                    panel(Colour.blue)
-//                                    panel(Colour.purple)
-//                                }
-//                                vdiv {
-//                                    panel(Colour.yellow)
-//                                    panel(Colour.red)
-//                                    panel(Colour.orange)
-//                                }
-//
-//                                padding.value = Padding(16f)
-//                            }
                         }
                     }
-                    imageButton(texture) {
-                        stretch.value = false
-                        alignment.value = vec2_zero
+                    vdiv(70.percent) {
+                        imageButton(texture) {
+                            stretch.value = false
+                            alignment.value = vec2_zero
+                        }
+                        hdiv(70.percent) {
+                            val a = mutableProperty(0)
+
+                            button("Change") {
+                                clicked.subscribe(this) { a.value = a.value + 1 }
+                            }
+
+                            item(a) {
+                                button(it.toString())
+                            }
+                        }
                     }
 
                     val items = observableListOf(1, 2, 3, 4, 5)
