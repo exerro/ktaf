@@ -5,6 +5,8 @@ import ktaf.data.property.mutableProperty
 import ktaf.graphics.*
 import ktaf.gui.core.*
 import lwjglkt.glfw.*
+import lwjglktx.font.Font
+import lwjglktx.font.widthOf
 import observables.Subscribable
 
 fun UIContainer.button(text: String, colour: RGBA = Colour.blue, textColour: RGBA = Colour.white, fn: Button.() -> Unit = {})
@@ -47,11 +49,11 @@ class Button(
             = (font.value ?: drawContext.DEFAULT_FONT).widthOf(text.value) + padding.value.width
 
     override fun getDefaultHeight(width: Float): Float
-            = (font.value ?: drawContext.DEFAULT_FONT).height + padding.value.height
+            = (font.value ?: drawContext.DEFAULT_FONT).lineHeight + padding.value.height
 
     override fun draw() {
         val font = font.value ?: drawContext.DEFAULT_FONT
-        val space = size - padding.value.size - vec2(font.widthOf(text.value), font.height)
+        val space = size - padding.value.size - vec2(font.widthOf(text.value), font.lineHeight)
         val colour = colour.value
                 .let { if (hovering && !pressed) it.darken() else it }
                 .let { if (pressed) it.lighten() else it }

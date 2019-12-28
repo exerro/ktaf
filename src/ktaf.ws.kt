@@ -7,11 +7,14 @@ import ktaf.data.property.const
 import ktaf.data.px
 import ktaf.graphics.Colour
 import ktaf.graphics.DrawContext2D
-import ktaf.gui.core.*
+import ktaf.gui.core.Padding
+import ktaf.gui.core.Spacing
+import ktaf.gui.core.UINode
+import ktaf.gui.core.scene
 import ktaf.gui.elements.*
 import lwjglkt.gl.bindIn
-import lwjglkt.util.loadTextureFile2D
 import lwjglkt.util.createFramebuffer
+import lwjglkt.util.loadTextureFile2D
 
 fun main() = application {
     window("Hello world", 1080, 720) { window ->
@@ -44,20 +47,34 @@ fun main() = application {
                         }
                         stack {
                             panel(Colour.white)
-                            hdiv {
-                                vdiv {
-                                    panel(Colour.green)
-                                    panel(Colour.blue)
-                                    panel(Colour.purple)
+                            grid(2, 3) {
+                                panel(Colour.green) {
+                                    width.value = 10f
+                                    height.value = 20f
                                 }
-                                vdiv {
-                                    panel(Colour.yellow)
-                                    panel(Colour.red)
-                                    panel(Colour.orange)
-                                }
+                                panel(Colour.blue)
+                                panel(Colour.purple)
+                                panel(Colour.yellow)
+                                panel(Colour.red)
+                                panel(Colour.orange)
 
                                 padding.value = Padding(16f)
+                                spacing.value = vec2(10f)
                             }
+//                            hdiv {
+//                                vdiv {
+//                                    panel(Colour.green)
+//                                    panel(Colour.blue)
+//                                    panel(Colour.purple)
+//                                }
+//                                vdiv {
+//                                    panel(Colour.yellow)
+//                                    panel(Colour.red)
+//                                    panel(Colour.orange)
+//                                }
+//
+//                                padding.value = Padding(16f)
+//                            }
                         }
                     }
                     imageButton(texture) {
@@ -85,7 +102,7 @@ fun main() = application {
                         }
 
                         button("ADD A BUTTON") {
-                            font.value = window.drawContext2D.DEFAULT_FONT.scaleTo(20f)
+                            font.value = window.drawContext2D.DEFAULT_FONT
 
                             clicked.subscribe(this) {
                                 items.add(n++)

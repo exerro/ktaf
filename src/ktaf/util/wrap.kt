@@ -1,7 +1,7 @@
 package ktaf.util
 
-import ktaf.graphics.Font
-import ktaf.graphics.widthOf
+import lwjglktx.font.Font
+import lwjglktx.font.widthOf
 import kotlin.math.max
 import kotlin.math.min
 

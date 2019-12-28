@@ -4,6 +4,8 @@ import geometry.vec2
 import ktaf.data.property.mutableProperty
 import ktaf.graphics.*
 import ktaf.gui.core.*
+import lwjglktx.font.Font
+import lwjglktx.font.widthOf
 
 fun UIContainer.label(text: String, textColour: RGBA = Colour.black, colour: RGBA = Colour.white.alpha(0f), fn: Label.() -> Unit = {})
         = addChild(Label(text, textColour, colour)).also(fn)
@@ -30,21 +32,15 @@ class Label(
             = (font.value ?: drawContext.DEFAULT_FONT).widthOf(text.value) + padding.value.width
 
     override fun getDefaultHeight(width: Float): Float
-            = (font.value ?: drawContext.DEFAULT_FONT).height + padding.value.height
+            = (font.value ?: drawContext.DEFAULT_FONT).lineHeight + padding.value.height
 
     override fun draw() {
         val font = font.value ?: drawContext.DEFAULT_FONT
-        val space = size - padding.value.size - vec2(font.widthOf(text.value), font.height)
+        val space = size - padding.value.size - vec2(font.widthOf(text.value), font.lineHeight)
 
         drawContext.colour.value = colour.value
         drawContext.rectangle(position, size)
         drawContext.colour.value = textColour.value
         drawContext.write(text.value, position + padding.value.topLeft + space * alignment.value, font)
-    }
-
-    ////////////////////////////////////////////////////////////////////////////
-
-    init {
-
     }
 }

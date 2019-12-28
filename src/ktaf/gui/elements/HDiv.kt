@@ -18,7 +18,7 @@ fun GUIBuilderContext.hdiv(vararg partitions: Ratio, fn: HDiv.() -> Unit = {})
 
 //////////////////////////////////////////////////////////////////////////////////////////
 
-class HDiv(
+open class HDiv(
         val partitions: List<AnimatedProperty<Ratio>>
 ): UIContainer() {
     val alignment = alignment2DProperty(vec2_zero)

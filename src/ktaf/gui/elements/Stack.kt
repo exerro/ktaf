@@ -21,7 +21,7 @@ fun <Child: UINode> GUIBuilderContext.stack(child: Child, vararg children: Child
 
 //////////////////////////////////////////////////////////////////////////////////////////
 
-class Stack(children: List<UINode>): UIContainer() {
+open class Stack(children: List<UINode>): UIContainer() {
     val alignment = alignment2DProperty(vec2(0.5f, 0.5f))
 
     constructor(vararg children: UINode): this(children.toList())

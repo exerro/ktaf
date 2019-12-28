@@ -19,7 +19,7 @@ fun GUIBuilderContext.vdiv(vararg partitions: Ratio, fn: VDiv.() -> Unit = {})
 
 //////////////////////////////////////////////////////////////////////////////////////////
 
-class VDiv(
+open class VDiv(
         val partitions: List<AnimatedProperty<Ratio>>
 ): UIContainer() {
     val alignment = alignment2DProperty(vec2_zero)

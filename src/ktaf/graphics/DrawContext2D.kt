@@ -8,14 +8,15 @@ import ktaf.data.property.mutableProperty
 import lwjglkt.gl.*
 import lwjglkt.gl.enum.*
 import lwjglkt.util.*
+import lwjglktx.font.FNTFont
+import lwjglktx.font.Font
+import lwjglktx.font.loadDefaultFont
 
 class DrawContext2D(
         glContext: GLContext,
         screenSize: Value<vec2>
 ): DrawContext(glContext, screenSize) {
-    val DEFAULT_FONT: Font = FNTFont.load(glContext,
-            FNTFont.preloadResource("font/open-sans/OpenSans-Regular.fnt"))
-            .scaleTo(16f)
+    val DEFAULT_FONT: Font = FNTFont.loadDefaultFont(glContext, 20f)
 
     val colour = mutableProperty(rgba(1f))
 
@@ -125,17 +126,18 @@ class DrawContext2D(
     fun write(text: String, position: vec2 = vec2_zero, font: Font = DEFAULT_FONT) {
         if (text == "") return
 
-        var x = position.x
-        val y = position.y + (font.lineHeight - font.baseline) * font.scale
+        var x = position.x - (text.getOrNull(0)?.let(font::getCharOffsetX) ?: 0f)
+        val y = position.y + font.lineHeight - font.baseline
 
         (text.zip(text.drop(1)) + listOf(text.last() to null)).forEach { (char, next) ->
-            val offset = font.getCharOffset(char)
-            val translation = vec3(x + offset.x * font.scale, y + offset.y * font.scale, 0f)
+            val offsetX = font.getCharOffsetX(char)
+            val offsetY = font.getCharOffsetY(char)
+            val translation = vec3(x + offsetX, y + offsetY, 0f)
             vao(font.getVAOVertexCount(char), font.getVAO(char),
-                    transform=mat4_translate(translation) * mat3_scale(vec3(font.scale)).mat4(),
+                    transform=mat4_translate(translation),
                     texture=font.getTexture(char))
-            x += font.getCharAdvance(char) * font.scale
-            next ?.let { x += font.getKerning(char, next) * font.scale }
+            x += font.getCharAdvance(char)
+            next ?.let { x += font.getKerning(char, next) }
         }
     }
 
@@ -145,6 +147,7 @@ class DrawContext2D(
         super.begin()
 
         currentContext.gl.enable(GLOption.GL_BLEND)
+//        currentContext.gl.enable(GLOption.GL_FRAMEBUFFER_SRGB)
 
         currentContext.gl.rasterState {
             defaults()
@@ -187,13 +190,13 @@ class DrawContext2D(
                 current.createShader(GLShaderType.GL_FRAGMENT_SHADER, FRAGMENT_SHADER_CODE)
         )
 
-        quadBuffer = current.createPositionBuffer(
+        quadBuffer = current.createBuffer(
                 floatArrayOf(0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f))
 
-        triBuffer = current.createPositionBuffer(
+        triBuffer = current.createBuffer(
                 floatArrayOf(0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f))
 
-        pointBuffer = current.createPositionBuffer(
+        pointBuffer = current.createBuffer(
                 floatArrayOf(0f, 0f, 0f))
 
         quadVAO = current.createVAO {
@@ -256,8 +259,6 @@ uniform sampler2D u_texture;
 
 in vec4 f_colour;
 in vec2 f_uv;
-
-// TODO: textures
 
 out vec4 fragment_colour;
 

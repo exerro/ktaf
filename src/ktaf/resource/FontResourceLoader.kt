@@ -1,10 +1,10 @@
 package ktaf.resource
 
-import ktaf.graphics.FNTFont
-import ktaf.graphics.Font
-import ktaf.graphics.load
 import lwjglkt.gl.GLContext
 import lwjglkt.gl.GLCurrentContext
+import lwjglktx.font.FNTFont
+import lwjglktx.font.Font
+import lwjglktx.font.load
 
 class FNTFontResourceLoader(
         context: GLContext
