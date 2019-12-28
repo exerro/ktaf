@@ -7,7 +7,9 @@ import ktaf.data.property.const
 import ktaf.gui.core.Alignment2D
 import ktaf.gui.core.GUIBuilderContext
 import ktaf.gui.core.UIContainer
+import ktaf.gui.core.UIPublicParent
 import ktaf.gui.layouts.HorizontalDivideLayout
+import kotlin.collections.List
 
 fun UIContainer.hdiv(vararg partitions: Ratio, fn: HDiv.() -> Unit = {})
         = addChild(HDiv(*partitions)).also(fn)
@@ -19,7 +21,7 @@ fun GUIBuilderContext.hdiv(vararg partitions: Ratio, fn: HDiv.() -> Unit = {})
 
 open class HDiv(
         partitions: List<Value<Ratio>>
-): UIContainer() {
+): UIPublicParent() {
     val alignment: MutableProperty<Alignment2D>
     val spacing: MutableProperty<Float>
 

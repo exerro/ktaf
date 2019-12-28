@@ -134,3 +134,19 @@ abstract class UIParent: UINode() {
     protected val childrenHeightMaximum
         get() = children.map { it.calculatedSize.y } .fold(0f, ::max)
 }
+
+abstract class UIPublicParent: UIParent(), UIContainer {
+    public override val children = super.children
+
+    public override fun <T: UINode> addChild(child: T)
+            = super.addChild(child)
+
+    public override fun <T: UINode> addChild(index: Int, child: T)
+            = super.addChild(index, child)
+
+    public override fun <T: UINode> removeChild(child: T)
+            = super.removeChild(child)
+
+    public override fun clearChildren()
+            = super.clearChildren()
+}

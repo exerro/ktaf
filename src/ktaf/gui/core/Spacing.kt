@@ -32,12 +32,20 @@ open class Spacing internal constructor(
 /** Spacing just around a set of nodes. */
 class AroundSpacing(
         around: SpacingFunction
-): Spacing({ _, _ -> 0f }, around)
+): Spacing({ _, _ -> 0f }, around) {
+    companion object {
+        fun exactly(pixels: Float) = AroundSpacing { _, _ -> pixels }
+    }
+}
 
 /** Spacing just between nodes. */
 class BetweenSpacing(
         between: SpacingFunction
-): Spacing(between, { _, _ -> 0f })
+): Spacing(between, { _, _ -> 0f }) {
+    companion object {
+        fun exactly(pixels: Float) = BetweenSpacing { _, _ -> pixels }
+    }
+}
 
 /** Combines a between spacing value and around spacing value.
  *

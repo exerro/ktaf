@@ -20,7 +20,4 @@ interface UINodeEvents {
 
     /** Handle a text input event. */
     fun handleInput(event: TextInputEvent) {}
-
-    /** Draw the node. */
-    fun draw()
 }

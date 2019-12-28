@@ -7,7 +7,9 @@ import ktaf.data.ratioAnimatedProperty
 import ktaf.gui.core.Alignment2D
 import ktaf.gui.core.GUIBuilderContext
 import ktaf.gui.core.UIContainer
+import ktaf.gui.core.UIPublicParent
 import ktaf.gui.layouts.VerticalDivideLayout
+import kotlin.collections.List
 
 fun UIContainer.vdiv(vararg partitions: Ratio, fn: VDiv.() -> Unit = {})
         = addChild(VDiv(*partitions)).also(fn)
@@ -19,7 +21,7 @@ fun GUIBuilderContext.vdiv(vararg partitions: Ratio, fn: VDiv.() -> Unit = {})
 
 open class VDiv(
         partitions: List<Value<Ratio>>
-): UIContainer() {
+): UIPublicParent() {
     val alignment: MutableProperty<Alignment2D>
     val spacing: MutableProperty<Float>
 

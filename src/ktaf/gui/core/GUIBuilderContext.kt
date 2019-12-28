@@ -11,3 +11,5 @@ interface GUIBuilderContext
 
 /** A generic GUIBuilderContext that may be used. */
 object GUIBuilder: GUIBuilderContext
+
+fun <T> gui(fn: GUIBuilderContext.() -> T) = fn(GUIBuilder)

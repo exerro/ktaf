@@ -8,11 +8,11 @@ import ktaf.data.property.mutableProperty
 import ktaf.data.px
 import ktaf.graphics.Colour
 import ktaf.graphics.DrawContext2D
-import ktaf.gui.core.Padding
-import ktaf.gui.core.Spacing
-import ktaf.gui.core.UINode
-import ktaf.gui.core.scene
+import ktaf.graphics.alpha
+import ktaf.gui.core.*
 import ktaf.gui.elements.*
+import ktaf.util.compareTo
+import ktaf.util.size
 import lwjglkt.gl.bindIn
 import lwjglkt.util.createFramebuffer
 import lwjglkt.util.loadTextureFile2D
@@ -39,7 +39,22 @@ fun main() = application {
             root = stack {
                 panel(Colour.yellow)
                 hdiv {
-                    image(tex)
+                    vdiv {
+                        image(tex)
+                        labeledPanel("Title") {
+                            label.background.colour.value = Colour.grey
+                            label.textColour.value = Colour.white
+                            label.padding.value = Padding(10f)
+
+                            hstack {
+                                button("Hello world 1")
+                                button("Hello world 2")
+                                button("Hello world 3")
+
+                                spacing.value = BetweenSpacing.exactly(32f) then AroundSpacing.exactly(16f)
+                            }
+                        }
+                    }
                     vdiv(40.percent) {
                         button("Click me", colour = Colour.orange) {
                             clicked.subscribe(this) {
@@ -49,10 +64,7 @@ fun main() = application {
                         stack {
                             panel(Colour.white)
                             grid(2, 3) {
-                                panel(Colour.green) {
-                                    width.value = 10f
-                                    height.value = 20f
-                                }
+                                panel(Colour.green)
                                 panel(Colour.blue)
                                 panel(Colour.purple)
                                 panel(Colour.yellow)
@@ -66,8 +78,8 @@ fun main() = application {
                     }
                     vdiv(70.percent) {
                         imageButton(texture) {
-                            stretch.value = false
-                            alignment.value = vec2_zero
+                            background.stretchImage.value = false
+                            background.imageAlignment.value = vec2_zero
                         }
                         hdiv(70.percent) {
                             val a = mutableProperty(0)
@@ -114,38 +126,28 @@ fun main() = application {
                     padding.value = Padding(100f, 50f)
                 }
             }
-//            root = stack {
-//                panel(Colour.white)
-//
-//                stack {
-//                    padding.value = Padding(10f)
-//
-//                    image(tex)
-//                }
-//            }
         }
 
         scene.attach()
 
-////        val texture = window.glfwWindow.glContext.loadTextureFile2D("C:\\Users\\bened\\Pictures\\3e4.jpg")
-////
-////        window.draw.connect {
-////            window.drawContext2D.begin()
-////            window.drawContext2D.colour <- const(Colour.red)
-////            window.drawContext2D.rectangle(vec2(100f), vec2(200f))
-////            window.drawContext2D.colour <- const(Colour.blue.alpha(0.5f))
-////            window.drawContext2D.triangle(vec2(200f), vec2(300f), vec2(250f, 350f))
-////            window.drawContext2D.colour <- const(Colour.green)
-////            window.drawContext2D.line(vec2(100f), vec2(300f))
-//            window.drawContext2D.line(vec2(100f, 200f), vec2(300f, 400f), 5f)
-//            window.drawContext2D.colour <- const(Colour.purple)
-//            window.drawContext2D.point(vec2(200f, 150f))
-//            window.drawContext2D.point(vec2(250f, 150f), 10f)
-//            window.drawContext2D.colour <- const(Colour.orange)
-//            window.drawContext2D.write("Hello world")
-//            window.drawContext2D.colour <- const(Colour.white)
-//            window.drawContext2D.image(texture, vec2(400f), vec2(100f) / texture.size)
-//            window.drawContext2D.end()
-//        }
+        window.draw.subscribe(window) {
+            val (cx, cy) = window.glfwWindow.cursorPosition
+            window.drawContext2D.begin()
+            window.drawContext2D.colour.value = Colour.red
+            window.drawContext2D.rectangle(vec2(100f), vec2(200f))
+            window.drawContext2D.colour.value = Colour.blue.alpha(0.5f)
+            window.drawContext2D.triangle(vec2(200f), vec2(300f), vec2(250f, 350f))
+            window.drawContext2D.colour.value = Colour.green
+            window.drawContext2D.line(vec2(100f), vec2(cx, cy))
+            window.drawContext2D.line(vec2(100f, 200f), vec2(300f, 400f), 5f)
+            window.drawContext2D.colour.value = Colour.purple
+            window.drawContext2D.point(vec2(200f, 150f))
+            window.drawContext2D.point(vec2(250f, 150f), 10f)
+            window.drawContext2D.colour.value = Colour.orange
+            window.drawContext2D.write("Hello world")
+            window.drawContext2D.colour.value = Colour.white
+            window.drawContext2D.image(texture, vec2(400f), vec2(100f) / texture.size)
+            window.drawContext2D.end()
+        }
     }
 }

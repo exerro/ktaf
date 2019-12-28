@@ -5,6 +5,7 @@ import ktaf.data.property.MutableProperty
 import ktaf.gui.core.Alignment2D
 import ktaf.gui.core.GUIBuilderContext
 import ktaf.gui.core.UIContainer
+import ktaf.gui.core.UIPublicParent
 import ktaf.gui.layouts.GridLayout
 
 fun UIContainer.grid(columns: Int, rows: Int, fn: Grid.() -> Unit = {})
@@ -15,7 +16,7 @@ fun GUIBuilderContext.grid(columns: Int, rows: Int, fn: Grid.() -> Unit = {})
 
 //////////////////////////////////////////////////////////////////////////////////////////
 
-open class Grid(columns: Int, rows: Int): UIContainer() {
+open class Grid(columns: Int, rows: Int): UIPublicParent() {
     val columns: MutableProperty<Int>
     val rows: MutableProperty<Int>
     val alignment: MutableProperty<Alignment2D>

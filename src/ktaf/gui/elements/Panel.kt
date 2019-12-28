@@ -1,13 +1,12 @@
 package ktaf.gui.elements
 
-import ktaf.data.property.AnimatedProperty
 import ktaf.graphics.Colour
-import ktaf.graphics.DrawContext2D
 import ktaf.graphics.RGBA
+import ktaf.gui.core.Background
 import ktaf.gui.core.GUIBuilderContext
 import ktaf.gui.core.UIContainer
 import ktaf.gui.core.UINode
-import ktaf.gui.core.colourProperty
+import lwjglkt.gl.GLTexture2
 
 fun UIContainer.panel(colour: RGBA = Colour.white, fn: Panel.() -> Unit = {})
         = addChild(Panel(colour)).also(fn)
@@ -15,18 +14,29 @@ fun UIContainer.panel(colour: RGBA = Colour.white, fn: Panel.() -> Unit = {})
 fun GUIBuilderContext.panel(colour: RGBA = Colour.white, fn: Panel.() -> Unit = {})
         = Panel(colour).also(fn)
 
+fun UIContainer.image(image: GLTexture2, colour: RGBA = Colour.white, fn: Panel.() -> Unit = {})
+        = addChild(Panel(colour)).also(fn).also { it.background.image.value = image }
+
+fun GUIBuilderContext.image(image: GLTexture2, colour: RGBA = Colour.white, fn: Panel.() -> Unit = {})
+        = Panel(colour).also(fn).also { it.background.image.value = image }
+
 //////////////////////////////////////////////////////////////////////////////////////////
 
 class Panel(colour: RGBA = Colour.white) : UINode() {
-    val colour: AnimatedProperty<RGBA> = colourProperty(colour)
+    val background = Background(colour)
 
     ////////////////////////////////////////////////////////////////////////////
 
     override fun getDefaultWidth(): Float? = null
     override fun getDefaultHeight(width: Float): Float? = null
-
     override fun draw() {
-        drawContext.colour.value = colour.value
-        drawContext.rectangle(position, size)
+        background.draw(drawContext, position, size)
+    }
+
+    ////////////////////////////////////////////////////////////////////////////
+
+    init {
+        addAnimatedProperty(background.colour)
+        addAnimatedProperty(background.imageAlignment)
     }
 }

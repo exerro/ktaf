@@ -2,15 +2,12 @@ package ktaf.gui.core
 
 import geometry.vec2_zero
 import ktaf.core.Window
-import ktaf.graphics.DrawContext2D
-import ktaf.data.property.vec2AnimatedProperty
-import ktaf.util.compareTo
 import lwjglkt.glfw.*
 
 class UIScene<Root: UINode>(
         root: Root,
         val window: Window
-): Positioner {
+) {
     var root: Root = root
         private set
 
@@ -25,9 +22,9 @@ class UIScene<Root: UINode>(
 
         window.glfwWindow.setCursor(mouseTarget?.cursor?.value ?: GLFWCursor.DEFAULT)
 
-        calculateChildrenWidths(drawContext.viewportSize.value.x)
-        calculateChildrenHeights(drawContext.viewportSize.value.y)
-        positionChildren()
+        root.calculateWidth(drawContext.viewportSize.value.x)
+        root.calculateHeight(drawContext.viewportSize.value.y)
+        root.position(vec2_zero)
         root.update(dt)
     }
 
@@ -83,20 +80,6 @@ class UIScene<Root: UINode>(
         window.events.mouseReleased.unsubscribe(this)
         window.events.mouseClicked.unsubscribe(this)
         window.events.mouseMoved.unsubscribe(this)
-    }
-
-    ////////////////////////////////////////////////////////////////////////////
-
-    override fun calculateChildrenWidths(availableWidth: Float) {
-        root.calculateWidth(availableWidth)
-    }
-
-    override fun calculateChildrenHeights(availableHeight: Float?) {
-        root.calculateHeight(availableHeight)
-    }
-
-    override fun positionChildren() {
-        root.position(vec2_zero)
     }
 
     ////////////////////////////////////////////////////////////////////////////

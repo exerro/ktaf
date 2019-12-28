@@ -7,15 +7,14 @@ import ktaf.gui.layouts.VerticalListLayout
 import kotlin.math.max
 
 fun <T> UIContainer.list(items: ObservableList<T>, fn: GUIBuilderContext.(T) -> UINode)
-        = addChild(ListNode(items, fn))
+        = addChild(List(items, fn))
 
 fun <T> GUIBuilderContext.list(items: ObservableList<T>, fn: GUIBuilderContext.(T) -> UINode)
-        = ListNode(items, fn)
+        = List(items, fn)
 
 //////////////////////////////////////////////////////////////////////////////////////////
 
-// TODO: add spacing
-class ListNode<T>(
+class List<T>(
         val items: ObservableList<T>,
         private val fn: GUIBuilderContext.(T) -> UINode
 ): UIParent() {

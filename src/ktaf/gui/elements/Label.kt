@@ -20,10 +20,10 @@ class Label(
         textColour: RGBA = Colour.black,
         colour: RGBA = Colour.white.alpha(0f)
 ): UINode() {
+    val background = Background(colour)
     val text = mutableProperty(text)
-    val colour = colourProperty(colour)
     val textColour = colourProperty(textColour)
-    val alignment = alignment2DProperty(vec2(0.5f))
+    val textAlignment = alignment2DProperty(vec2(0.5f))
     val font = mutableProperty(null as Font?)
 
     ////////////////////////////////////////////////////////////////////////////
@@ -38,9 +38,15 @@ class Label(
         val font = font.value ?: drawContext.DEFAULT_FONT
         val space = size - padding.value.size - vec2(font.widthOf(text.value), font.lineHeight)
 
-        drawContext.colour.value = colour.value
-        drawContext.rectangle(position, size)
+        background.draw(drawContext, position, size)
         drawContext.colour.value = textColour.value
-        drawContext.write(text.value, position + padding.value.topLeft + space * alignment.value, font)
+        drawContext.write(text.value, position + padding.value.topLeft + space * textAlignment.value, font)
+    }
+
+    ////////////////////////////////////////////////////////////////////////////
+
+    init {
+        addAnimatedProperty(background.colour)
+        addAnimatedProperty(background.imageAlignment)
     }
 }

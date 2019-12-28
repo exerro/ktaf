@@ -73,6 +73,9 @@ abstract class UINode: UINodeEvents, UINodePositioning {
         animatedProperties.forEach { it.update(dt) }
     }
 
+    /** Draw the node. */
+    abstract fun draw()
+
     ////////////////////////////////////////////////////////////////////////////
 
     /** The draw context of the scene or parent this node is a child of. */
@@ -168,7 +171,7 @@ abstract class UINode: UINodeEvents, UINodePositioning {
                 .asSequence()
                 .map { it as KProperty1<UINode, *> }
                 .filter { it.visibility == KVisibility.PUBLIC }
-                .map { it.get(this) }
+                .map { try { it.get(this) } catch (e: Exception) { null } }
                 .filterIsInstance<AnimatedProperty<*>>()
                 .toMutableList()
     }

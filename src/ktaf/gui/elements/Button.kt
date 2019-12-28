@@ -4,6 +4,7 @@ import geometry.vec2
 import ktaf.data.property.mutableProperty
 import ktaf.graphics.*
 import ktaf.gui.core.*
+import lwjglkt.gl.GLTexture2
 import lwjglkt.glfw.*
 import lwjglktx.font.Font
 import lwjglktx.font.widthOf
@@ -15,6 +16,12 @@ fun UIContainer.button(text: String, colour: RGBA = Colour.blue, textColour: RGB
 fun GUIBuilderContext.button(text: String, colour: RGBA = Colour.blue, textColour: RGBA = Colour.white, fn: Button.() -> Unit = {})
         = Button(text, colour, textColour).also(fn)
 
+fun UIContainer.imageButton(image: GLTexture2, colour: RGBA = Colour.white, textColour: RGBA = Colour.white, fn: Button.() -> Unit = {})
+        = addChild(Button("", colour, textColour)).also(fn).also { it.background.image.value = image }
+
+fun GUIBuilderContext.imageButton(image: GLTexture2, colour: RGBA = Colour.white, textColour: RGBA = Colour.white, fn: Button.() -> Unit = {})
+        = Button("", colour, textColour).also(fn).also { it.background.image.value = image }
+
 //////////////////////////////////////////////////////////////////////////////////////////
 
 class Button(
@@ -22,10 +29,10 @@ class Button(
         colour: RGBA = Colour.blue,
         textColour: RGBA = Colour.white
 ): UINode() {
+    val background = Background(colour)
     val text = mutableProperty(text)
-    val colour = colourProperty(colour)
     val textColour = colourProperty(textColour)
-    val alignment = alignment2DProperty(vec2(0.5f))
+    val textAlignment = alignment2DProperty(vec2(0.5f))
     val font = mutableProperty(null as Font?)
     val clicked = Subscribable<MouseClickEvent>()
 
@@ -54,14 +61,13 @@ class Button(
     override fun draw() {
         val font = font.value ?: drawContext.DEFAULT_FONT
         val space = size - padding.value.size - vec2(font.widthOf(text.value), font.lineHeight)
-        val colour = colour.value
+
+        background.draw(drawContext, position, size) { c -> c
                 .let { if (hovering && !pressed) it.darken() else it }
                 .let { if (pressed) it.lighten() else it }
-
-        drawContext.colour.value = colour
-        drawContext.rectangle(position, size)
+        }
         drawContext.colour.value = textColour.value
-        drawContext.write(text.value, position + padding.value.topLeft + space * alignment.value, font)
+        drawContext.write(text.value, position + padding.value.topLeft + space * textAlignment.value, font)
     }
 
     ////////////////////////////////////////////////////////////////////////////
@@ -72,5 +78,8 @@ class Button(
     init {
         padding.value = Padding(16f, 32f)
         cursor.value = GLFWCursor.POINTER
+
+        addAnimatedProperty(background.colour)
+        addAnimatedProperty(background.imageAlignment)
     }
 }

@@ -21,7 +21,7 @@ fun RGBA.rgb() = rgb(x, y, z)
 fun RGBA.alpha(a: Float) = rgba(x, y, z, a)
 
 fun RGBA.darken() = vec3().length().let { this * max(it - 0.07f, 0f) / it }
-fun RGBA.lighten() = vec3().length().let { this * min(it + 0.07f, 1f) / it }
+fun RGBA.lighten() = vec3().length().let { this * min(it + 0.07f, MAX_BRIGHTNESS) / it }
 
 object Colour {
     val white: RGBA = rgba(1.0f)
@@ -35,3 +35,5 @@ object Colour {
     val purple: RGBA = rgb(0.40f, 0.20f, 0.60f).normalise(1.05f).rgba()
     val yellow: RGBA = rgb(0.90f, 0.84f, 0.00f).normalise(1.26f).rgba()
 }
+
+const val MAX_BRIGHTNESS = 1.73205081f
