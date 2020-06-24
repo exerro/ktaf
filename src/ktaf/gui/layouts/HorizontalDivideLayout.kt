@@ -10,7 +10,7 @@ import ktaf.gui.core.Layout
 import ktaf.gui.core.UINode
 import ktaf.gui.core.alignment2DProperty
 
-class HorizontalDivideLayout(private val partitions: List<Value<Ratio>>): Layout() {
+class HorizontalDivideLayout(val partitions: List<Value<Ratio>>): Layout() {
     val alignment = alignment2DProperty(vec2_zero)
     val spacing = mutableProperty(0f)
 

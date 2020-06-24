@@ -36,7 +36,7 @@ class ObservableList<T> internal constructor(
             = elements.map(this::add).any()
 
     override fun clear()
-            = items.forEach { remove(it) }
+            = items.toList().forEach { remove(it) }
 
     override fun remove(element: T)
             = indexOf(element).takeIf { it != -1 } ?.let(this::removeAt) != null

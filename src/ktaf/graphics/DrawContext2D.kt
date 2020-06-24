@@ -10,20 +10,28 @@ import lwjglkt.gl.enum.*
 import lwjglkt.util.*
 import lwjglktx.font.FNTFont
 import lwjglktx.font.Font
+import lwjglktx.font.FontShaderGenerator
 import lwjglktx.font.loadDefaultFont
 
 class DrawContext2D(
         glContext: GLContext,
         screenSize: Value<vec2>
 ): DrawContext(glContext, screenSize) {
-    val DEFAULT_FONT: Font = FNTFont.loadDefaultFont(glContext, 20f)
-
+    val DEFAULT_FONT: Font = FNTFont.loadDefaultFont(glContext, 24f)
     val colour = mutableProperty(rgba(1f))
 
     fun vao(count: Int, vao: GLVAO,
             transform: mat4 = mat4_identity,
-            texture: GLTexture2? = null
+            texture: GLTexture2? = null,
+            shader: GLShaderProgram = defaultShader
     ) {
+        if (lastActiveShader != shader) {
+            lastActiveShader = shader
+            shader.use()
+        }
+
+        shader.use()
+
         shader.uniform("u_viewportSize", viewportSize.value)
         shader.uniform("u_colour", colour.value)
         shader.uniform("u_transform", transform)
@@ -32,13 +40,13 @@ class DrawContext2D(
 
         texture?.use(0)
 
-        shader.useIn {
-            vao.bindIn {
-                currentContext.gl.drawElements(count)
-            }
+        vao.bindIn {
+            currentContext.gl.drawElements(count)
         }
 
         texture?.stopUsing()
+
+        shader.stopUsing()
     }
 
     fun image(texture: GLTexture2, position: vec2, scale: vec2 = vec2_one) {
@@ -61,11 +69,11 @@ class DrawContext2D(
     }
 
     fun triangle(a: vec2, b: vec2, c: vec2) {
-        shader.uniform("u_viewportSize", viewportSize.value)
-        shader.uniform("u_colour", colour.value)
+        defaultShader.uniform("u_viewportSize", viewportSize.value)
+        defaultShader.uniform("u_colour", colour.value)
         quadBuffer.subData(floatArrayOf(a.x, a.y, 0f, b.x, b.y, 0f, c.x, c.y, 0f))
 
-        shader.useIn {
+        defaultShader.useIn {
             triVAO.bindIn {
                 currentContext.gl.drawArrays(3)
             }
@@ -108,26 +116,27 @@ class DrawContext2D(
     }
 
     fun point(position: vec2, size: Float = 2f) {
-        shader.uniform("u_viewportSize", viewportSize.value)
-        shader.uniform("u_colour", colour.value)
+        defaultShader.uniform("u_viewportSize", viewportSize.value)
+        defaultShader.uniform("u_colour", colour.value)
         pointBuffer.subData(floatArrayOf(position.x, position.y, 0f))
 
         currentContext.gl.rasterState {
             pointSize(size)
         }
 
-        shader.useIn {
+        defaultShader.useIn {
             pointVAO.bindIn {
                 currentContext.gl.drawArrays(GLDrawMode.GL_POINTS, 1)
             }
         }
     }
 
-    fun write(text: String, position: vec2 = vec2_zero, font: Font = DEFAULT_FONT) {
+    fun write(text: String, position: vec2 = vec2_zero, font: Font = DEFAULT_FONT, monospaceAdvance: Float? = null) {
         if (text == "") return
 
-        var x = position.x - (text.getOrNull(0)?.let(font::getCharOffsetX) ?: 0f)
+        var x = position.x - (monospaceAdvance?.let { 0f } ?: text.getOrNull(0)?.let(font::getCharOffsetX) ?: 0f)
         val y = position.y + font.lineHeight - font.baseline
+        val shader = fsg.get(font)
 
         (text.zip(text.drop(1)) + listOf(text.last() to null)).forEach { (char, next) ->
             val offsetX = font.getCharOffsetX(char)
@@ -135,9 +144,10 @@ class DrawContext2D(
             val translation = vec3(x + offsetX, y + offsetY, 0f)
             vao(font.getVAOVertexCount(char), font.getVAO(char),
                     transform=mat4_translate(translation),
-                    texture=font.getTexture(char))
-            x += font.getCharAdvance(char)
-            next ?.let { x += font.getKerning(char, next) }
+                    texture=font.getTexture(char),
+                    shader=shader)
+            x += monospaceAdvance ?: font.getCharAdvance(char)
+            if (monospaceAdvance == null) next ?.let { x += font.getKerning(char, next) }
         }
     }
 
@@ -171,27 +181,40 @@ class DrawContext2D(
     }
 
     ////////////////////////////////////////////////////////////////////////////
+    override fun end() {
+        lastActiveShader?.stopUsing()
+        lastActiveShader = null
+        super.end()
+    }
 
-    private val shader: GLShaderProgram
+    ////////////////////////////////////////////////////////////////////////////
+
+    private val defaultShader: GLShaderProgram
+    private val vertex: GLShader
     private val quadBuffer: GLVBO
     private val triBuffer: GLVBO
     private val pointBuffer: GLVBO
     private val quadVAO: GLVAO
     private val triVAO: GLVAO
     private val pointVAO: GLVAO
+    private var lastActiveShader: GLShaderProgram? = null
 
     ////////////////////////////////////////////////////////////////////////////
 
     init {
         val current = glContext.waitToMakeCurrent()
 
-        shader = current.createShaderProgram(
-                current.createShader(GLShaderType.GL_VERTEX_SHADER, VERTEX_SHADER_CODE),
+        vertex = current.createShader(GLShaderType.GL_VERTEX_SHADER, VERTEX_SHADER_CODE)
+
+        defaultShader = current.createShaderProgram(
+                vertex,
                 current.createShader(GLShaderType.GL_FRAGMENT_SHADER, FRAGMENT_SHADER_CODE)
         )
 
         quadBuffer = current.createBuffer(
                 floatArrayOf(0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f))
+
+//        println("Quad buffer ID: ${quadBuffer.id}")
 
         triBuffer = current.createBuffer(
                 floatArrayOf(0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f))
@@ -214,7 +237,7 @@ class DrawContext2D(
             val uvs = current.createUVBuffer(floatArrayOf(0f, 0f, 0f, 1f, 1f, 1f))
             val colours = current.createColourBuffer(3)
 
-            bindPositionBuffer(quadBuffer)
+            bindPositionBuffer(triBuffer)
             bindUVBuffer(uvs)
             bindColourBuffer(colours)
         }
@@ -222,12 +245,17 @@ class DrawContext2D(
         pointVAO = current.createVAO {
             val colours = current.createColourBuffer(1)
 
-            bindPositionBuffer(quadBuffer)
+            bindPositionBuffer(pointBuffer)
             bindColourBuffer(colours)
         }
 
         current.free()
     }
+
+    ////////////////////////////////////////////////////////////////////////////
+
+    private val fsg = FontShaderGenerator { fragment ->
+        currentContext.createShaderProgram(vertex, fragment) }
 }
 
 private const val VERTEX_SHADER_CODE = """

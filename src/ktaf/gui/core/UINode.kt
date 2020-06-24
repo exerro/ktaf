@@ -181,8 +181,8 @@ abstract class UINode: UINodeEvents, UINodePositioning {
     private var sizeAnimation: Animation<vec2>? = null
 
     // TODO: make these properties
-    private val entrance = Entrance.grow // Entrance.fromLeft()
-    internal val exit = Exit.shrink // Exit.toTop()
+    var entrance = Entrance.grow // Entrance.fromLeft()
+    var exit = Exit.shrink // Exit.toTop()
     private val ANIMATION_DURATION = 0.3f
     private val ANIMATION_EASING = EasingFunctions.smooth
 

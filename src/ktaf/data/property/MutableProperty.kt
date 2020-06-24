@@ -12,7 +12,7 @@ fun <T> mutableProperty(value: T) = MutableProperty(value)
 
 open class MutableProperty<T>(
         protected var rawValue: T
-): Value<T>, ArrowOverloadLHS<Value<T>> {
+): Value<T>, ArrowOverloadLHS<Value<T>, Unit> {
     override var value
         get() = rawValue
         set(new) {

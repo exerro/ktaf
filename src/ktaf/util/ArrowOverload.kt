@@ -1,7 +1,7 @@
 package ktaf.util
 
-interface ArrowOverloadLHS<T> {
-    fun arrowOperator(value: T)
+interface ArrowOverloadLHS<T, R> {
+    fun arrowOperator(value: T): R
 }
 
 @Suppress("UNCHECKED_CAST")
@@ -13,7 +13,7 @@ class ArrowOverloadRHSInstance<T> internal constructor(
         internal val value: T
 )
 
-operator fun <T> ArrowOverloadLHS<T>.compareTo(value: ArrowOverloadRHSInstance<T>): Int {
+operator fun <T, R> ArrowOverloadLHS<T, R>.compareTo(value: ArrowOverloadRHSInstance<T>): Int {
     arrowOperator(value.value)
     return 0
 }

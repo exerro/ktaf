@@ -57,6 +57,26 @@ class UIScene<Root: UINode>(
         currentNode?.handleMouseEvent(event)
     }
 
+    fun mouseDragged(event: MouseDragEvent) {
+        currentNode?.handleMouseEvent(event)
+    }
+
+    fun mouseScrolled(event: MouseScrollEvent) {
+        root.getMouseHandler(event.position)?.handleMouseEvent(event)
+    }
+
+    fun keyPressed(event: KeyPressEvent) {
+        root.getKeyHandler(event)?.handleKeyEvent(event)
+    }
+
+    fun keyReleased(event: KeyReleaseEvent) {
+        root.getKeyHandler(event)?.handleKeyEvent(event)
+    }
+
+    fun input(event: TextInputEvent) {
+        root.getInputHandler()?.handleInput(event)
+    }
+
     fun attach() {
         // this is important to stop the scene from being garbage collected
         // if the scene is garbage collected then the callbacks below will be
@@ -69,6 +89,11 @@ class UIScene<Root: UINode>(
         window.events.mouseReleased.subscribe(this) { scene.mouseReleased(it) }
         window.events.mouseClicked.subscribe(this) { scene.mouseClicked(it) }
         window.events.mouseMoved.subscribe(this) { scene.mousePosition = it.position }
+        window.events.mouseDragged.subscribe(this) { scene.mouseDragged(it) }
+        window.events.mouseScrolled.subscribe(this) { scene.mouseScrolled(it) }
+        window.events.keyPressed.subscribe(this) { scene.keyPressed(it) }
+        window.events.keyReleased.subscribe(this) { scene.keyReleased(it) }
+        window.events.input.subscribe(this) { scene.input(it) }
 
         mousePosition = window.glfwWindow.cursorPosition
     }
@@ -80,6 +105,10 @@ class UIScene<Root: UINode>(
         window.events.mouseReleased.unsubscribe(this)
         window.events.mouseClicked.unsubscribe(this)
         window.events.mouseMoved.unsubscribe(this)
+        window.events.mouseScrolled.unsubscribe(this)
+        window.events.keyPressed.unsubscribe(this)
+        window.events.keyReleased.unsubscribe(this)
+        window.events.input.unsubscribe(this)
     }
 
     ////////////////////////////////////////////////////////////////////////////

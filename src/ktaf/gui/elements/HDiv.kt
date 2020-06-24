@@ -37,7 +37,7 @@ open class HDiv(
 
     ////////////////////////////////////////////////////////////////////////////
 
-    override val layout: HorizontalDivideLayout
+    override public val layout: HorizontalDivideLayout
 
     init {
         val h = HorizontalDivideLayout(partitions)
